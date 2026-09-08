@@ -1,0 +1,1 @@
+<span class="badge {{ $color }} rounded-pill d-inline">{{ $spanValue }}</span>

@@ -1,0 +1,209 @@
+@media screen and (max-width: 600px) {
+    #author-options {
+        display: none;
+    }
+}
+
+.read-more-hide {
+    cursor: pointer;
+}
+
+.hide_content {
+    display: none;
+}
+
+.read-more-show {
+    cursor: pointer;
+}
+
+/*table css
+@media screen and (max-width: 991px) {
+    .table {
+        margin: 0 auto;
+        width: 100%;
+        border-spacing: 0;
+    }
+
+    .table thead {
+        position: inherit;
+        clip: rect(1px, 1px, 1px, 1px);
+        padding: 0;
+        border: 0;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+        
+    }
+
+    .table tbody,
+    .table tr,
+    .table th,
+    .table td {
+        display: block;
+        padding: 0;
+        text-align: left;
+        white-space: normal;
+    }
+
+    .table tr td,
+    .table tr th {
+        padding: 8px;
+        vertical-align: middle;
+        overflow: hidden;
+        position: relative;
+        vertical-align: top;
+        border: 1px solid #edf0f1;
+        border-top: none;
+        width: 100%;
+        white-space: normal;
+    }
+
+    .table th[scope="row"] {
+        width: 100%;
+        text-align: center;
+        display: block;
+        background-color: #b3bfc6;
+        margin: 0 auto;
+        padding: 0.5em 0;
+    
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .center {
+        width: 100%;
+    }
+}*/
+
+.testimonial-card .card-up {
+    height: 90px;
+    overflow: hidden;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+.testimonial-card .avatar {
+    width: 90px;
+    margin-top: -60px;
+    overflow: hidden;
+    border: 3px solid #fff;
+    border-radius: 50%;
+}
+
+.testimonial-card .card-body {
+    text-align: center;
+}
+
+.card-up {
+    background-color: #33642b;
+}
+
+/* css*/
+@import url("https://fonts.googleapis.com/css?family=Roboto");
+
+.mobile-show {
+    display: none;
+}
+
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+    .mobile-show {
+        display: inline;
+    }
+
+    .floating-container {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        margin: 8px;
+        display: flex;
+        justify-content: end;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    #toggle {
+        -webkit-appearance: none;
+    }
+
+    .button {
+        position: absolute;
+        z-index: 999;
+        width: 43px;
+        height: 43px;
+        background: #3b71ca;
+        border-radius: 100%;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        top: -12px;
+    }
+
+    .button:before {
+        position: absolute;
+        content: "";
+        width: 20px;
+        height: 2px;
+        background: #fff;
+        transform: rotate(90deg);
+        transition: all 0.4s ease;
+    }
+
+    .button:after {
+        position: absolute;
+        content: "";
+        width: 20px;
+        height: 2px;
+        background: #fff;
+        transition: all 0.4s ease;
+    }
+
+    .nav-area {
+        opacity: 0;
+        transition: all 0.4s ease-in-out;
+        background: #fff;
+        width: 100%;
+        border-radius: 5px;
+        transform: translateY(0%);
+        box-shadow: 2px 3px 10px 0 rgba(81, 81, 81, 0.1);
+        border: 1px solid #e4e4e4;
+        padding: 10px;
+    }
+
+    .nav-area ul {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav-area a {
+        text-align: center;
+        margin: 20px 0;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .nav-area a:hover {
+        color: #c784dd;
+    }
+
+    #toggle:checked ~ .nav-area {
+        opacity: 1;
+        transform: translateY(-106%);
+    }
+
+    #toggle:checked ~ .button:before {
+        transform: rotate(225deg);
+    }
+
+    #toggle:checked ~ .button:after {
+        transform: rotate(135deg);
+    }
+
+    @media (max-width: 640px) {
+        .container {
+            width: 100%;
+        }
+    }
+}

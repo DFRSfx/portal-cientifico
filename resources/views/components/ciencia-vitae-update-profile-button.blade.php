@@ -1,0 +1,14 @@
+<div class="list-group list-group-flush pt-3">
+    <button id="update-author-information" type="button"
+        class="btn btn-rounded gain-bg ripple-surface-dark text-white"
+        style="background-color:#2A6B20;" 
+        data-mdb-ripple-color="dark"
+        data-author-id="{{ $authorId }}">
+        {{ __('Atualizar ciencia vitae') }}
+    </button>
+
+    <div id="update-message-container" class="mt-2 position-relative"></div>
+</div>
+@pushOnce('scripts')
+    <script src="{{ asset('javascript/authors/updateProfile.js') }}"></script>
+@endPushOnce

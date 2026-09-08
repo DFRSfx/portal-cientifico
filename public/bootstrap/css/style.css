@@ -1,0 +1,94 @@
+body {
+	background-color: #f9f9f9;
+}
+.btn.btn-outline-dark.btn-lg.btn-block {
+  text-align: left;
+}
+
+
+.card-up {
+background-color: #000960;}
+
+.navbar-brand img {
+  max-width: 175px;
+}
+
+
+.dropdown-dots.dropdown-toggle::after {
+  display: none;
+}
+
+.link-post {
+  color: #4f4f4f;
+  border-radius: .25rem;
+  padding-bottom: .9rem;
+  transition: all .2s ease-in-out;
+}
+
+.link-post:hover {
+  color: #4f4f4f;
+  background-color: rgba(0, 0, 0, .1);
+  transition: all .2s ease-in-out;
+}
+
+.link-grey {
+  color: #4f4f4f;
+}
+
+.link-grey:hover {
+  color: #4f4f4f;
+}
+
+.link-underline {
+  color: #262626;
+  font-weight: 500;
+}
+
+.link-underline:hover {
+  text-decoration: underline;
+  color: #000960;
+}
+
+.gain-bg
+{
+  background-color: #000960;
+  color:white;
+}
+
+.gain-bg:hover{
+  background-color: #06127a;
+  color:white;
+}
+
+
+.icon-underline {
+  color: #4f4f4f;
+}
+
+.icon-underline:hover {
+  color: #000960;
+  text-decoration: underline;
+}
+
+.testimonial-card .card-up {
+  height: 90px;
+  overflow: hidden;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+
+.testimonial-card .avatar {
+  width: 90px;
+  margin-top: -60px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  border-radius: 50%;
+}
+
+.testimonial-card .card-body {
+  text-align: center;
+}
+
+.font-weight-bold {
+  font-weight: 500 !important;
+}
