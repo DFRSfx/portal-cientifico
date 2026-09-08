@@ -7,6 +7,7 @@ use App\Models\Book;
 use App\Models\Jury;
 use App\Models\User;
 use \GuzzleHttp\Pool;
+use GuzzleHttp\Exception\GuzzleException;
 use App\Models\Author;
 use App\Models\Output;
 use App\Models\Keyword;
@@ -16,6 +17,11 @@ use App\Models\OutputType;
 use App\Models\Supervisor;
 use PhpParser\JsonDecoder;
 use App\Models\BookChapter;
+use App\Models\BookReview;
+use App\Models\EditedBook;
+use App\Models\EncyclopediaEntry;
+use App\Models\ExhibitionCatalogue;
+use App\Models\JournalIssue;
 use App\Models\ServiceType;
 use App\Models\Supervision;
 use App\Models\AuthorDegree;
@@ -23,16 +29,26 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\TransferStats;
 use App\Models\JournalArticle;
+use App\Models\Manual;
 use App\Models\ConferencePaper;
 use App\Models\ConferencePoster;
 use App\Models\MagazineArticles;
+use App\Models\NewsletterArticle;
 use App\Models\NewspaperArticle;
+use App\Models\OnlineResource;
+use App\Models\Preprint;
+use App\Models\PrefacePostface;
+use App\Models\Report;
 use App\Models\AuthorEmployments;
 use App\Models\AuthorCitationName;
 use App\Models\CommiteeMembership;
 use App\Models\ConferenceAbstract;
 use App\Models\EventParticipation;
+use App\Models\Test;
 use App\Models\ThesisDissertation;
+use App\Models\Translation;
+use App\Models\Website;
+use App\Models\WorkingPaper;
 use Illuminate\Support\Facades\DB;
 use App\Models\EventAdministration;
 use App\Models\AuthorSpokenLanguage;
@@ -64,6 +80,12 @@ class CienciaVitaeController extends Controller
             "year-column" => "publication-date",
             "attribute" => "journal-article"
         ],
+        "P102" => [
+            "table-class" => JournalIssue::class,
+            "title-atribute-name" => "issue-title",
+            "year-column" => "publication-date",
+            "attribute" => "journal-issue"
+        ],
         "P113" => [
             "table-class" => MagazineArticles::class,
             "title-atribute-name" => "article-title",
@@ -82,11 +104,29 @@ class CienciaVitaeController extends Controller
             "year-column" => "publication-year",
             "attribute" => "book"
         ],
+        "P104" => [
+            "table-class" => EditedBook::class,
+            "title-atribute-name" => "title",
+            "year-column" => "publication-year",
+            "attribute" => "edited-book"
+        ],
         "P105" => [
             "table-class" => BookChapter::class,
             "title-atribute-name" => "chapter-title",
             "year-column" => "publication-year",
             "attribute" => "book-chapter"
+        ],
+        "P106" => [
+            "table-class" => BookReview::class,
+            "title-atribute-name" => "review-title",
+            "year-column" => "date-of-review-publication",
+            "attribute" => "book-review"
+        ],
+        "P107" => [
+            "table-class" => Translation::class,
+            "title-atribute-name" => "title",
+            "year-column" => "publication-year",
+            "attribute" => "translation"
         ],
         "P108" => [
             "table-class" => ThesisDissertation::class,
@@ -100,11 +140,83 @@ class CienciaVitaeController extends Controller
             "year-column" => "publication-date",
             "attribute" => "newspapper-article"
         ],
+        "P111" => [
+            "table-class" => NewsletterArticle::class,
+            "title-atribute-name" => "article-title",
+            "year-column" => "publication-date",
+            "attribute" => "newsletter-article"
+        ],
+        "P112" => [
+            "table-class" => EncyclopediaEntry::class,
+            "title-atribute-name" => "entry-title",
+            "year-column" => "publication-date",
+            "attribute" => "encyclopedia-entry"
+        ],
+        "P114" => [
+            "table-class" => DictionaryEntry::class,
+            "title-atribute-name" => "dictionary-title",
+            "year-column" => "publication-date",
+            "attribute" => "dictionary-entry"
+        ],
+        "P115" => [
+            "table-class" => Report::class,
+            "title-atribute-name" => "report-title",
+            "year-column" => "date-submitted",
+            "attribute" => "report"
+        ],
+        "P116" => [
+            "table-class" => WorkingPaper::class,
+            "title-atribute-name" => "title",
+            "year-column" => "publication-date",
+            "attribute" => "working-paper"
+        ],
+        "P118" => [
+            "table-class" => Manual::class,
+            "title-atribute-name" => "title",
+            "year-column" => "publication-year",
+            "attribute" => "manual"
+        ],
+        "P119" => [
+            "table-class" => OnlineResource::class,
+            "title-atribute-name" => "title",
+            "year-column" => "creation-date",
+            "attribute" => "online-resource"
+        ],
+        "P120" => [
+            "table-class" => Test::class,
+            "title-atribute-name" => "title",
+            "year-column" => "date-first-used",
+            "attribute" => "test"
+        ],
+        "P121" => [
+            "table-class" => Website::class,
+            "title-atribute-name" => "title",
+            "year-column" => "launch-date",
+            "attribute" => "website"
+        ],
         "P123" => [
             "table-class" => ConferenceAbstract::class,
             "title-atribute-name" => "article-title",
             "year-column" => "publication-date",
             "attribute" => "conference-abstract"
+        ],
+        "P125" => [
+            "table-class" => ExhibitionCatalogue::class,
+            "title-atribute-name" => "title",
+            "year-column" => "publication-year",
+            "attribute" => "exhibition-catalogue"
+        ],
+        "P126" => [
+            "table-class" => PrefacePostface::class,
+            "title-atribute-name" => "preface-postface-title",
+            "year-column" => "publication-year",
+            "attribute" => "preface-postface"
+        ],
+        "P127" => [
+            "table-class" => Preprint::class,
+            "title-atribute-name" => "title",
+            "year-column" => "date-submitted",
+            "attribute" => "preprint"
         ]
     ];
 
@@ -115,6 +227,8 @@ class CienciaVitaeController extends Controller
             "attribute" => "event-administration",
             "start-date-attribute" => "activity-start-date",
             "end-date-attribute" => "activity-end-date",
+            "title-atribute-name" => "article-title",
+
         ],
         "S202" => [
             "table-class" => EventParticipation::class,
@@ -162,8 +276,19 @@ class CienciaVitaeController extends Controller
         $this->apiAddress = config("app.ciencia_vitae_url_pd");
 
         $curlSSLVerify = config('app.curl_ssl_verify');
+        $timeoutSeconds = 30;
+        $connectTimeoutSeconds = 10;
 
-        $this->client = new \GuzzleHttp\Client(['base_uri' => $this->apiAddress, 'verify' => $curlSSLVerify, "headers" => ["accept" => "application/json", "authorization" => $this->authorization]]);
+        $this->client = new \GuzzleHttp\Client([
+            'base_uri' => $this->apiAddress,
+            'verify' => $curlSSLVerify,
+            'timeout' => $timeoutSeconds,
+            'connect_timeout' => $connectTimeoutSeconds,
+            'headers' => [
+                'accept' => 'application/json',
+                'authorization' => $this->authorization,
+            ],
+        ]);
     }
 
     /**
@@ -183,6 +308,9 @@ class CienciaVitaeController extends Controller
             $responseArray = json_decode($request->getBody()->getContents(), true);
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
             return $e->getCode();
+        } catch (GuzzleException $e) {
+            $code = $e->getCode();
+            return $code ? $code : -1;
         }
 
         return $responseArray;
@@ -224,9 +352,27 @@ public function updateAuthorInformation($responseArray, $authorObject)
         $googleScholarId = "";
         $researcherId = "";
         $scopusId = "";
+        $authenticusId = "";
+        $researchGateProfile = "";
+        $lattesId = "";
 
-        if (isset($responseArray["identifying-info"]["author-identifiers"]["author-identifier"])) {
-            foreach ($responseArray["identifying-info"]["author-identifiers"]["author-identifier"] as $identifier) {
+        $identifyingInfo =
+            $responseArray["identifying-info"] ??
+            $responseArray["identifyingInfo"] ??
+            $responseArray["identifying_info"] ??
+            [];
+
+        $authorIdentifiersBlock =
+            $identifyingInfo["author-identifiers"] ??
+            $identifyingInfo["authorIdentifiers"] ??
+            [];
+        $authorIdentifiers =
+            $authorIdentifiersBlock["author-identifier"] ??
+            $authorIdentifiersBlock["authorIdentifier"] ??
+            [];
+
+        if (!empty($authorIdentifiers)) {
+            foreach ($authorIdentifiers as $identifier) {
                     $identifierType = $identifier["identifier-type"] ?? [];
                     $identifierTypeCodeRaw =
                         ($identifierType["code"] ?? null) ??
@@ -234,6 +380,8 @@ public function updateAuthorInformation($responseArray, $authorObject)
                         ($identifierType["label"] ?? null) ??
                         ($identifierType["name"] ?? null) ??
                         ($identifier["identifier-type-code"] ?? null) ??
+                        ($identifier["identifierType"]["code"] ?? null) ??
+                        ($identifier["identifierType"]["value"] ?? null) ??
                         "";
                     $identifierTypeCode = strtoupper(trim((string) $identifierTypeCodeRaw));
 
@@ -285,6 +433,13 @@ public function updateAuthorInformation($responseArray, $authorObject)
                 $researcherId = $researchGateProfile;
             }
 
+        $resumeValue = $identifyingInfo["resume"]["value"] ?? $identifyingInfo["resume"]["value"] ?? null;
+        $lastModifiedDate = $responseArray["last-modified-date"] ?? $responseArray["lastModifiedDate"] ?? null;
+        $privacyLevel =
+            $identifyingInfo["person-info"]["photography"]["privacy-level"] ??
+            $identifyingInfo["personInfo"]["photography"]["privacyLevel"] ??
+            null;
+
         $authorObject->update([
                 "orcid" => $orcid,
                 "id_google_scholar" => $googleScholarId,
@@ -294,15 +449,25 @@ public function updateAuthorInformation($responseArray, $authorObject)
                 "researchgate_profile" => $researchGateProfile,
                 "id_lattes" => $lattesId,
                 "profile_is_public" => 1,
-                "resume" => ($responseArray["identifying-info"]["resume"]["value"] ?? null),
-                "profile_updated_date" => date('Y-m-d', strtotime($responseArray["last-modified-date"])),
-                "profile_image_is_public" => ($responseArray["identifying-info"]["person-info"]["photography"]["privacy-level"] == "publico")
+                "resume" => $resumeValue,
+                "profile_updated_date" => $lastModifiedDate ? date('Y-m-d', strtotime($lastModifiedDate)) : null,
+                "profile_image_is_public" => ($privacyLevel == "publico")
             ]);
 
-        if (isset($responseArray["identifying-info"]["citation-names"])) {
+        $citationNamesBlock =
+            $identifyingInfo["citation-names"] ??
+            $identifyingInfo["citationNames"] ??
+            null;
+
+        if (!empty($citationNamesBlock)) {
             $citations = [];
 
-            foreach ($responseArray["identifying-info"]["citation-names"]["citation-name"] as $citationName) {
+            $citationNameItems =
+                $citationNamesBlock["citation-name"] ??
+                $citationNamesBlock["citationName"] ??
+                [];
+
+            foreach ($citationNameItems as $citationName) {
                 $citation = AuthorCitationName::firstOrCreate(["citation_name" => $citationName["value"], "author_id" => $authorObject->id]);
                 array_push($citations, $citation->id);
             }
@@ -320,33 +485,95 @@ public function updateAuthorInformation($responseArray, $authorObject)
             $authorObject->citationName()->whereNotIn("id", $citations)->delete();
         }
 
-        if (isset($responseArray["identifying-info"]["emails"])) {
+        $emailsBlock = $identifyingInfo["emails"] ?? null;
+
+        if (!empty($emailsBlock)) {
             $authorObject->emails()->delete();
 
             $emailsToInsert = [];
+            $seenEmails = [];
+            $now = now();
 
-            foreach ($responseArray["identifying-info"]["emails"]["email"] as $emails) {
-                if (isset($emails["emailAddress"])) {
+            $emailItems = $emailsBlock["email"] ?? [];
+
+            foreach ($emailItems as $emails) {
+                $emailAddress =
+                    $emails["emailAddress"] ??
+                    $emails["email-address"] ??
+                    $emails["email_address"] ??
+                    $emails["address"] ??
+                    $emails["value"] ??
+                    null;
+                $emailUseType =
+                    $emails["emailType"]["value"] ??
+                    $emails["email-type"]["value"] ??
+                    $emails["emailType"]["label"] ??
+                    $emails["emailType"] ??
+                    null;
+
+                $emailAddress = is_string($emailAddress) ? trim($emailAddress) : $emailAddress;
+
+                if (!empty($emailAddress) && !isset($seenEmails[$emailAddress])) {
+                    $seenEmails[$emailAddress] = true;
                     array_push($emailsToInsert, [
-                        "email" => ($emails["emailAddress"])
+                        "email" => $emailAddress,
+                        "use_type" => $emailUseType,
+                        "author_id" => $authorObject->id,
+                        "created_at" => $now,
+                        "updated_at" => $now
                     ]);
                 }
             }
 
             if (count($emailsToInsert) != 0) {
-                $authorObject->emails()->createMany($emailsToInsert);
+                $authorObject->emails()->insertOrIgnore($emailsToInsert);
             }
         }
 
-        if (isset($responseArray["identifying-info"]["phone-numbers"])) {
+        $phonesBlock =
+            $identifyingInfo["phone-numbers"] ??
+            $identifyingInfo["phoneNumbers"] ??
+            null;
+
+        if (!empty($phonesBlock)) {
             $authorObject->phones()->delete();
 
             $phonesToInsert = [];
 
-            foreach ($responseArray["identifying-info"]["phone-numbers"]["phone-number"] as $phone) {
-                if (isset($phone["localNumber"])) {
+            $phoneItems =
+                $phonesBlock["phone-number"] ??
+                $phonesBlock["phoneNumber"] ??
+                [];
+
+            foreach ($phoneItems as $phone) {
+                $phoneNumber =
+                    $phone["localNumber"] ??
+                    $phone["local-number"] ??
+                    $phone["local_number"] ??
+                    $phone["internationalNumber"] ??
+                    $phone["international-number"] ??
+                    $phone["international_number"] ??
+                    $phone["number"] ??
+                    $phone["value"] ??
+                    null;
+                $phoneType =
+                    $phone["phoneType"]["value"] ??
+                    $phone["phoneType"]["label"] ??
+                    $phone["type"]["value"] ??
+                    $phone["type"] ??
+                    null;
+                $usageType =
+                    $phone["usageType"]["value"] ??
+                    $phone["usageType"]["label"] ??
+                    $phone["usageType"] ??
+                    null;
+                $resolvedType = $phoneType ?? $usageType;
+
+                if (!empty($phoneNumber)) {
                     array_push($phonesToInsert, [
-                        "phone" => $phone["localNumber"]
+                        "number" => $phoneNumber,
+                        "type" => $resolvedType,
+                        "use_type" => $usageType
                     ]);
                 }
             }
@@ -356,15 +583,60 @@ public function updateAuthorInformation($responseArray, $authorObject)
             }
         }
 
-        if (isset($responseArray["identifying-info"]["mailing-addresses"])) {
+        $addressesBlock =
+            $identifyingInfo["mailing-addresses"] ??
+            $identifyingInfo["mailingAddresses"] ??
+            null;
+
+        if (!empty($addressesBlock)) {
             $authorObject->addresses()->delete();
 
             $addressesToInsert = [];
 
-            foreach ($responseArray["identifying-info"]["mailing-addresses"]["mailing-address"] as $address) {
-                if (isset($address["streetAddress"])) {
+            $addressItems =
+                $addressesBlock["mailing-address"] ??
+                $addressesBlock["mailingAddress"] ??
+                [];
+
+            foreach ($addressItems as $address) {
+                $street =
+                    $address["streetAddress"] ??
+                    $address["street-address"] ??
+                    $address["street_address"] ??
+                    $address["addressLine"] ??
+                    $address["address-line"] ??
+                    $address["address"] ??
+                    null;
+                $postalCode = $address["postalCode"] ?? $address["postal-code"] ?? $address["postal_code"] ?? null;
+                $city = $address["city"] ?? null;
+                $locality = $address["locality"] ?? null;
+                $municipality = $address["municipality"] ?? null;
+                if (!empty($locality) && !empty($municipality) && $locality !== $municipality) {
+                    $city = trim($locality . ', ' . $municipality);
+                } elseif (empty($city)) {
+                    $city = $locality ?? $municipality;
+                }
+                $state = $address["provinceState"] ?? $address["state"] ?? $address["region"] ?? null;
+                $country = $address["country"]["value"] ?? $address["country"] ?? null;
+                $addressUseType =
+                    $address["addressType"]["value"] ??
+                    $address["addressType"]["label"] ??
+                    $address["addressType"] ??
+                    null;
+
+                if (!empty($street) || !empty($postalCode) || !empty($city) || !empty($state) || !empty($country)) {
+                    $streetValue = $street ?? '';
+                    $postalCodeValue = $postalCode ?? '';
+                    $cityValue = $city ?? '';
+                    $stateValue = $state ?? '';
+                    $countryValue = $country ?? '';
                     array_push($addressesToInsert, [
-                        "address" => $address["streetAddress"]
+                        "adress" => $streetValue,
+                        "postal_code" => $postalCodeValue,
+                        "city" => $cityValue,
+                        "state" => $stateValue,
+                        "country" => $countryValue,
+                        "use_type" => $addressUseType
                     ]);
                 }
             }
@@ -374,17 +646,106 @@ public function updateAuthorInformation($responseArray, $authorObject)
             }
         }
 
-        if (isset($responseArray["identifying-info"]["language-competencies"])) {
+        $websitesBlock =
+            $identifyingInfo["websites"] ??
+            $identifyingInfo["web-sites"] ??
+            $identifyingInfo["website"] ??
+            $identifyingInfo["web-site"] ??
+            $identifyingInfo["webAddresses"] ??
+            $identifyingInfo["web-addresses"] ??
+            null;
+
+        if (!empty($websitesBlock)) {
+            $authorObject->websites()->delete();
+
+            $rawItems =
+                $websitesBlock["website"] ??
+                $websitesBlock["web-site"] ??
+                $websitesBlock["webAddress"] ??
+                $websitesBlock["web-address"] ??
+                $websitesBlock;
+
+            if (!is_array($rawItems)) {
+                $rawItems = [];
+            }
+
+            $items = array_values($rawItems);
+            if (!empty($items) && array_keys($items) !== range(0, count($items) - 1)) {
+                $items = [$items];
+            }
+
+            $websitesToInsert = [];
+
+            foreach ($items as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+
+                $url =
+                    $item["url"] ??
+                    $item["uri"] ??
+                    $item["website-url"] ??
+                    $item["websiteUrl"] ??
+                    $item["value"] ??
+                    null;
+
+                $type =
+                    $item["siteType"]["value"] ??
+                    $item["siteType"]["label"] ??
+                    $item["type"]["value"] ??
+                    $item["type"]["label"] ??
+                    $item["type"] ??
+                    null;
+                $websiteUseType =
+                    $item["siteType"]["value"] ??
+                    $item["siteType"]["label"] ??
+                    $item["siteType"] ??
+                    null;
+
+                $label =
+                    $item["label"] ??
+                    $item["title"] ??
+                    $item["description"] ??
+                    null;
+
+                $url = $this->sanitizeCvUrl($url);
+
+                if (!empty($url)) {
+                    $websitesToInsert[] = [
+                        "url" => $url,
+                        "type" => $type,
+                        "label" => $label,
+                        "use_type" => $websiteUseType,
+                    ];
+                }
+            }
+
+            if (count($websitesToInsert) != 0) {
+                $authorObject->websites()->createMany($websitesToInsert);
+            }
+        }
+
+        $languagesBlock =
+            $identifyingInfo["language-competencies"] ??
+            $identifyingInfo["languageCompetencies"] ??
+            null;
+
+        if (!empty($languagesBlock)) {
             $languagesToInsert = [];
 
-            foreach ($responseArray["identifying-info"]["language-competencies"]["language-competency"] as $languages) {
+            $languageItems =
+                $languagesBlock["language-competency"] ??
+                $languagesBlock["languageCompetency"] ??
+                [];
+
+            foreach ($languageItems as $languages) {
                 $insertedOrExistinglanguage = Language::firstOrCreate(["language" => $languages["language"]["value"]]);
 
                 $languagesToInsert[$insertedOrExistinglanguage->id] = [
                     "speech_level" => (($languages["speak"]["value"] ?? null)),
                     "writing_level" => (($languages["write"]["value"] ?? null)),
-                    "listening_level" => (($languages["understand-spoken"]["value"] ?? null)),
-                    "peer_review_level" => (($languages["peer-review"]["value"] ?? null)),
+                    "listening_level" => (($languages["understand-spoken"]["value"] ?? null) ?? ($languages["understandSpoken"]["value"] ?? null)),
+                    "peer_review_level" => (($languages["peer-review"]["value"] ?? null) ?? ($languages["peerReview"]["value"] ?? null)),
                     "read-level" => (($languages["read"]["value"] ?? null))
                 ];
             }
@@ -392,10 +753,20 @@ public function updateAuthorInformation($responseArray, $authorObject)
             $authorObject->languages()->sync($languagesToInsert);
         }
 
-        if (isset($responseArray["identifying-info"]["domains-activity"])) {
+        $domainsBlock =
+            $identifyingInfo["domains-activity"] ??
+            $identifyingInfo["domainsActivity"] ??
+            null;
+
+        if (!empty($domainsBlock)) {
             $domainActivities = [];
 
-            foreach ($responseArray["identifying-info"]["domains-activity"]["domain-activity"] as $domainActivity) {
+            $domainItems =
+                $domainsBlock["domain-activity"] ??
+                $domainsBlock["domainActivity"] ??
+                [];
+
+            foreach ($domainItems as $domainActivity) {
                 if (isset($domainActivity["topic"])) {
                     $treatedActivities = StringTreatmentController::explodeAndReplaceSpecificCharacters($domainActivity["topic"]);
 
@@ -520,8 +891,22 @@ public function updateAuthorInformation($responseArray, $authorObject)
         }
 
         if (isset($responseArray["services"])) {
-            $authorObject->service()->delete();
-            $this->removePolymorphicRelations($this->cienciaVitaeServiceAttrs, "service");
+            try {
+                $authorObject->service()->delete();
+            } catch (\Throwable $e) {
+                \Log::warning('Service delete skipped due to lock error', [
+                    'author_id' => $authorObject->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            try {
+                $this->removePolymorphicRelations($this->cienciaVitaeServiceAttrs, "service");
+            } catch (\Throwable $e) {
+                \Log::warning('Service cleanup skipped due to lock error', [
+                    'author_id' => $authorObject->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             foreach ($responseArray["services"]["service"] as $service) {
                 $servicesAttributes = ($this->cienciaVitaeServiceAttrs[$service["service-category"]["code"]] ?? null);
@@ -529,7 +914,15 @@ public function updateAuthorInformation($responseArray, $authorObject)
                 if ($servicesAttributes) {
                     $serviceInformation = $service[$servicesAttributes["attribute"]];
                     $serviceType = ServiceType::firstOrCreate(["name" => $service["service-category"]["value"]]);
-                    $newPolymorphicService = new $servicesAttributes["table-class"]($this->serviceData($servicesAttributes["attribute"], $serviceInformation));
+                    $serviceData = $this->serviceData($servicesAttributes["attribute"], $serviceInformation);
+                    foreach ($serviceData as $key => $value) {
+                        if (is_string($value)) {
+                            $sanitized = $this->sanitizeCvText($value);
+                            $serviceData[$key] = $this->truncateCvString($sanitized ?? '', 255);
+                        }
+                    }
+
+                    $newPolymorphicService = new $servicesAttributes["table-class"]($serviceData);
                     $newPolymorphicService->save();
 
                     $newService = $newPolymorphicService->service()->create([
@@ -550,11 +943,22 @@ public function updateAuthorInformation($responseArray, $authorObject)
 
         if (isset($responseArray["outputs"])) {
             $publicationsAdded = [];
-            
+            $cvOutputIdsSeen = [];
+            $outputProcessingHadError = false;
+
             \Log::info('Starting outputs processing', [
                 'total_outputs' => count($responseArray["outputs"]["output"])
             ]);
             
+            $authorCitationNames = $authorObject->citationName()
+                ->pluck('citation_name')
+                ->map(fn ($name) => trim((string) $name))
+                ->filter()
+                ->values();
+            $authorCitationNamesLower = $authorCitationNames
+                ->map(fn ($name) => strtolower($name))
+                ->values();
+
             foreach ($responseArray["outputs"]["output"] as $output) {
                 $publicationsAttributes = ($this->outputs[$output["output-type"]["code"]]) ?? null;
 
@@ -565,30 +969,64 @@ public function updateAuthorInformation($responseArray, $authorObject)
                 ]);
 
                 if ($publicationsAttributes) {
-                    $publicationTypeAttribute = $publicationsAttributes["attribute"];
-                    $publicationTitleAttribute = $publicationsAttributes["title-atribute-name"];
-                    $publicationInformation = $output[$publicationTypeAttribute];
-                    $doi = "";
+                    $cvOutputIdsSeen[] = $output["id"];
 
-                    if (isset($publicationInformation["identifiers"])) {
-                        foreach ($publicationInformation["identifiers"]["identifier"] as $identifier) {
-                            if ($identifier["identifier-type"]["code"] == "doi") {
-                                $doi = $identifier["identifier"];
-                                break;
+                    try {
+                        $publicationTypeAttribute = $publicationsAttributes["attribute"];
+                        $publicationTitleAttribute = $publicationsAttributes["title-atribute-name"];
+                        $publicationInformation = $output[$publicationTypeAttribute];
+                        $doi = "";
+
+                        if (isset($publicationInformation["identifiers"])) {
+                            foreach ($publicationInformation["identifiers"]["identifier"] as $identifier) {
+                                if ($identifier["identifier-type"]["code"] == "doi") {
+                                    $doi = $identifier["identifier"];
+                                    break;
+                                }
                             }
                         }
-                    }
 
-                    if (isset($publicationInformation["authors"])) {
-                        \Log::info('Processing authors', [
-                            'author_count' => count($publicationInformation["authors"]["author"])
-                        ]);
-                        
-                        foreach ($publicationInformation["authors"]["author"] as $authorData) {
-                            $citationName = trim($authorData["value"] ?? "");
-                            
-                            if (!$citationName) {
-                                \Log::warning('No citation name found for author', ['author_data' => $authorData]);
+                        if (isset($publicationInformation["authors"])) {
+                            \Log::info('Processing authors', [
+                                'author_count' => count($publicationInformation["authors"]["author"])
+                            ]);
+                            $citationName = null;
+                            $authorCvId = trim((string) ($authorObject->userInformation->ciencia_vitae ?? ''));
+                            foreach ($publicationInformation["authors"]["author"] as $authorData) {
+                                $candidateName = trim((string) ($authorData["value"] ?? ""));
+                                if ($candidateName === '') {
+                                    continue;
+                                }
+
+                                $candidateCvId = trim((string) (
+                                    $authorData["ciencia-vitae-id"] ??
+                                    $authorData["ciencia-vitae"] ??
+                                    $authorData["cv-id"] ??
+                                    ""
+                                ));
+
+                                $matchesAuthor = false;
+                                if ($authorCvId !== '' && $candidateCvId !== '' && strcasecmp($authorCvId, $candidateCvId) === 0) {
+                                    $matchesAuthor = true;
+                                } elseif ($authorCitationNamesLower->contains(strtolower($candidateName))) {
+                                    $matchesAuthor = true;
+                                }
+
+                                if ($matchesAuthor) {
+                                    $citationName = $candidateName;
+                                    break;
+                                }
+                            }
+
+                            if ($citationName === null && $authorCitationNames->isNotEmpty()) {
+                                $citationName = $authorCitationNames->first();
+                            }
+
+                            if ($citationName === null) {
+                                \Log::warning('No matching citation name for author output', [
+                                    'author_id' => $authorObject->id,
+                                    'output_id' => $output["id"]
+                                ]);
                                 continue;
                             }
 
@@ -601,7 +1039,7 @@ public function updateAuthorInformation($responseArray, $authorObject)
                                     'citation_name' => $citationName,
                                     'author_id' => $authorObject->id
                                 ]);
-                                
+
                                 $citation = AuthorCitationName::create([
                                     'citation_name' => $citationName,
                                     'author_id' => $authorObject->id
@@ -617,7 +1055,10 @@ public function updateAuthorInformation($responseArray, $authorObject)
                                 ->where("ciencia_vitae_pub_id", "=", $output["id"])
                                 ->first();
 
-                            $title = ($publicationInformation[$publicationTitleAttribute]) ?? "";
+                            $title = $this->sanitizeCvText($publicationInformation[$publicationTitleAttribute] ?? "");
+                            if ($title === null) {
+                                $title = "";
+                            }
                             if (strlen($title) > 255) {
                                 $title = substr($title, 0, 255);
                             }
@@ -633,13 +1074,35 @@ public function updateAuthorInformation($responseArray, $authorObject)
 
                                 $dataToUpdate = $this->getPublicationData($publicationTypeAttribute, $publicationInformation);
                                 $tableColumns = \Schema::getColumnListing($publication->polymorphic()->getRelated()->getTable());
-                                
+
                                 foreach ($dataToUpdate as $key => $value) {
+                                    if (is_array($value)) {
+                                        $value = $this->normalizeCvScalar($value);
+                                    }
+
+                                    if (is_string($value)) {
+                                        $value = $this->sanitizeCvText($value);
+                                    }
+
+                                    if ($this->isUrlField($key)) {
+                                        $value = $this->sanitizeCvUrl($value);
+                                    }
+
                                     if (is_string($value) && strlen($value) > 255) {
-                                        $dataToUpdate[$key] = substr($value, 0, 255);
+                                        $value = substr($value, 0, 255);
+                                    }
+
+                                    $dataToUpdate[$key] = $value;
+                                }
+
+                                if (array_key_exists('encyclopedia_title', $dataToUpdate)) {
+                                    $titleValue = $dataToUpdate['encyclopedia_title'] ?? null;
+                                    if ($titleValue === null || $titleValue === '') {
+                                        $fallback = $this->sanitizeCvText($dataToUpdate['entry_title'] ?? null);
+                                        $dataToUpdate['encyclopedia_title'] = $fallback ?? 'Unknown';
                                     }
                                 }
-                                
+
                                 $dataToUpdate = array_filter(
                                     $dataToUpdate,
                                     fn($key) => in_array($key, $tableColumns),
@@ -648,55 +1111,124 @@ public function updateAuthorInformation($responseArray, $authorObject)
 
                                 $publication->polymorphic()->update($dataToUpdate);
 
+                                $citationString = $this->truncateCvString(
+                                    $this->returnValueIfNotNull($publicationInformation, "authors", "citation"),
+                                    255
+                                );
+
                                 $publication->update([
                                     "title" => $title,
                                     "doi" => ($doi) ?? null,
-                                    "citation_string" => $this->returnValueIfNotNull($publicationInformation, "authors", "citation"),
+                                    "citation_string" => $citationString,
                                     "year" => $this->returnValueIfNotNull($publicationInformation, $publicationsAttributes["year-column"], "year")
                                 ]);
-                                
+
                                 \Log::info('Updated existing publication', ['id' => $publication->id]);
                             } else {
                                 $publicationType = OutputType::firstOrCreate(["name" => $output["output-type"]["value"]]);
-                                
+
                                 $publicationData = $this->getPublicationData($publicationTypeAttribute, $publicationInformation);
-                                
+                                if (!is_array($publicationData)) {
+                                    \Log::warning('Publication data is not an array', [
+                                        'author_id' => $authorObject->id,
+                                        'output_id' => $output["id"],
+                                        'type' => $publicationTypeAttribute
+                                    ]);
+                                    $publicationData = [];
+                                }
+
                                 foreach ($publicationData as $key => $value) {
+                                    if (is_array($value)) {
+                                        $value = $this->normalizeCvScalar($value);
+                                    }
+
+                                    if (is_string($value)) {
+                                        $value = $this->sanitizeCvText($value);
+                                    }
+
+                                    if ($this->isUrlField($key)) {
+                                        $value = $this->sanitizeCvUrl($value);
+                                    }
+
+                                    if ($key === 'encyclopedia_title' && ($value === null || $value === '')) {
+                                        $fallback = $this->sanitizeCvText($publicationData['entry_title'] ?? null);
+                                        $value = $fallback ?? 'Unknown';
+                                    }
+
                                     if (is_string($value) && strlen($value) > 255) {
-                                        $publicationData[$key] = substr($value, 0, 255);
+                                        $value = substr($value, 0, 255);
+                                    }
+
+                                    $publicationData[$key] = $value;
+                                }
+
+                                if (array_key_exists('encyclopedia_title', $publicationData)) {
+                                    $titleValue = $publicationData['encyclopedia_title'] ?? null;
+                                    if ($titleValue === null || $titleValue === '') {
+                                        $fallback = $this->sanitizeCvText($publicationData['entry_title'] ?? null);
+                                        $publicationData['encyclopedia_title'] = $fallback ?? 'Unknown';
                                     }
                                 }
-                                
+
                                 $newPolymorphicPublication = new $publicationsAttributes["table-class"]($publicationData);
                                 $newPolymorphicPublication->save();
+
+                                $citationString = $this->truncateCvString(
+                                    $this->returnValueIfNotNull($publicationInformation, "authors", "citation"),
+                                    255
+                                );
 
                                 $publication = $newPolymorphicPublication->output()->create([
                                     "title" => $title,
                                     "doi" => ($doi) ?? null,
                                     "type_id" => $publicationType->id,
-                                    "citation_string" => $this->returnValueIfNotNull($publicationInformation, "authors", "citation"),
+                                    "citation_string" => $citationString,
                                     "year" => $this->returnValueIfNotNull($publicationInformation, $publicationsAttributes["year-column"], "year"),
                                     "ciencia_vitae_pub_id" => $output["id"]
                                 ]);
-                                
+
                                 \Log::info('Created new publication', ['id' => $publication->id]);
                             }
 
                             array_push($publicationsAdded, $output["id"]);
 
-                            $publication->citations()->syncWithoutDetaching([
-                                $citation->id => ["author_id" => $authorObject->id]
-                            ]);
-                            
+                            $citationId = (int) ($citation->id ?? 0);
+                            if ($citationId > 0) {
+                                try {
+                                    $publication->citations()->syncWithoutDetaching([
+                                        $citationId => ["author_id" => $authorObject->id]
+                                    ]);
+                                } catch (\Throwable $e) {
+                                    \Log::warning('Citation sync skipped due to invalid IDs', [
+                                        'publication_id' => $publication->id,
+                                        'citation_id' => $citationId,
+                                        'error' => $e->getMessage()
+                                    ]);
+                                }
+                            }
+
                             \Log::info('Synced citation', [
                                 'publication_id' => $publication->id,
                                 'citation_id' => $citation->id
                             ]);
 
-                            $this->insertKeywords($publication, $publicationInformation);
-
-                            break;
+                            try {
+                                $this->insertKeywords($publication, $publicationInformation);
+                            } catch (\Throwable $e) {
+                                \Log::warning('Keyword insert skipped due to error', [
+                                    'publication_id' => $publication->id,
+                                    'error' => $e->getMessage()
+                                ]);
+                            }
                         }
+                    } catch (\Throwable $e) {
+                        $outputProcessingHadError = true;
+                        \Log::error('Output processing failed', [
+                            'author_id' => $authorObject->id,
+                            'output_id' => $output["id"],
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString()
+                        ]);
                     }
                 }
             }
@@ -706,9 +1238,11 @@ public function updateAuthorInformation($responseArray, $authorObject)
                 'ids' => $publicationsAdded
             ]);
 
-            if (count($publicationsAdded) > 0) {
+            $cvOutputIdsSeen = array_values(array_unique($cvOutputIdsSeen));
+
+            if (count($cvOutputIdsSeen) > 0 && !$outputProcessingHadError) {
                 $outputIdsToDelete = $authorObject->output()
-                    ->whereNotIn("ciencia_vitae_pub_id", $publicationsAdded)
+                    ->whereNotIn("ciencia_vitae_pub_id", $cvOutputIdsSeen)
                     ->pluck('outputs.id');
 
                 if ($outputIdsToDelete->isNotEmpty()) {
@@ -759,8 +1293,8 @@ public function updateAuthorInformation($responseArray, $authorObject)
                         "conf_country" => (($data["conference-location"]["country"]["value"]) ?? null),
                         "conf_city" => (($data["conference-location"]["city"]) ?? null),
                         "proceedings_title" => ($data["proceedings-title"]) ?? null,
-                        "start_page" => hexdec(($data["page-range-from"]) ?? null),
-                        "end_page" => hexdec(($data["page-range-to"]) ?? null),
+                        "start_page" => $this->normalizeCvInt($data["page-range-from"] ?? null),
+                        "end_page" => $this->normalizeCvInt($data["page-range-to"] ?? null),
                         "status" => ($data["publication-status"]["value"]) ?? null,
                         "pub_country" => (($data["publication-location"]["country"]["value"]) ?? null),
                         "pub_city" => (($data["publication-location"]["city"]) ?? null),
@@ -773,8 +1307,8 @@ public function updateAuthorInformation($responseArray, $authorObject)
                         "journal" => ($data["journal"] ?? null),
                         "volume" => ($data["volume"] ?? null),
                         "issue" => ($data["issue"] ?? null),
-                        "start_page" => substr(hexdec(($data["page-range-from"] ?? null)), 0, 5),
-                        "end_page" =>  substr(hexdec(($data["page-range-to"] ?? null)), 0, 5),
+                        "start_page" => $this->normalizeCvInt($data["page-range-from"] ?? null),
+                        "end_page" => $this->normalizeCvInt($data["page-range-to"] ?? null),
                         'city' => (($data["publication-location"]["city"]) ?? null),
                         'publisher' => "",
                         'open_access' => ($data["open-access"] ?? null),
@@ -782,37 +1316,107 @@ public function updateAuthorInformation($responseArray, $authorObject)
                         "publication_year" => ($data["publication-date"]["year"]) ?? null,
                         "publication_month" => ($data["publication-date"]["month"]) ?? null,
                         "publication_day" => ($data["publication-date"]["day"]) ?? null,
-                        'country' => (($data["publication-location"]["country"]["value"]) ?? null),
+                        'country' => $this->getNestedValue($data, ["publication-location", "country", "value"]) ?? $this->normalizeCvScalar($data["publication-location"] ?? null),
                         'role' => ($data["authoring-role"]["value"] ?? null),
                         'url' => ($data["url"] ?? null),
                         "refreed" => ($data["refereed"] ?? null)
                     ];
                     break;
+                case "journal-issue":
+                    $array = [
+                        "issue_title" => ($data["issue-title"] ?? null),
+                        "journal" => ($data["journal"] ?? null),
+                        "volume" => ($data["volume"] ?? null),
+                        "issue_number" => ($data["issue-number"] ?? null),
+                        "number_of_pages" => $this->normalizeCvInt($data["number-of-pages"] ?? null),
+                        "refereed" => ($data["refereed"] ?? null),
+                        "publication_status" => ($data["publication-status"]["value"] ?? null),
+                        "publication_date" => ($data["publication-date"]["year"] ?? null),
+                        "publication_location" => $this->getNestedValue($data, ["publication-location", "country", "value"]) ?? $this->normalizeCvScalar($data["publication-location"] ?? null),
+                        "editing_role" => ($data["editing-role"]["value"] ?? null),
+                        "url" => ($data["url"] ?? null),
+                    ];
+                    break;
+                case "encyclopedia-entry":
+                    $encyclopediaTitle = $this->sanitizeCvText($data["encyclopedia"] ?? null)
+                        ?? $this->sanitizeCvText($data["entry-title"] ?? null)
+                        ?? '';
+                    $array = [
+                        "entry_title" => ($data["entry-title"] ?? null),
+                        "encyclopedia_title" => $encyclopediaTitle,
+                        "volume" => $this->normalizeCvInt($data["volume"] ?? null),
+                        "number_of_volumes" => $this->normalizeCvInt($data["number-of-volumes"] ?? null),
+                        "edition" => ($data["edition"] ?? null),
+                        "page_range_from" => $this->normalizeCvInt($data["page-range-from"] ?? null),
+                        "page_range_to" => $this->normalizeCvInt($data["page-range-to"] ?? null),
+                        "publication_status" => ($data["publication-status"]["value"] ?? null),
+                        "publication_year" => ($data["publication-date"]["year"] ?? null),
+                        "publication_location" => $this->getNestedValue($data, ["publication-location", "country", "value"]) ?? $this->normalizeCvScalar($data["publication-location"] ?? null),
+                        "publisher" => ($data["publisher"] ?? null),
+                        "autoring_role" => ($data["authoring-role"]["value"] ?? null),
+                        "url" => ($data["url"] ?? null),
+                    ];
+                    break;
+                case "newsletter-article":
+                    $array = [
+                        "article_title" => $this->truncateCvString($data["article-title"] ?? null, 255),
+                        "newsletter" => $this->truncateCvString($data["newsletter"] ?? null, 255),
+                        "volume" => $this->normalizeCvInt($data["volume"] ?? null),
+                        "issue" => $this->normalizeCvScalar($data["issue"] ?? null),
+                        "page_range_from" => $this->normalizeCvInt($data["page-range-from"] ?? null),
+                        "page_range_to" => $this->normalizeCvInt($data["page-range-to"] ?? null),
+                        "publication_date" => $this->formatCvDate($data["publication-date"] ?? null),
+                        "publication_location" => $this->getNestedValue($data, ["publication-location", "country", "value"]) ?? $this->normalizeCvScalar($data["publication-location"] ?? null),
+                        "url" => $this->normalizeCvScalar($data["url"] ?? null),
+                        "research_classifications" => $this->normalizeCvScalar($data["research-classifications"] ?? null),
+                    ];
+                    break;
                 case "newspapper-article":
                     $array = [
-                        "article_title" => ($data["article-title"] ?? null),
-                        "newspaper" => ($data["newspaper"] ?? null),
-                        "section" => ($data["section"] ?? null),
-                        "volume" => hexdec(($data["volume"] ?? null)),
-                        "edition" => ($data["edition"] ?? null),
-                        "page_range_from" => hexdec(($data["page-range-from"] ?? null)),
-                        "page_range_to" => hexdec(($data["page-range-to"] ?? null)),
+                        "article_title" => $this->truncateCvString($data["article-title"] ?? null, 255),
+                        "newspaper" => $this->truncateCvString($data["newspaper"] ?? null, 255),
+                        "section" => $this->normalizeCvScalar($data["section"] ?? null),
+                        "volume" => $this->normalizeCvInt($data["volume"] ?? null),
+                        "edition" => $this->normalizeCvScalar($data["edition"] ?? null),
+                        "page_range_from" => $this->normalizeCvInt($data["page-range-from"] ?? null),
+                        "page_range_to" => $this->normalizeCvInt($data["page-range-to"] ?? null),
                         "publication_date" => ($data["publication-date"]["year"] ?? null),
-                        "publication_location" => ($data["publication-location"]["country"]["value"] ?? null),
-                        "url" => ($data["url"] ?? null),
-                        "research_classifications" => ($data["research-classifications"] ?? null),
+                        "publication_location" => $this->getNestedValue($data, ["publication-location", "country", "value"]) ?? $this->normalizeCvScalar($data["publication-location"] ?? null),
+                        "url" => $this->normalizeCvScalar($data["url"] ?? null),
+                        "research_classifications" => $this->normalizeCvScalar($data["research-classifications"] ?? null),
                     ];
                     break;
                 case "conference-abstract":
                     $array = [
                         "article_title" => $data["article-title"] ?? null,
                         // "section" => $data["section"] ?? null,
-                        "volume" => $data["volume"] ?? null,
+                        "volume" => $this->normalizeCvInt($data["volume"] ?? null),
                         // "edition" => $data["edition"] ?? null,
-                        "page_range_from" => hexdec($data["page-range-from"] ?? null),
-                        "page_range_to" => hexdec($data["page-range-to"] ?? null),
+                        "page_range_from" => $this->normalizeCvInt($data["page-range-from"] ?? null),
+                        "page_range_to" => $this->normalizeCvInt($data["page-range-to"] ?? null),
                         "publication_date" => ($data["publication-date"]["year"] ?? null),
                         // "publication_location" => ($data["publication-location"]["country"]["value"] ?? null),
+                    ];
+                    break;
+                case "test":
+                    $array = [
+                        "title" => ($data["title"] ?? null),
+                        "date_first_used" => ($data["date-first-used"]["year"] ?? null),
+                    ];
+                    break;
+                case "working-paper":
+                    $array = [
+                        "title" => ($data["title"] ?? null),
+                        "volume" => ($data["volume"] ?? null),
+                        "publication_date" => $this->formatCvDate($data["publication-date"] ?? null),
+                        "url" => ($data["url"] ?? null),
+                    ];
+                    break;
+                case "online-resource":
+                    $array = [
+                        "title" => ($data["title"] ?? null),
+                        "creation_date" => $this->formatCvDate($data["creation-date"] ?? null),
+                        "url" => ($data["url"] ?? null),
                     ];
                     break;
                 case "magazine-article":
@@ -821,14 +1425,50 @@ public function updateAuthorInformation($responseArray, $authorObject)
                         'role' => ($data["authoring-role"]["value"] ?? null),
                         'url' => ($data["url"] ?? null),
                         "issue" => ($data["issue"] ?? null),
-                        "start_page" => ($data["page-range-from"] ?? null),
-                        "end_page" => ($data["page-range-to"] ?? null),
+                        "start_page" => $this->normalizeCvInt($data["page-range-from"] ?? null),
+                        "end_page" => $this->normalizeCvInt($data["page-range-to"] ?? null),
                         "volume" => ($data["volume"] ?? null),
                         "publication_year" => ($data["publication-date"]["year"]) ?? null,
                         "publication_month" => ($data["publication-date"]["month"]) ?? null,
                         "publication_day" => ($data["publication-date"]["day"]) ?? null,
                         "pub_country" => (($data["publication-location"]["country"]["value"]) ?? null),
                         "pub_city" => (($data["publication-location"]["city"]) ?? null),
+                    ];
+                    break;
+                case "exhibition-catalogue":
+                    $array = [
+                        "title" => ($data["title"] ?? null),
+                        "number_of_pages" => ($data["number-of-pages"] ?? null),
+                        "publication_year" => ($data["publication-date"]["year"] ?? null),
+                        "gallery_or_publisher" => ($data["gallery-or-publisher"] ?? null),
+                    ];
+                    break;
+                case "preface-postface":
+                    $array = [
+                        "preface_postface_type" => $data["preface-postface-type"] ?? null,
+                        "preface_postface_title" => $data["preface-postface-title"] ?? null,
+                        "book_title" => $data["book-title"] ?? null,
+                        "book_volume" => $data["book-volume"] ?? null,
+                        "book_edition" => $data["book-edition"] ?? null,
+                        "preface_postface_page_range_from" => $this->normalizeCvInt($data["preface-postface-page-range-from"] ?? null),
+                        "preface_postface_page_range_to" => $this->normalizeCvInt($data["preface-postface-page-range-to"] ?? null),
+                        "refereed" => $data["refereed"] ?? null,
+                        "publication_status" => $data["publication-status"]["value"] ?? null,
+                        "publication_year" => $data["publication-year"] ?? null,
+                        "publication_location" => $this->getNestedValue($data, ["publication-location", "country", "value"]) ?? $this->normalizeCvScalar($data["publication-location"] ?? null),
+                        "book_publisher" => $data["book-publisher"] ?? null,
+                        "authoring_role" => $data["authoring-role"]["value"] ?? null,
+                        "url" => $data["url"] ?? null,
+                    ];
+                    break;
+                case "preprint":
+                    $array = [
+                        "title" => $data["title"] ?? null,
+                        "volume" => $data["volume"] ?? null,
+                        "journal" => $data["journal"] ?? null,
+                        "submission_location" => $data["submission-location"] ?? null,
+                        "date_submitted" => $this->formatCvDate($data["date-submitted"] ?? null),
+                        "url" => $data["url"] ?? null,
                     ];
                     break;
                 case "dissertation":
@@ -845,13 +1485,51 @@ public function updateAuthorInformation($responseArray, $authorObject)
 
                     ];
                     break;
+                case "book-review":
+                    $array = [
+                        "review_title" => ($data["review-title"] ?? null),
+                        "published_in" => ($data["published-in"] ?? null),
+                        "review_volume" => $this->normalizeCvScalar($data["review-volume"] ?? null),
+                        "review_issue" => $this->normalizeCvScalar($data["review-issue"] ?? null),
+                        "start_page" => ($data["review-page-range-from"] ?? null),
+                        "end_page" => ($data["review-page-range-to"] ?? null),
+                        "refereed" => $data["refereed"] ?? null,
+                        "publication_status" => $data["publication-status"]["value"] ?? null,
+                        "review_publication" => $this->normalizeCvScalar($data["review-publication"] ?? null),
+                        "date_of_review_publication" => $data["date-of-review-publication"]["year"] ?? null,
+                        "review_publisher" => $this->normalizeCvScalar($data["review-publisher"] ?? null),
+                        "url" => $this->normalizeCvScalar($data["url"] ?? null),
+                        "book_title" => $data["book-title"] ?? null,
+                        "book_volume" => $this->normalizeCvScalar($data["book-volume"] ?? null),
+                        "book_edition" => $this->normalizeCvScalar($data["book-edition"] ?? null),
+                        "book_refereed" => $data["book-refereed"] ?? null,
+                        "book_publication_year" => $data["book-publication-year"] ?? null,
+                        "book_publication_location" => $this->getNestedValue($data, ["book-publication-location", "country", "value"]) ?? $this->normalizeCvScalar($data["book-publication-location"] ?? null),
+                    ];
+                    break;
+                case "edited-book":
+                    $array = [
+                        "title" => $data["title"] ?? null,
+                        "volume" => $data["volume"] ?? null,
+                        "edition" => $data["edition"] ?? null,
+                        "number_of_pages" => $data["number-of-pages"] ?? null,
+                        "refereed" => $data["refereed"] ?? null,
+                        "status" => $data["publication-status"]["value"] ?? null,
+                        "publication_year" => $data["publication-year"] ?? null,
+                        "pub_country" => $this->getNestedValue($data, ["publication-location", "country", "value"]) ?? $this->normalizeCvScalar($data["publication-location"] ?? null),
+                        "pub_city" => $this->getNestedValue($data, ["publication-location", "city"]) ?? null,
+                        "publisher" => $data["publisher"] ?? null,
+                        "editing_role" => $data["editing-role"]["value"] ?? null,
+                        "url" => $data["url"] ?? null,
+                    ];
+                    break;
                 case "book-chapter":
                     $array = [
                         "book_title" => ($data["book-title"]) ?? null,
                         "book_volume" => ($data["book-volume"]) ?? null,
                         "book_edition" => ($data["book-edition"]) ?? null,
-                        "chapter_start_page" => ($data["chapter-page-range-from"] ?? null),
-                        "chapter_end_page" => ($data["chapter-page-range-to"] ?? null),
+                        "chapter_start_page" => $this->normalizeCvInt($data["chapter-page-range-from"] ?? null),
+                        "chapter_end_page" => $this->normalizeCvInt($data["chapter-page-range-to"] ?? null),
                         "refreed" => ($data["refereed"] ?? null),
                         "publisher" => ($data["book-publisher"]) ?? null,
                         "status" => ($data["publication-status"]["value"]) ?? null,
@@ -886,6 +1564,57 @@ public function updateAuthorInformation($responseArray, $authorObject)
                         "conference_day" => ($data["conference-date"]["day"]) ?? null
                     ];
                     break;
+                case "translation":
+                    $array = [
+                        "title" => ($data["title"] ?? null),
+                        "series_title" => ($data["series-title"] ?? null),
+                        "volume" => ($data["volume"] ?? null),
+                        "number_of_volumes" => ($data["number-of-volumes"] ?? null),
+                        "edition" => ($data["edition"] ?? null),
+                        "number_of_pages" => ($data["number-of-pages"] ?? null),
+                        "publication_status" => ($data["publication-status"]["value"] ?? null),
+                        "publication_year" => ($data["publication-year"] ?? null),
+                        "publication_location" => ($data["publication-location"]["country"]["value"] ?? null),
+                        "publisher" => ($data["publisher"] ?? null),
+                        "url" => ($data["url"] ?? null)
+                    ];
+                    break;
+                case "manual":
+                    $array = [
+                        "title" => ($data["title"] ?? null),
+                        "series_title" => ($data["series-title"] ?? null),
+                        "volume" => ($data["volume"] ?? null),
+                        "number_of_volumes" => $this->normalizeCvInt($data["number-of-volumes"] ?? null),
+                        "edition" => ($data["edition"] ?? null),
+                        "number_of_pages" => $this->normalizeCvInt($data["number-of-pages"] ?? null),
+                        "publication_status" => ($data["publication-status"]["value"] ?? null),
+                        "publication_year" => $this->normalizeCvInt($data["publication-year"] ?? null),
+                        "publication_location" => $this->getNestedValue($data, ["publication-location", "country", "value"]) ?? $this->normalizeCvScalar($data["publication-location"] ?? null),
+                        "publisher" => ($data["publisher"] ?? null),
+                        "authoring_role" => ($data["authoring-role"]["value"] ?? null),
+                        "url" => ($data["url"] ?? null),
+                    ];
+                    break;
+                case "report":
+                    $array = [
+                        "report_title" => ($data["report-title"] ?? null),
+                        "volume" => ($data["volume"] ?? null),
+                        "number_of_pages" => $this->normalizeCvInt($data["number-of-pages"] ?? null),
+                        "institution" => $this->normalizeCvScalar($data["institution"] ?? null),
+                        "date_submitted" => $this->formatCvDate($data["date-submitted"] ?? null),
+                        "authoring_role" => ($data["authoring-role"]["value"] ?? null),
+                        "publication_status" => ($data["publication-status"]["value"] ?? null),
+                        "url" => ($data["url"] ?? null),
+                    ];
+                    break;
+                case "website":
+                    $array = [
+                        "title" => ($data["title"] ?? null),
+                        "description" => ($data["description"] ?? null),
+                        "launch_date" => $this->formatCvDate($data["launch-date"] ?? null),
+                        "url" => ($data["url"] ?? null),
+                    ];
+                    break;
             } 
 
 
@@ -898,9 +1627,15 @@ public function updateAuthorInformation($responseArray, $authorObject)
 
     public function serviceData($serviceType, $data)
     {
+        if (!is_array($data)) {
+            return [];
+        }
 
         switch ($serviceType) {
             case "event-administration":
+                $eventDescription = $this->sanitizeCvAscii($this->returnValueIfNotNull($data, "event-description"));
+                $eventType = $this->sanitizeCvAscii($this->returnValueIfNotNull($data, "event-type", "value"));
+                $adminRole = $this->sanitizeCvAscii($this->returnValueIfNotNull($data, "administrative-role", "value"));
                 $array = [
                     "activity_start_year" => $this->returnValueIfNotNull($data, "activity-start-date", "year"),
                     "activity_start_month" => $this->returnValueIfNotNull($data, "activity-start-date", "month"),
@@ -908,16 +1643,19 @@ public function updateAuthorInformation($responseArray, $authorObject)
                     "activity_end_year" => $this->returnValueIfNotNull($data, "activity-end-date", "year"),
                     "activity_end_month" => $this->returnValueIfNotNull($data, "activity-end-date", "month"),
                     "activity_end_day" => $this->returnValueIfNotNull($data, "activity-end-date", "day"),
-                    "event_description" => $this->returnValueIfNotNull($data, "event-description"),
-                    "event_type" => $this->returnValueIfNotNull($data, "event-type", "value"),
-                    "administrative_role" => $this->returnValueIfNotNull($data, "administrative-role", "value")
+                    "event_description" => $this->truncateCvString($eventDescription ?? 'Unknown', 255),
+                    "event_type" => $this->truncateCvString($eventType ?? null, 255),
+                    "administrative_role" => $this->truncateCvString($adminRole ?? null, 255)
                 ];
                 break;
             case "event-participation":
+                $eventDescription = $this->sanitizeCvAscii($this->returnValueIfNotNull($data, "event-description"));
+                $eventName = $this->sanitizeCvAscii($this->returnValueIfNotNull($data, "event-name"));
+                $eventType = $this->sanitizeCvAscii($this->returnValueIfNotNull($data, "event-type", "value"));
                 $array = [
-                    "event_description" => $this->returnValueIfNotNull($data, "event-description"),
-                    "event_name" => $this->returnValueIfNotNull($data, "event-name"),
-                    "event_type" => $this->returnValueIfNotNull($data, "event-type", "value"),
+                    "event_description" => $this->truncateCvString($eventDescription ?? 'Unknown', 255),
+                    "event_name" => $this->truncateCvString($eventName ?? null, 255),
+                    "event_type" => $this->truncateCvString($eventType ?? null, 255),
                     "start_date_year" => $this->returnValueIfNotNull($data, "startDate", "year"),
                     "start_date_month" => $this->returnValueIfNotNull($data, "startDate", "month"),
                     "start_date_day" => $this->returnValueIfNotNull($data, "startDate", "day"),
@@ -927,42 +1665,47 @@ public function updateAuthorInformation($responseArray, $authorObject)
                 ];
                 break;
             case "committee-membership":
+                $committeeName = $this->sanitizeCvText($this->returnValueIfNotNull($data, "committee-name"));
+                $membershipType = $this->sanitizeCvText($this->returnValueIfNotNull($data, "membership-type", "value"));
                 $array = [
-                    "committee_name" => $this->returnValueIfNotNull($data, "committee-name"),
-                    "membership_type" => $this->returnValueIfNotNull($data, "membership-type", "value"),
+                    "committee_name" => $this->truncateCvString($committeeName ?? 'Unknown', 255),
+                    "membership_type" => $this->truncateCvString($membershipType ?? null, 255),
                 ];
                 break;
             case "journal-reviewing-refereeing":
                 $array = [
-                    "journal" => $this->returnValueIfNotNull($data, "journal", "value"),
-                    "press" => $this->returnValueIfNotNull($data, "press"),
+                    "journal" => $this->truncateCvString($this->returnValueIfNotNull($data, "journal", "value"), 255),
+                    "press" => $this->truncateCvString($this->returnValueIfNotNull($data, "press"), 255),
                     "works_reviewed" =>  $this->returnValueIfNotNull($data, "works-reviewed"),
                     "url" => $this->returnValueIfNotNull($data, "url"),
                 ];
                 break;
             case "conference-reviewing-refereeing":
                 $array = [
-                    "conference" => $this->returnValueIfNotNull($data, "conference"),
-                    "conference_host" => $this->returnValueIfNotNull($data, "conference-host"),
+                    "conference" => $this->truncateCvString($this->returnValueIfNotNull($data, "conference"), 255),
+                    "conference_host" => $this->truncateCvString($this->returnValueIfNotNull($data, "conference-host"), 255),
                     "works_reviewed" => $this->returnValueIfNotNull($data, "works-reviewed")
                 ];
                 break;
             case "research-based-degree-supervision":
                 // dd($this->returnValueIfNotNull($data, "thesis-title"));
                 $array = [
-                    "thesis_title" => $this->returnValueIfNotNull($data, "thesis-title"),
-                    "supervisory_title" => $data['supervisory-type']['value'],
-                    "start_date" => $data['start-date']['year'] ?? '',
-                    "end_date" => $data['end-date']['year'] ?? '',
+                    "thesis_title" => $this->truncateCvString($this->returnValueIfNotNull($data, "thesis-title"), 255),
+                    "supervisory_title" => $this->getNestedValue($data, ['supervisory-type', 'value'])
+                        ?? $this->normalizeCvScalar($data['supervisory-type'] ?? null),
+                    "start_date" => $this->getNestedValue($data, ['start-date', 'year']) ?? '',
+                    "end_date" => $this->getNestedValue($data, ['end-date', 'year']) ?? '',
                 ];
                 break;
             case "graduate-examination":
+                $theme = $this->sanitizeCvText($this->returnValueIfNotNull($data, "theme"));
+                $examSubject = $this->sanitizeCvText($data['examination-subject'] ?? null);
                 $array = [
-                    "theme" => $this->returnValueIfNotNull($data, "theme"),
-                    "examination_subject" => $data['examination-subject'],
-                    "start_date" => $data['date']['year'] ?? '',
-                    "end_date" => $data['date']['year'] ?? '',
-                    "year" => $data['date']['year'] ?? '',
+                    "theme" => $this->truncateCvString($theme ?? 'Unknown', 255),
+                    "examination_subject" => $this->truncateCvString($examSubject ?? null, 255),
+                    "start_date" => $this->getNestedValue($data, ['date', 'year']) ?? '',
+                    "end_date" => $this->getNestedValue($data, ['date', 'year']) ?? '',
+                    "year" => $this->getNestedValue($data, ['date', 'year']) ?? '',
 
                 ];
                 break;
@@ -991,31 +1734,267 @@ public function updateAuthorInformation($responseArray, $authorObject)
         // Adds or Updates the outputKeyword
         if (isset($data["keywords"])) {
             $keywords = [];
+            $keywordItems = $data["keywords"]["keyword"] ?? [];
 
-            foreach ($data["keywords"]["keyword"] as $keyword) {
-                $treatedKeyWords = StringTreatmentController::explodeAndReplaceSpecificCharacters($keyword);
+            if (!is_array($keywordItems)) {
+                $keywordItems = [$keywordItems];
+            }
+
+            foreach ($keywordItems as $keyword) {
+                $treatedKeyWords = StringTreatmentController::explodeAndReplaceSpecificCharacters((string) $keyword);
 
                 foreach ($treatedKeyWords as $treatedKeyWord) {
                     $keyWordToAssociate = Keyword::firstOrCreate(["keyword" => $treatedKeyWord]);
 
-                    array_push($keywords, $keyWordToAssociate->id);
+                    $keywords[] = $keyWordToAssociate->id;
                 }
             }
 
-            $model->keywords()->sync($keywords);
+            if (empty($keywords)) {
+                return;
+            }
+
+            $keywords = array_map('intval', $keywords);
+            $keywords = array_values(array_filter($keywords, fn($id) => $id > 0));
+            if (empty($keywords)) {
+                return;
+            }
+
+            try {
+                $model->keywords()->sync($keywords);
+            } catch (\Throwable $e) {
+                \Log::warning('Keyword sync skipped due to invalid IDs', [
+                    'model' => get_class($model),
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
     }
 
     private function removePolymorphicRelations($array, $relationName)
     {
         foreach ($array as $element) {
-            $element["table-class"]::doesntHave($relationName)->delete();
+            try {
+                $element["table-class"]::doesntHave($relationName)->delete();
+            } catch (\Throwable $e) {
+                \Log::warning('Polymorphic cleanup skipped due to lock error', [
+                    'relation' => $relationName,
+                    'model' => $element["table-class"],
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
     }
 
     private function returnValueIfNotNull($array, $key1, $key2 = null)
     {
         $value = (isset($key2)) ? ($array[$key1][$key2]) ?? null : ($array[$key1]) ?? null;
+
+        return $value;
+    }
+
+    private function formatCvDate($date)
+    {
+        if (!is_array($date)) {
+            if (is_string($date) || is_numeric($date)) {
+                $dateString = trim((string) $date);
+
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateString)) {
+                    return $dateString;
+                }
+
+                if (preg_match('/^\d{4}$/', $dateString)) {
+                    return sprintf('%04d-01-01', (int) $dateString);
+                }
+            }
+
+            return null;
+        }
+
+        $year = $date['year'] ?? null;
+        if (!$year) {
+            $fallback = $this->normalizeCvScalar($date);
+            if ($fallback !== null) {
+                $fallbackString = trim((string) $fallback);
+
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fallbackString)) {
+                    return $fallbackString;
+                }
+
+                if (preg_match('/^\d{4}$/', $fallbackString)) {
+                    return sprintf('%04d-01-01', (int) $fallbackString);
+                }
+            }
+        }
+        if (!$year) {
+            return null;
+        }
+
+        $month = $date['month'] ?? 1;
+        $day = $date['day'] ?? 1;
+
+        return sprintf('%04d-%02d-%02d', (int) $year, (int) $month, (int) $day);
+    }
+
+    private function normalizeCvScalar($value)
+    {
+        if (is_array($value)) {
+            foreach (['value', 'label', 'name', 'code'] as $key) {
+                if (array_key_exists($key, $value) && !is_array($value[$key])) {
+                    return $value[$key];
+                }
+            }
+
+            return null;
+        }
+
+        return $value;
+    }
+
+    private function getNestedValue($data, array $keys)
+    {
+        $current = $data;
+
+        foreach ($keys as $key) {
+            if (!is_array($current) || !array_key_exists($key, $current)) {
+                return null;
+            }
+
+            $current = $current[$key];
+        }
+
+        return $current;
+    }
+
+    private function truncateCvString($value, int $max)
+    {
+        $text = $this->sanitizeCvText($value);
+        if ($text === null) {
+            return null;
+        }
+
+        if (strlen($text) > $max) {
+            return substr($text, 0, $max);
+        }
+
+        return $text;
+    }
+
+    private function sanitizeCvText($value)
+    {
+        $scalar = $this->normalizeCvScalar($value);
+        if ($scalar === null) {
+            return null;
+        }
+
+        $text = trim((string) $scalar);
+        if ($text === '') {
+            return null;
+        }
+
+        $converted = $text;
+        if (function_exists('mb_convert_encoding')) {
+            $converted = @mb_convert_encoding($converted, 'UTF-8', 'UTF-8, ISO-8859-1, Windows-1252');
+        }
+
+        $converted = @iconv('UTF-8', 'UTF-8//IGNORE', $converted);
+        if ($converted === false) {
+            return null;
+        }
+
+        $converted = trim($converted);
+
+        return $converted === '' ? null : $converted;
+    }
+
+    private function sanitizeCvUrl($value)
+    {
+        $text = $this->sanitizeCvText($value);
+        if ($text === null) {
+            return null;
+        }
+
+        $text = trim((string) $text);
+        if ($text === '') {
+            return null;
+        }
+
+        // URLs should be ASCII-safe; strip non-ASCII to avoid encoding errors.
+        $ascii = preg_replace('/[^\x20-\x7E]/', '', $text);
+        $ascii = trim((string) $ascii);
+
+        return $ascii === '' ? null : $ascii;
+    }
+
+    private function sanitizeCvAscii($value)
+    {
+        $text = $this->sanitizeCvText($value);
+        if ($text === null) {
+            return null;
+        }
+
+        $ascii = preg_replace('/[^\x20-\x7E]/', '', $text);
+        $ascii = trim((string) $ascii);
+
+        return $ascii === '' ? null : $ascii;
+    }
+
+    private function isUrlField(string $key): bool
+    {
+        return $key === 'url' || str_ends_with($key, '_url');
+    }
+
+    private function normalizeCvInt($value)
+    {
+        $scalar = $this->normalizeCvScalar($value);
+        if ($scalar === null) {
+            return null;
+        }
+
+        if (is_numeric($scalar)) {
+            return $this->clampCvInt((int) $scalar);
+        }
+
+        $text = trim((string) $scalar);
+        if ($text === '') {
+            return null;
+        }
+
+        if (preg_match('/\d+/', $text, $m)) {
+            return $this->clampCvInt((int) $m[0]);
+        }
+
+        $roman = strtoupper(preg_replace('/[^IVXLCDM]/i', '', $text));
+        if ($roman !== '') {
+            $map = ['I' => 1, 'V' => 5, 'X' => 10, 'L' => 50, 'C' => 100, 'D' => 500, 'M' => 1000];
+            $total = 0;
+            $prev = 0;
+
+            for ($i = strlen($roman) - 1; $i >= 0; $i--) {
+                $value = $map[$roman[$i]] ?? 0;
+                if ($value < $prev) {
+                    $total -= $value;
+                } else {
+                    $total += $value;
+                    $prev = $value;
+                }
+            }
+
+            return $total > 0 ? $this->clampCvInt($total) : null;
+        }
+
+        return null;
+    }
+
+    private function clampCvInt(int $value): int
+    {
+        if ($value > 2147483647) {
+            return 2147483647;
+        }
+
+        if ($value < -2147483648) {
+            return -2147483648;
+        }
 
         return $value;
     }

@@ -16,7 +16,6 @@ use App\Models\AuthorCitationName;
 use Illuminate\Support\Facades\DB;
 use App\Models\EventAdministration;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Requests\OutputsFilterRequest;
@@ -30,23 +29,12 @@ class PublicationController extends Controller
      */
     public function index()
     {
-        $authorsIds = Author::whereHas('userInformation', function ($query) {
-            $query->where('is_active', 1)
-                ->where('type', '!=', 'administrative')
-                ->where('is_isla', '=', Auth::user()->is_isla);
-        })->pluck('id');
-
         $outputsType = OutputType::orderBy("name")->cursor();
 
         $outputsKeyWords = DB::table("keywords")->join("output_keywords", "keywords.id", "=", "output_keywords.keyword_id")->select("keyword", "id")->orderBy("keyword", 'ASC')->distinct()->cursor();
 
         $citationNames = AuthorCitationName::has("outputs")->cursor();
-        $outputsInformation = Output::with(['polymorphic', 'authors' => function ($query) use ($authorsIds) {
-            $query->whereIn('author_outputs.author_id', $authorsIds);
-        }, 'type'])
-            ->whereHas('authors', function ($query) use ($authorsIds) {
-                $query->whereIn('author_outputs.author_id', $authorsIds);
-            })
+        $outputsInformation = Output::with(['polymorphic', 'authors', 'type'])
             ->orderBy('year', 'DESC')
             ->distinct()
             ->get();
@@ -57,26 +45,40 @@ class PublicationController extends Controller
         return view("outputs.index", compact("outputsInformation", "outputsType", "outputsKeyWords", "citationNames", "oldestYear", "newestYear"));
     }
 
-    public function showAuthorOutputs($authorsId)
+    public function showAuthorOutputs(Request $request, $authorsId)
     {
+        $typeName = trim((string) $request->query('type', ''));
 
         $author = Author::with([
             "output.polymorphic" => function ($query) {
                 $query->orderBy("publication_year", "DESC");
             },
             "output" => function ($query) {
-                $query->orderBy("year", "DESC");
+                $query->select('outputs.*')->distinct()->orderBy("year", "DESC");
             },
             "output.type"
         ])->findOrFail($authorsId);
-        return view("authors.authorsInformation.output", compact(["author"]));
+
+        $outputs = null;
+        if ($typeName !== '') {
+            $outputs = $author->output()
+                ->with(['polymorphic', 'type'])
+                ->whereHas('type', function ($query) use ($typeName) {
+                    $query->where('name', $typeName);
+                })
+                ->select('outputs.*')
+                ->distinct()
+                ->orderBy('year', 'DESC')
+                ->get();
+        }
+
+        return view("authors.authorsInformation.output", compact(["author", "outputs", "typeName"]));
     }
 
 
     public function filter(OutputsFilterRequest $request)
     {
         $dataValidated = $request->validated();
-
 
         $filteredResults = Output::whereHasMorph(
             'polymorphic',

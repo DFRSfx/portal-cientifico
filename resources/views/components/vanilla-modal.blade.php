@@ -13,7 +13,7 @@
                     </svg>
                 </div>
                 <div class="vc-header-body">
-                    <h5 id="reportModalTitle">{{ __('Gerar relatório de CEOS.PP') }}</h5>
+                    <h5 id="reportModalTitle">{{ __('Gerar relatório') }}</h5>
                     <p class="vc-subtitle">{{ __('Selecione o ano para gerar um relatório protegido em Excel.') }}</p>
                 </div>
             </header>
@@ -21,6 +21,7 @@
             <div class="vc-modal-body">
                 <form id="reportForm" action="{{ route('ceos-excel') }}" method="GET" class="vc-form" aria-describedby="reportHelp">
                     @method('GET')
+                    <input type="hidden" id="reportEntity" name="entity" value="">
                     <p id="reportHelp" class="vc-help small">{{ __('Escolha um dos anos rápidos ou digite manualmente. O relatório é gerado em Excel protegido.') }}</p>
 
                     <div class="vc-quickyears" role="list">

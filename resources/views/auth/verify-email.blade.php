@@ -6,11 +6,17 @@
 
             <h1 class="mb-3 h2 ">{{ __('Verify your email address') }}</h1>
             <h5 class="mb-3 text-muted">We have sent a verification link to {{ auth()->user()->email }}</h5>
-            
-            <p class=" ">
-                Click on the link to complete the verification process.
-                You might need to check your spam folder
-            </p>
+
+            @if (auth()->user()->hasVerifiedEmail())
+                <p>
+                    O seu email ja foi confirmado. Aguarde a aprovacao do administrador para aceder ao dashboard.
+                </p>
+            @else
+                <p class=" ">
+                    Click on the link to complete the verification process.
+                    You might need to check your spam folder
+                </p>
+            @endif
             
         </div>
 

@@ -26,6 +26,9 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
 
+    <!-- Custom theme overrides -->
+    <link href="{{ asset('css/extra.css') }}" rel="stylesheet">
+
     @stack('header-links')
 
     <!-- MDB Min javascript -->
@@ -38,6 +41,9 @@
     <!-- Jquery -->
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 
+    <!-- Alpine.js (used by x-modal component) -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
 
 
 
@@ -47,7 +53,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-<body>
+<body class="saas">
 
     <x-layouts.nav-bar />
     <x-vanilla-modal />
@@ -65,15 +71,36 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Get elements
-            var reportLink = document.getElementById("reportLink");
+            var reportLinks = document.querySelectorAll(".report-link");
             var reportModal = document.getElementById("reportModal");
             var closeModalBtns = document.querySelectorAll("#closeModalBtn");
+            var reportTitle = document.getElementById("reportModalTitle");
+            var reportForm = document.getElementById("reportForm");
+            var reportEntity = document.getElementById("reportEntity");
 
-            // Open the modal when the link is clicked
-            reportLink.addEventListener("click", function(event) {
-                event.preventDefault(); // Prevent the default link action
-                reportModal.style.display = "flex"; // Show the modal
-            });
+            if (reportLinks.length && reportModal) {
+                reportLinks.forEach(function(link) {
+                    link.addEventListener("click", function(event) {
+                        event.preventDefault();
+                        var entity = link.getAttribute("data-entity") || "";
+                        var action = link.getAttribute("data-report-action") || reportForm?.action;
+
+                        if (reportTitle) {
+                            reportTitle.textContent = entity ? `Gerar relatorio de ${entity}` : 'Gerar relatorio';
+                        }
+
+                        if (reportForm && action) {
+                            reportForm.action = action;
+                        }
+
+                        if (reportEntity) {
+                            reportEntity.value = entity;
+                        }
+
+                        reportModal.style.display = "flex";
+                    });
+                });
+            }
 
             // Close the modal when the close button is clicked
             closeModalBtns.forEach(function(btn) {

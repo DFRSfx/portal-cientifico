@@ -6,6 +6,7 @@ use App\Models\Author;
 use App\Models\Output;
 use App\Models\Service;
 use App\Models\OutputType;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -44,8 +45,21 @@ class StatisticsController extends Controller
         $oldestYear = $releaseYears->oldest_year;
         $newestYear = $releaseYears->newest_year;
 
+        // User counters
+        $activeUsersCount = User::where('is_active', 1)->count();
+        $pendingUsersCount = User::where('is_active', 0)->count();
+        $pendingVerificationCount = User::whereNull('email_verified_at')->count();
 
-        return view("pages.statistics", compact('publicationsByYear', 'average', 'numberOfPublications','oldestYear','newestYear'));
+        return view("pages.statistics", compact(
+            'publicationsByYear',
+            'average',
+            'numberOfPublications',
+            'oldestYear',
+            'newestYear',
+            'activeUsersCount',
+            'pendingUsersCount',
+            'pendingVerificationCount'
+        ));
     }
 
     public function getPublicationsStats(StatisticsPublicationsRequest $request)

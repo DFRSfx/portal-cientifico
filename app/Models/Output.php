@@ -17,6 +17,7 @@ class Output extends Model
     protected $fillable = [
         "title",
         "doi",
+        "quartile",
         "type_id",
         "model_id",
         "citation_string",

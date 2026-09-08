@@ -1,4 +1,15 @@
 {
     "teacher": "Professor",
-    "student": "Estudante"
+    "student": "Estudante",
+    "Name": "Nome",
+    "Choose the Entity": "Escolha a Entidade",
+    "Password": "Palavra-passe",
+    "Confirm Password": "Confirmar Palavra-passe",
+    "I'm a Researcher": "Sou um Investigador",
+    "School / Organization": "Escola / Organização",
+    "Linkedin Profile URL": "Perfil do LinkedIn URL",
+    "Phone number": "Número de Telefone",
+    "Already registered?": "Já está registado?",
+    "Personal": "Pessoal",
+    "Professional": "Profissional"
 }

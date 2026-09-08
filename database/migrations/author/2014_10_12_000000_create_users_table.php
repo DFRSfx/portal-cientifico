@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('ciencia_vitae')->nullable();
             $table->string("type");
-            $table->boolean("is_active");
+            $table->boolean("is_active")->default(0);
             $table->string("set_password_token", 30);
             $table->boolean("is_admin");
             $table->rememberToken();

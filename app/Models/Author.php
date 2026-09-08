@@ -16,11 +16,22 @@ class Author extends Model
         'id_google_scholar',
         'id_researcher',
         'id_scopus_author',
+        'researchgate_profile',
+        'id_lattes',
+        'h_index',
+        'h_index_source',
+        'h_index_reported_at',
+        'h_index_is_self_declared',
         "resume",
         "profile_updated_date",
         "profile_image_is_public",
         "profile_is_public", // this identifies if a ciencia vitae profile is public or private and is not the same thing as the image because a user may have one public profile and one private image
         "user_id",
+    ];
+
+    protected $casts = [
+        'h_index_reported_at' => 'date',
+        'h_index_is_self_declared' => 'boolean',
     ];
 
     public function userInformation()
@@ -51,6 +62,11 @@ class Author extends Model
     public function addresses()
     {
         return $this->hasMany(AuthorAddress::class);
+    }
+
+    public function websites()
+    {
+        return $this->hasMany(AuthorWebsite::class);
     }
 
     public function citationName()

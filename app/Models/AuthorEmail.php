@@ -10,7 +10,9 @@ class AuthorEmail extends Model
     use HasFactory;
 
     protected $fillable = [
-        "email"
+        "author_id",
+        "email",
+        "use_type"
     ];
 
     public function authors()

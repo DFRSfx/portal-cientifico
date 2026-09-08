@@ -6,6 +6,195 @@
             background-color: transparent;
             color: black;
         }
+
+        .publications-table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .publications-table thead th {
+            background: #e6f1ea;
+            color: #1f4d2f;
+            font-weight: 700;
+            border-bottom: 1px solid #cfe2d6;
+            padding: 12px 14px;
+        }
+
+        .publications-table tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #dfeae3;
+            vertical-align: middle;
+        }
+
+        .publications-table tbody tr:nth-child(even) {
+            background: #f2f8f4;
+        }
+
+        .publications-table tbody tr:hover {
+            background: #e3f2e8;
+        }
+
+        .quartile-select {
+            min-width: 86px;
+        }
+
+        .pub-cell-title {
+            font-weight: 600;
+            color: #1f2d24;
+        }
+
+        .pub-cell-year {
+            color: #3d4f45;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .pub-cell-status .badge,
+        .pub-cell-type .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .publications-body {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .metrics-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 18px;
+            align-items: center;
+        }
+
+        .metric-label {
+            color: #3d4f45;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #1f2d24;
+        }
+
+        .vc-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1050;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vc-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+        }
+
+        .vc-modal-dialog {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 640px;
+            padding: 1rem;
+        }
+
+        .vc-modal-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(10px);
+            animation: vc-enter 0.18s ease-out both;
+        }
+
+        @keyframes vc-enter {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.99);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .vc-modal-header {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding: 1.25rem;
+            background: linear-gradient(90deg, #2f6b2f, #245022);
+            color: #fff;
+        }
+
+        .vc-header-body h5 {
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .vc-subtitle {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .vc-close {
+            position: absolute;
+            right: 0.75rem;
+            top: 0.5rem;
+            background: transparent;
+            border: 0;
+            color: #fff;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .vc-modal-body {
+            padding: 1.25rem;
+        }
+
+        .vc-input-row {
+            margin-bottom: 1rem;
+        }
+
+        .vc-footer {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .vc-cta {
+            background: #2f6b2f;
+            color: #fff;
+            border: 0;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .vc-secondary {
+            background: transparent;
+            border: 0;
+            color: #666;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        @media (min-width: 1200px) {
+            .publications-body {
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+        }
     </style>
     <div class="accordion-item">
         <div class="accordion-header" id="headingEight">
@@ -18,23 +207,49 @@
         </div>
 
         <div id="collapseEight" class="collapse show" aria-labelledby="headingEight" data-parent="#accordion">
-            <div class="card-body">
+            <div class="card-body publications-body">
                 @php
                     // usa a coleção filtrada se existir, senão usa todos os outputs do author
-                    $outputsCollection = $outputs ?? $author->output;
+                    $outputsCollection = ($outputs ?? $author->output)->unique('id')->values();
                     $class = '';
                     $hasMoreThanFiveOutputs = false;
                 @endphp
 
+                @php
+                    $canEditMetrics = auth()->check() && (auth()->user()->type === 'administrative'
+                        || (auth()->user()->authorInformation && auth()->user()->authorInformation->id === $author->id));
+                @endphp
+
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="metrics-inline">
+                        <span class="metric-label">H-index:</span>
+                        <span class="metric-value">{{ $author->h_index ?? '-' }}</span>
+                        @if ($author->h_index_is_self_declared)
+                            <span class="badge rounded-pill badge-warning">Auto-declarado</span>
+                        @endif
+                        <span class="metric-label">Fonte:</span>
+                        <span>{{ $author->h_index_source ?? '-' }}</span>
+                        <span class="metric-label">Data:</span>
+                        <span>{{ $author->h_index_reported_at?->format('Y-m-d') ?? '-' }}</span>
+                    </div>
+
+                    @if ($canEditMetrics)
+                        <button type="button" class="btn btn-outline-success btn-sm hindex-modal-open">
+                            {{ __('Editar H-index') }}
+                        </button>
+                    @endif
+                </div>
+
                 @if ($outputsCollection->count() > 0)
                     <div class="table-responsive">
-                        <table id="tableThree" class="table">
+                        <table id="tableThree" class="table publications-table w-100">
                             <thead>
                                 <tr>
                                     <th scope="row">{{ __('Título') }}</th>
                                     <th scope="row">{{ __('Ano') }}</th>
                                     <th scope="row">{{ __('Estados') }}</th>
                                     <th scope="row">{{ __('Tipo') }}</th>
+                                    <th scope="row">{{ __('Indexacao') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -45,33 +260,44 @@
                                     @endif
 
                                     <tr class="{{ $class }}">
-                                        <td>
+                                        <td class="pub-cell-title">
                                             <x-publication-title firstDivClass="" secondDivClass="" :publication=$output
                                                 displayType="0" displayAccessPubButton="1" />
                                         </td>
-                                        <td>
+                                        <td class="pub-cell-year">
                                             @if ($output->output_type_class == 'App\\Models\\BookChapter')
                                                 {{ $output->polymorphic->publication_year ?? '-' }}
                                             @else
                                                 {{ $output->year ?? '-' }}
                                             @endif
                                         </td>
-                                        <td>
+                                        <td class="pub-cell-status">
                                             <x-mdb-span type="publicationStatus" :spanValue="$output->output_type_class == 'App\\Models\\MagazineArticles'
                                                 ? 'Published'
                                                 : $output->polymorphic->status ?? 'No Status'">
                                                 {{ $output->polymorphic->publication_year ?? '-' }}
                                             </x-mdb-span>
                                         </td>
-                                        <td>
+                                        <td class="pub-cell-type">
                                             <span class="badge {{ $colors[$output->type_id - 1] ?? 'badge-primary' }} rounded-pill d-inline">
                                                 {{ $output->type->name ?? '' }}
                                             </span>
                                         </td>
+                                        <td>
+                                            <form method="POST" action="{{ route('authors.outputs.quartile.update', ['authorId' => $author->id, 'outputId' => $output->id]) }}">
+                                                @csrf
+                                                <select name="quartile" class="form-select form-select-sm quartile-select" onchange="this.form.submit()">
+                                                    <option value="">{{ __('Quartil') }}</option>
+                                                    @foreach (['Q1', 'Q2', 'Q3', 'Q4'] as $quartile)
+                                                        <option value="{{ $quartile }}" {{ $output->quartile === $quartile ? 'selected' : '' }}>{{ $quartile }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </form>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4">{{ __('Sem Publicações') }}</td>
+                                        <td colspan="5">{{ __('Sem Publicações') }}</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -92,6 +318,56 @@
             </div>
         </div>
     </div>
+
+    @if ($canEditMetrics)
+        <div id="hIndexModal" class="vc-modal" aria-hidden="true" role="dialog" aria-labelledby="hIndexModalTitle" style="display:none;">
+            <div class="vc-modal-backdrop"></div>
+            <div class="vc-modal-dialog" role="document">
+                <div class="vc-modal-card">
+                    <button type="button" class="vc-close" id="closeHIndexModal" aria-label="{{ __('Close') }}">&times;</button>
+
+                    <header class="vc-modal-header">
+                        <div class="vc-header-left">
+                            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <rect width="24" height="24" rx="6" fill="#2f6b2f"/>
+                                <path d="M7 12h10M7 8h10M7 16h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="vc-header-body">
+                            <h5 id="hIndexModalTitle">{{ __('Editar H-index') }}</h5>
+                            <p class="vc-subtitle">{{ __('Atualize o seu H-index auto-declarado.') }}</p>
+                        </div>
+                    </header>
+
+                    <div class="vc-modal-body">
+                        <form id="hIndexForm" method="POST" action="{{ route('authors.metrics.update', $author->id) }}" class="vc-form">
+                            @csrf
+                            <div class="vc-input-row">
+                                <label class="form-label" for="h_index_modal">H-index</label>
+                                <input type="number" min="0" max="200" name="h_index" id="h_index_modal" class="form-control @error('h_index') is-invalid @enderror" value="{{ old('h_index', $author->h_index) }}">
+                                @error('h_index')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="vc-input-row">
+                                <label class="form-label" for="h_index_source_modal">Fonte</label>
+                                <input type="text" name="h_index_source" id="h_index_source_modal" class="form-control @error('h_index_source') is-invalid @enderror" value="{{ old('h_index_source', $author->h_index_source) }}" placeholder="Scopus / Google Scholar / WOS">
+                                @error('h_index_source')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="vc-input-row">
+                                <label class="form-label" for="h_index_reported_at_modal">Data</label>
+                                <input type="date" name="h_index_reported_at" id="h_index_reported_at_modal" class="form-control @error('h_index_reported_at') is-invalid @enderror" value="{{ old('h_index_reported_at', optional($author->h_index_reported_at)->format('Y-m-d')) }}">
+                                @error('h_index_reported_at')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+
+                            <div class="vc-footer">
+                                <button type="submit" class="vc-cta">{{ __('Guardar') }}</button>
+                                <button type="button" class="vc-secondary" id="cancelHIndexModal">{{ __('Cancelar') }}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <script>
         function initializeDataTable(buttons) {
@@ -133,6 +409,52 @@
         $(document).ready(function() {
             initializeDataTable(['excel', 'pdf']);
 
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const openBtn = document.querySelector('.hindex-modal-open');
+            const modal = document.getElementById('hIndexModal');
+            const closeBtn = document.getElementById('closeHIndexModal');
+            const cancelBtn = document.getElementById('cancelHIndexModal');
+
+            if (!modal || !openBtn) {
+                return;
+            }
+
+            function openModal() {
+                if (modal.parentElement !== document.body) {
+                    document.body.appendChild(modal);
+                }
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                const firstInput = modal.querySelector('input');
+                if (firstInput) {
+                    setTimeout(function() {
+                        firstInput.focus();
+                    }, 120);
+                }
+            }
+
+            function closeModal() {
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+            }
+
+            openBtn.addEventListener('click', openModal);
+            closeBtn?.addEventListener('click', closeModal);
+            cancelBtn?.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                }
+            });
         });
     </script>
 @endsection

@@ -11,12 +11,24 @@ class AuthorAddress extends Model
 
     protected $fillable = [
         'author_id',
+        'adress',
         'address',
         'city',
         'state',
         'postal_code',
         'country',
+        'use_type',
     ];
+
+    public function getAddressAttribute()
+    {
+        return $this->adress;
+    }
+
+    public function setAddressAttribute($value)
+    {
+        $this->attributes['adress'] = $value;
+    }
 
     public function author()
     {

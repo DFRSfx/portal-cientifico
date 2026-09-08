@@ -174,7 +174,6 @@ function getSelectedOptions(targetClassOrId, targetType, typeOfIdentifier) {
 }
 
 function clearSelectedElements() {
-
     const elementsLength = document.getElementById("filtred-filds").children.length
 
     for (let i = 0; i < elementsLength; i++) {

@@ -18,6 +18,10 @@ class DashboardController extends Controller
         else
         {
             $author = Author::where("user_id", "=", auth()->user()->id)->with(["userInformation:id,name,ciencia_vitae,email,type"])->first();
+
+            if (!$author) {
+                return redirect()->route('verification.notice');
+            }
     
             return redirect()->route("authors.show", $author->id);
         }

@@ -1,7 +1,5 @@
 <x-app-layout>
 
-    <link href="{{ asset('css\extra.css') }}" rel="stylesheet">
-
     @php
         $routes = [
             'authors.employments' => 'Percurso profissional',
@@ -34,20 +32,162 @@
         </script>
     @endpush
 
+    <style>
+        .scientific-production-menu {
+            max-height: calc(100vh - 220px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+            z-index: 1060;
+        }
 
-    {{-- Bootstrap Bundle (JS + Popper para dropdowns, modals, etc.) --}}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+        .author-identifiers-menu {
+            display: none;
+        }
+
+        .author-identifiers-menu.show {
+            display: block;
+        }
+
+        .sp-panel,
+        .sp-backdrop,
+        .ai-panel,
+        .ai-backdrop {
+            display: none;
+        }
+
+        .sp-panel,
+        .sp-backdrop {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .scientific-production-menu {
+                display: none !important;
+            }
+
+            .scientific-production-menu {
+                display: none !important;
+            }
+
+            .scientific-production-menu.show {
+                display: none !important;
+            }
+
+            .sp-panel {
+                position: fixed;
+                left: 12px;
+                right: 12px;
+                top: 12px;
+                bottom: 12px;
+                background: #fff;
+                border-radius: 14px;
+                box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+                z-index: 1070;
+                display: none;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .sp-panel.open {
+                display: flex;
+            }
+
+            .sp-panel-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 14px;
+                border-bottom: 1px solid #e6efe6;
+                font-weight: 600;
+            }
+
+            .sp-panel-body {
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .sp-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.35);
+                z-index: 1065;
+                display: none;
+            }
+
+            .sp-backdrop.open {
+                display: block;
+            }
+
+            .author-identifiers-menu {
+                display: none !important;
+            }
+
+            .ai-panel {
+                position: fixed;
+                left: 12px;
+                right: 12px;
+                top: 12px;
+                bottom: 12px;
+                background: #fff;
+                border-radius: 14px;
+                box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+                z-index: 1070;
+                display: none;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .ai-panel.open {
+                display: flex;
+            }
+
+            .ai-panel-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 14px;
+                border-bottom: 1px solid #e6efe6;
+                font-weight: 600;
+            }
+
+            .ai-panel-body {
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .ai-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.35);
+                z-index: 1065;
+                display: none;
+            }
+
+            .ai-backdrop.open {
+                display: block;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .sp-panel,
+            .sp-backdrop,
+            .ai-panel,
+            .ai-backdrop {
+                display: none !important;
+            }
+        }
+    </style>
+
+    {{-- Bootstrap Bundle removido: o projeto já carrega `mdb.min.js` no layout global --}}
 
 
-
-
-    <section style="background-color: #eee;">
-        <div class="container py-3">
-            <div class="row">
+    <section class="saas-page">
+        <div class="container saas-profile saas-profile-wide py-3 ">
+            <div class="row g-3">
                 <div class="col-xl-3">
-                    <div class="card testimonial-card mb-3">
+                    <div class="card testimonial-card mb-3 saas-sticky">
                         <div class="card-up"></div>
                         <div class="avatar mx-auto white">
                             <x-user-image showLogedUserImage="0"
@@ -57,20 +197,73 @@
                         </div>
 
                         <div class="card-body">
-
-                            <h5 class="font-weight-bolder mb-1">{{ $author->userInformation->name ?? __('Sem Valor') }}
+                            <h5 class="font-weight-bolder mb-0">
+                                {{ $author->userInformation->name ?? __('Sem Valor') }}
                             </h5>
+                            @php
+                                $rawEntities = [];
+                                $entityName = $author->userInformation->entidade ?? null;
 
+                                if (is_string($entityName) && trim($entityName) !== '') {
+                                    $rawEntities[] = $entityName;
+                                }
+
+                                if (!empty($author->userInformation->entities) && is_array($author->userInformation->entities)) {
+                                    foreach ($author->userInformation->entities as $value) {
+                                        if (is_string($value) && trim($value) !== '') {
+                                            $rawEntities[] = $value;
+                                        }
+                                    }
+                                }
+
+                                $expandedEntities = [];
+                                foreach ($rawEntities as $value) {
+                                    $parts = preg_split('/\s*[\/;,]\s*/', $value);
+                                    foreach ($parts as $part) {
+                                        $trimmed = trim($part);
+                                        if ($trimmed !== '') {
+                                            $expandedEntities[] = $trimmed;
+                                        }
+                                    }
+                                }
+
+                                $expandedEntities = array_values(array_unique($expandedEntities));
+                                $entityCount = count($expandedEntities);
+                                $entityName = $entityCount > 1 ? 'All institutions' : ($expandedEntities[0] ?? null);
+                            @endphp
                             @if (!isset($author->profile_updated_date))
-                                <span
-                                    class="badge rounded-pill badge-success">{{ $author->userInformation->type }}</span>
-                                <span class="badge rounded-pill badge-success">{{ __('No Profile Status') }}</span>
+                                <div>
+                                    <span class="badge rounded-pill badge-success">{{ $author->userInformation->type }}</span>
+                                    <span class="badge rounded-pill badge-success">{{ __('No Profile Status') }}</span>
+                                </div>
                             @else
-                                <span
-                                    class="badge rounded-pill badge-success">{{ $author->userInformation->type }}</span>
+                                <div>
+                                    <span class="badge rounded-pill badge-success">{{ $author->userInformation->type }}</span>
+                                </div>
+                            @endif
+                            @if ($entityName)
+                                @if ($entityCount > 1)
+                                    <div class="dropdown d-inline-block mt-1">
+                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button"
+                                            id="authorEntitiesDropdown" data-mdb-toggle="dropdown" aria-expanded="false"
+                                            style="padding: 6px 12px; border: 1px solid #2ac41cff; border-radius: 6px;">
+                                            {{ $entityName }}
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="authorEntitiesDropdown">
+                                            @foreach($expandedEntities as $entityLabel)
+                                                <li><span class="dropdown-item-text">{{ $entityLabel }}</span></li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @else
+                                    <small class="badge text-muted d-inline-block mt-1"
+                                        style="padding: 6px 12px; border: 1px solid #2ac41cff; border-radius: 6px;">
+                                        {{ $entityName }}
+                                    </small>
+                                @endif
                             @endif
 
-                            <div class="my-4">
+                            <div class="my-3">
                                 @php
                                     $url = 'https://www.cienciavitae.pt/pt/' . $author->userInformation->ciencia_vitae;
                                 @endphp
@@ -86,7 +279,6 @@
                                     if ($wosResearcher === '') {
                                         $wosResearcher = trim((string) ($author->researchgate_profile ?? ''));
                                     }
-                                    $authenticus = trim((string) ($author->id_authenticus ?? ''));
                                     $lattes = trim((string) ($author->id_lattes ?? ''));
 
                                     // Ciencia Vitae may label this identifier as IDAIC.
@@ -105,9 +297,6 @@
                                             $wosUrl = 'https://www.google.com/search?q=' . rawurlencode('IDAIC ' . $wosResearcher);
                                         }
                                     }
-                                    $authenticusUrl = $authenticus !== ''
-                                        ? ('https://www.google.com/search?q=' . rawurlencode('AuthenticusID ' . $authenticus))
-                                        : null;
 
                                     // Human-friendly display values (keep URLs clickable but show only the identifier part)
                                     $wosResearcherDisplay = $wosResearcher;
@@ -126,11 +315,6 @@
                                                 $wosResearcherDisplay = $slug;
                                             }
                                         }
-                                    }
-
-                                    $authenticusDisplay = $authenticus;
-                                    if ($authenticusDisplay !== '' && preg_match('/([A-Z]-\d{4}-\d{4}|\d{4}-\d{4})/i', $authenticusDisplay, $m)) {
-                                        $authenticusDisplay = $m[1];
                                     }
 
                                     $lattesUrl = null;
@@ -183,10 +367,10 @@
                                             'label' => 'Researcher Id',
                                             'value' => $wosResearcherDisplay,
                                             'title' => 'Researcher Id (IDAIC)',
-                                            'icon' => '/logo/ResearcherGate_icon_SVG.png',
+                                            'icon' => '/logo/ResearchGate_icon_SVG.svg',
                                             'url' => $wosUrl,
                                         ],
-                                       // When the Researcher Id actually resolves to Web of Science,
+                                        // When the Researcher Id actually resolves to Web of Science,
                                         // also expose it explicitly as a "Web of Science" identifier.
                                         [
                                             'label' => 'Web of Science',
@@ -194,13 +378,6 @@
                                             'title' => 'Web of Science (Researcher Id)',
                                             'icon' => null,
                                             'url' => (is_string($wosUrl) && str_contains($wosUrl, 'webofscience.com')) ? $wosUrl : null,
-                                        ],
-                                        [
-                                            'label' => 'AuthenticusID',
-                                            'value' => $authenticusDisplay,
-                                            'title' => 'AuthenticusID',
-                                            'icon' => '/logo/authenticus.svg',
-                                            'url' => $authenticusUrl,
                                         ],
                                         [
                                             'label' => 'LattesID',
@@ -240,7 +417,7 @@
                                             </span>
                                         </button>
 
-                                        <ul class="dropdown-menu w-100 shadow-sm mt-1 p-2" aria-labelledby="dropdownIdentifiers" style="border-radius: 12px;">
+                                        <ul class="dropdown-menu w-100 shadow-sm mt-1 p-2 author-identifiers-menu" aria-labelledby="dropdownIdentifiers" style="border-radius: 12px;">
                                             @foreach ($identifierRowsWithValue as $row)
                                                 <li class="mb-1">
                                                     @php
@@ -270,47 +447,92 @@
                                                 </li>
                                             @endforeach
                                         </ul>
+
+                                        <div class="ai-backdrop" id="aiBackdrop"></div>
+                                        <div class="ai-panel" id="aiPanel" aria-hidden="true">
+                                            <div class="ai-panel-header">
+                                                <span>{{ __('Identificadores de Autor') }}</span>
+                                                <button type="button" class="btn btn-sm btn-light" id="aiClose">{{ __('Fechar') }}</button>
+                                            </div>
+                                            <div class="ai-panel-body">
+                                                <ul class="dropdown-menu w-100 shadow-sm" style="position: static; display: block; box-shadow: none; border: 0;">
+                                                    @foreach ($identifierRowsWithValue as $row)
+                                                        <li class="mb-1">
+                                                            @php
+                                                                $content = '<div class="d-flex align-items-center gap-2">'
+                                                                    . (!empty($row['icon'])
+                                                                        ? ('<span class="d-inline-flex align-items-center justify-content-center border rounded-circle" style="width:34px;height:34px;background:#fff;">'
+                                                                            . '<img src="' . e(asset($row['icon'])) . '" alt="' . e($row['label']) . '" style="width:20px;height:20px;" />'
+                                                                            . '</span>')
+                                                                        : '<span class="d-inline-flex align-items-center justify-content-center border rounded-circle" style="width:34px;height:34px;background:#fff;"></span>')
+                                                                    . '<div class="d-flex flex-column min-w-0" style="max-width: 260px;">'
+                                                                    . '<span class="text-muted" style="font-size: 12px; line-height: 1.1;">'
+                                                                    . e($row['label'])
+                                                                    . '</span>'
+                                                                    . '<span class="font-monospace small text-dark text-truncate" title="' . e($row['title']) . '" style="line-height: 1.2;">'
+                                                                    . e($row['value'])
+                                                                    . '</span>'
+                                                                    . '</div>'
+                                                                    . (!empty($row['url']) ? '<span class="ms-auto text-muted small">↗</span>' : '')
+                                                                    . '</div>';
+                                                            @endphp
+
+                                                            @if (!empty($row['url']))
+                                                                <a class="dropdown-item rounded-3 py-2" href="{{ $row['url'] }}" target="_blank" rel="noopener noreferrer">{!! $content !!}</a>
+                                                            @else
+                                                                <div class="dropdown-item rounded-3 py-2" style="cursor: default;">{!! $content !!}</div>
+                                                            @endif
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 @endif
-                                
-                            </div>
 
-                         
+                            </div>
+                            
                             <hr class="mb-2">
                                 <div class="list-group-item border-0 font-weight-bold p-0">
                                     <div class="dropdown w-100">
+                                        @php
+                                            $uniqueOutputs = $author->output->unique('id')->values();
+                                            $groupedOutputs = $uniqueOutputs->groupBy('type.name');
+                                        @endphp
                                         <button class="btn w-100 d-flex justify-content-between align-items-center"
-                                            type="button"
-                                            id="dropdownScientificProduction"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                            style="background-color: rgba(255, 255, 255, 0.9);
+                                                type="button"
+                                                id="dropdownScientificProduction"
+                                                data-mdb-toggle="dropdown"
+                                                aria-expanded="false"
+                                                style="
+                                                    background-color: rgba(255, 255, 255, 0.9);
                                                     border: 1px solid #2ac41cff;
                                                     border-radius: 8px;
                                                     font-weight: bold;
                                                     padding: 10px 14px;
                                                     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                                                    transition: all 0.2s ease-in-out;">
-                                            <span>{{ __('Produção científica') }}</span>
+                                                    transition: all 0.2s ease-in-out;
+                                                ">
+                                                <span>{{ __('Produção científica') }}</span>
                                                 <span class="d-inline-flex align-items-center gap-3">
-                                                    <span class="text-primary">{{ $author->output_count ?? count($author->output) }}</span>
+                                                    <span class="text-primary">{{ $uniqueOutputs->count() }}</span>
                                                     <i class="fas fa-caret-down"></i>
                                                 </span>
                                             </button>
 
-                                        @php
-                                            // Agrupar outputs por tipo
-                                            $groupedOutputs = $author->output->groupBy('type.name');
-                                        @endphp
-
-                                        <ul class="dropdown-menu w-100 shadow-sm mt-1" aria-labelledby="dropdownScientificProduction">
+                                        <ul class="dropdown-menu w-100 shadow-sm scientific-production-menu"
+                                            aria-labelledby="dropdownScientificProduction">
+                                            <li>
+                                                <a class="dropdown-item d-flex justify-content-between align-items-center"
+                                                   href="{{ route('authors.outputs', ['authorsId' => $author->id]) }}">
+                                                    <span>{{ __('All') }}</span>
+                                                    <span class="text-success fw-bold">{{ $uniqueOutputs->count() }}</span>
+                                                </a>
+                                            </li>
                                             @forelse ($groupedOutputs as $typeName => $outputs)
-                                                @php 
-                                                    $typeId = $outputs->first()->type->id ?? null;
-                                                @endphp
                                                 <li>
                                                     <a class="dropdown-item d-flex justify-content-between align-items-center"
-                                                    href="{{ route('authors.outputs', ['authorsId' => $author->id, 'type' => $typeId]) }}">
+                                                    href="{{ route('authors.outputs', ['authorsId' => $author->id, 'type' => $typeName]) }}">
                                                         <span>{{ $typeName }}</span>
                                                         <span class="text-success fw-bold">{{ $outputs->count() }}</span>
                                                     </a>
@@ -319,17 +541,42 @@
                                                 <li><span class="dropdown-item text-muted">{{ __('Sem publicações') }}</span></li>
                                             @endforelse
                                         </ul>
+
+                                        <div class="sp-backdrop" id="spBackdrop"></div>
+                                        <div class="sp-panel" id="spPanel" aria-hidden="true">
+                                            <div class="sp-panel-header">
+                                                <span>{{ __('Produção científica') }}</span>
+                                                <button type="button" class="btn btn-sm btn-light" id="spClose">{{ __('Fechar') }}</button>
+                                            </div>
+                                            <div class="sp-panel-body">
+                                                <ul class="dropdown-menu w-100 shadow-sm" style="position: static; display: block; box-shadow: none; border: 0;">
+                                                    <li>
+                                                        <a class="dropdown-item d-flex justify-content-between align-items-center"
+                                                           href="{{ route('authors.outputs', ['authorsId' => $author->id]) }}">
+                                                            <span>{{ __('All') }}</span>
+                                                            <span class="text-success fw-bold">{{ $uniqueOutputs->count() }}</span>
+                                                        </a>
+                                                    </li>
+                                                    @forelse ($groupedOutputs as $typeName => $outputs)
+                                                        <li>
+                                                            <a class="dropdown-item d-flex justify-content-between align-items-center"
+                                                            href="{{ route('authors.outputs', ['authorsId' => $author->id, 'type' => $typeName]) }}">
+                                                                <span>{{ $typeName }}</span>
+                                                                <span class="text-success fw-bold">{{ $outputs->count() }}</span>
+                                                            </a>
+                                                        </li>
+                                                    @empty
+                                                        <li><span class="dropdown-item text-muted">{{ __('Sem publicações') }}</span></li>
+                                                    @endforelse
+                                                </ul>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
 
                             <hr class="mt-2 mb-0">
-                                                        
-
-		<x-ciencia-vitae-update-profile-button :author-id="$author->id" />
-<!--<x-ciencia-vitae-update-allprofile-button :author-id="$author->id" /> -->
-
-
-
+                            <x-ciencia-vitae-update-profile-button authorId="{{ $author->id }}" />
 
                         </div>
                     </div>
@@ -340,7 +587,7 @@
                         <div class="card-body">
 
                             <!-- Tabs navs -->
-                            <ul class="nav nav-tabs nav-justified mb-3" id="ex1" role="tablist">
+                            <ul class="nav nav-tabs nav-justified mb-2" id="ex1" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <a class="{{ request()->routeIs('authors.show') ? 'nav-link active' : 'nav-link' }}"
                                         style="color:#2A6B20 ;"
@@ -353,18 +600,18 @@
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <a class="{{ request()->routeIs('authors.outputs') ? 'nav-link active' : 'nav-link' }}"
-                                        style="color:#2A6B20 ;"
-                                        href="{{ route('authors.outputs', ['authorsId' => $author->id]) }}">{{ __('Publicações') }}</a>
+                                    style="color:#2A6B20 ;"
+                                    href="{{ route('authors.outputs', ['authorsId' => $author->id]) }}">{{ __('Publicações') }}</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <a class="{{ request()->routeIs('authors.projects') ? 'nav-link active' : 'nav-link' }}"
-                                        style="color:#2A6B20 ;"
-                                        href="{{ route('authors.projects', ['authorsId' => $author->id]) }}">{{ __('Projetos') }}</a>
+                                    style="color:#2A6B20 ;"
+                                    href="{{ route('authors.projects', ['authorsId' => $author->id]) }}">{{ __('Projetos') }}</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <a class="{{ request()->routeIs('authors.activities') ? 'nav-link active' : 'nav-link' }}"
-                                        style="color:#2A6B20 ;"
-                                        href="{{ route('authors.activities', ['authorsId' => $author->id]) }}">{{ __('Atividades') }}</a>
+                                    style="color:#2A6B20 ;"
+                                    href="{{ route('authors.activities', ['authorsId' => $author->id]) }}">{{ __('Atividades') }}</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <a class="{{ request()->routeIs('authors.statistics') ? 'nav-link active' : 'nav-link' }}"
@@ -390,6 +637,114 @@
             </div>
     </section>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const identifiersBtn = document.getElementById('dropdownIdentifiers');
+            const identifiersMenu = document.querySelector('.author-identifiers-menu');
+            const aiPanel = document.getElementById('aiPanel');
+            const aiBackdrop = document.getElementById('aiBackdrop');
+            const aiClose = document.getElementById('aiClose');
+            const btn = document.getElementById('dropdownScientificProduction');
+            const menu = document.querySelector('.scientific-production-menu');
+            const panel = document.getElementById('spPanel');
+            const backdrop = document.getElementById('spBackdrop');
+            const closeBtn = document.getElementById('spClose');
+
+            if (!btn || !menu) {
+                return;
+            }
+
+            if (identifiersBtn && identifiersMenu && aiPanel && aiBackdrop) {
+                identifiersBtn.addEventListener('click', function (event) {
+                    if (window.innerWidth <= 768) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        identifiersBtn.removeAttribute('data-mdb-toggle');
+                        identifiersMenu.classList.remove('show');
+                        identifiersMenu.style.display = 'none';
+                        aiPanel.classList.add('open');
+                        aiPanel.setAttribute('aria-hidden', 'false');
+                        aiBackdrop.classList.add('open');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+
+                const closeIdentifiersPanel = function () {
+                    aiPanel.classList.remove('open');
+                    aiPanel.setAttribute('aria-hidden', 'true');
+                    aiBackdrop.classList.remove('open');
+                    document.body.style.overflow = '';
+                };
+
+                aiBackdrop.addEventListener('click', closeIdentifiersPanel);
+                aiClose.addEventListener('click', closeIdentifiersPanel);
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        closeIdentifiersPanel();
+                    }
+                });
+            }
+
+            function positionMenu() {
+                if (window.innerWidth > 768) {
+                    menu.classList.remove('is-fixed');
+                    menu.style.top = '';
+                    menu.style.maxHeight = '';
+                    return;
+                }
+
+                const rect = btn.getBoundingClientRect();
+                const top = rect.bottom + window.scrollY;
+                menu.classList.add('is-fixed');
+                menu.style.top = `${top}px`;
+                menu.style.maxHeight = `${Math.max(window.innerHeight - top - 12, 120)}px`;
+            }
+            function openPanel() {
+                if (!panel || !backdrop) {
+                    return;
+                }
+                panel.classList.add('open');
+                panel.setAttribute('aria-hidden', 'false');
+                backdrop.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closePanel() {
+                if (!panel || !backdrop) {
+                    return;
+                }
+                panel.classList.remove('open');
+                panel.setAttribute('aria-hidden', 'true');
+                backdrop.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            btn.addEventListener('click', function (event) {
+                if (window.innerWidth <= 768) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    btn.removeAttribute('data-mdb-toggle');
+                    menu.classList.remove('show');
+                    menu.style.display = 'none';
+                    openPanel();
+                    return;
+                }
+                positionMenu();
+                requestAnimationFrame(positionMenu);
+                setTimeout(positionMenu, 0);
+            });
+
+            backdrop?.addEventListener('click', closePanel);
+            closeBtn?.addEventListener('click', closePanel);
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    closePanel();
+                }
+            });
+            window.addEventListener('resize', positionMenu);
+        });
+    </script>
+
     <div class="alert alert-dismissible fade " id="show-message" role="alert" data-mdb-color="primary"
         data-mdb-width="600px" data-mdb-hidden="true" data-mdb-autohide="true" data-mdb-append-to-body="true"
         data-mdb-delay="2000" data-mdb-position="bottom-right">
@@ -397,7 +752,6 @@
         <button type="button" class="btn-close ms-2" data-mdb-dismiss="alert"
             aria-label="{{ __('Close') }}"></button>
     </div>
-
 
 
 </x-app-layout>

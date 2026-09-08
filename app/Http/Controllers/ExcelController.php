@@ -84,7 +84,9 @@ class ExcelController extends Controller
     {        //retrieve the author projects
         list($authorResearchLeaderCount, $authorProjects, $authorProjectsCount, $authorResearchLeader, $authorProjectsParticipations) = $this->authorProject();
         list($outCount, $booksCount, $bookChapterCount, $magazineCount, $conferencePaperCount, $indexedConferencesCount, $indexedMagazinesCount) = $this->authorOutput();
-        $filename = 'Avaliação de ' . Auth::user()->name . '.xlsx';
+        $rawName = (string) Auth::user()->name;
+        $safeName = preg_replace('/[^A-Za-z0-9 _-]/', '', $rawName);
+        $filename = 'Avaliacao de ' . trim($safeName) . '.xlsx';
         // $option = match (true) {
         //     $outCount >= 1 && $outCount <= 5 => "1 a 5",
         //     $outCount >= 6 && $outCount <= 10 => "6 a 10",

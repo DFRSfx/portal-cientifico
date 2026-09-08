@@ -208,13 +208,13 @@ public function authorSupervision() //para o N4 todas as atividades feito
         $date =  date('d-m-Y');
         $options = array_map(function ($outputType) {
             return match (true) {
-                $outputType == "App\Models\JournalArticle" => "Artigo em revista científica",
-                $outputType == "App\Models\ConferencePaper"  => "Artigo em conferência",
-                $outputType == "App\Models\MagazineArticles"  => "Artigo em revista científica",
-                $outputType == "App\Models\ConferencePoster"  => "Poster em conferência",
-                $outputType == "App\Models\Book"  => "Livro, Antologia, Número especial de uma revista",
-                $outputType == "App\Models\BookChapter"  => "Livro, Antologia, Número especial de uma revista",
-                $outputType == "App\Models\ConferenceAbstract"  => "Resumo em atas de conferência",
+                $outputType == "App\Models\JournalArticle" => "Artigo em revista cientÃ­fica",
+                $outputType == "App\Models\ConferencePaper"  => "Artigo em conferÃªncia",
+                $outputType == "App\Models\MagazineArticles"  => "Artigo em revista cientÃ­fica",
+                $outputType == "App\Models\ConferencePoster"  => "Poster em conferÃªncia",
+                $outputType == "App\Models\Book"  => "Livro, Antologia, NÃºmero especial de uma revista",
+                $outputType == "App\Models\BookChapter"  => "Livro, Antologia, NÃºmero especial de uma revista",
+                $outputType == "App\Models\ConferenceAbstract"  => "Resumo em atas de conferÃªncia",
                 default => "Outro",
             };
         }, $concatOutputTypes);
@@ -227,7 +227,9 @@ public function authorSupervision() //para o N4 todas as atividades feito
         $reader = IOFactory::createReader('Xlsx');
         $spreadsheet = $reader->load(storage_path('app/public/FirminoSilva_RelatorioIndividual_2023.xlsx'));
 
-        $filename = 'Avaliação de ' . Auth::user()->name . $date . '.xlsx';
+        $rawName = (string) Auth::user()->name;
+        $safeName = preg_replace('/[^A-Za-z0-9 _-]/', '', $rawName);
+        $filename = 'Avaliacao de ' . trim($safeName) . ' ' . $date . '.xlsx';
 
         $columnArray = array_chunk($concatOutputs, 1);
         $columnArray2 = array_chunk($concatProjects, 1);
@@ -338,13 +340,13 @@ public function authorSupervision() //para o N4 todas as atividades feito
                     ]);
                     
                     $outputCategory = match ($outputType) {
-                        "App\Models\JournalArticle" => "Artigo em revista científica",
-                        "App\Models\ConferencePaper" => "Artigo em conferência",
-                        "App\Models\MagazineArticles" => "Artigo em revista científica",
-                        "App\Models\ConferencePoster" => "Poster em conferência",
-                        "App\Models\Book" => "Livro, Antologia, Número especial de uma revista",
-                        "App\Models\BookChapter" => "Livro, Antologia, Número especial de uma revista",
-                        "App\Models\ConferenceAbstract" => "Resumo em atas de conferência",
+                        "App\Models\JournalArticle" => "Artigo em revista cientï¿½fica",
+                        "App\Models\ConferencePaper" => "Artigo em conferï¿½ncia",
+                        "App\Models\MagazineArticles" => "Artigo em revista cientï¿½fica",
+                        "App\Models\ConferencePoster" => "Poster em conferï¿½ncia",
+                        "App\Models\Book" => "Livro, Antologia, Nï¿½mero especial de uma revista",
+                        "App\Models\BookChapter" => "Livro, Antologia, Nï¿½mero especial de uma revista",
+                        "App\Models\ConferenceAbstract" => "Resumo em atas de conferï¿½ncia",
                         default => "Outro",
                     };
                     

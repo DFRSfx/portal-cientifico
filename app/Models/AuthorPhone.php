@@ -11,9 +11,32 @@ class AuthorPhone extends Model
 
     protected $fillable = [
         'author_id',
+        'number',
+        'phone',
         'phone_number',
         'type',
+        'use_type',
     ];
+
+    public function getPhoneAttribute()
+    {
+        return $this->number;
+    }
+
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['number'] = $value;
+    }
+
+    public function getPhoneNumberAttribute()
+    {
+        return $this->number;
+    }
+
+    public function setPhoneNumberAttribute($value)
+    {
+        $this->attributes['number'] = $value;
+    }
 
     public function author()
     {

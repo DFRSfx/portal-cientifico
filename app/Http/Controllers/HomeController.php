@@ -31,6 +31,7 @@ public function index()
         $numberOfAuthors = DB::table('authors')->count();
         $numberOfOutputs = DB::table('outputs')->count();
 
+
         $ttl = 60 * 60 * 24 * 7; // 1 week
 
         $eventsUrl  = env('EVENTS_API_URL', 'https://investigacao.islagaia.pt/wp-json/wp/v2/tribe_events');

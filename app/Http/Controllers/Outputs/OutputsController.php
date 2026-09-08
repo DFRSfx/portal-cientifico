@@ -143,7 +143,8 @@ class OutputsController extends Controller
                     $query->whereIn("type", $request->input("status"));
                 }
             }
-        )->with(["authors", "type", "polymorphic"])
+        )
+            ->with(["authors", "type", "polymorphic"])
             ->when($request->filled("title"), function ($query) use ($dataValidated) {
                 return $query->where('title', 'like', '%' . $dataValidated["title"] . '%');
             })

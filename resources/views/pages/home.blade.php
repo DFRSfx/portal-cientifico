@@ -4,14 +4,12 @@
         Home
     </x-slot>
 
-    <link href="{{ asset('css\extra.css') }}" rel="stylesheet">
-
     <main>
 
-        <div class="container pt-5">
-            <div class="row">
+        <div class="container-xxl saas-dashboard pt-4 pb-4 home-layout">
+            <div class="row g-4">
                 <div class="col-xl-3">
-                    <div class="card testimonial-card mb-3">
+                    <div class="card testimonial-card mb-4">
                         <div class="card-up">
 
                         </div>
@@ -20,7 +18,7 @@
                                 showLogedUserImage="{{ Auth::check() && auth()->user()->type != 'administrative' }}"
                                 class="rounded-circle img-fluid" height="36" />
                         </div>
-                        <div class="card-body" style="height: 250px;">
+                        <div class="card-body">
                             @if (Auth::check())
                                 <h5 class="font-weight-bolder mb-1">
                                     {{ auth()->user()->name }}
@@ -51,9 +49,9 @@
 
                         </div>
                     </div>
-                    <div class="card mb-3">
+                    <div class="card mb-4">
                         <div class="card-body">
-                            <p class="mb-4" style="color:#2A6B20">{{ __('Eventos') }}</p>
+                            <p class="mb-2 fw-semibold" style="color:#2A6B20">{{ __('Eventos') }}</p>
                             <div class="list-group list-group-flush">
 
                                 @if(!empty($eventsFinal) && count($eventsFinal))
@@ -78,7 +76,7 @@
                             <hr>
 
                             <a href="https://investigacao.islagaia.pt/events/" target="_blank" rel="noopner noreferrer">
-                                <button type="button" class="btn btn-link " style="color:#343a40"
+                                <button type="button" class="btn btn-link" style="color:#343a40"
                                     data-mdb-ripple-color="dark"> {{ __('Mostrar todos os Eventos') }} <i
                                         class="fas fa-arrow-right ps-2"></i></button>
                             </a>
@@ -87,7 +85,19 @@
                 </div>
 
                 <div class="col-xl-5">
-                    <div class="card mb-3">
+                    @php
+                        $featuredItems = !empty($lastOutputs) ? collect($lastOutputs)->values() : collect();
+                        if ($featuredItems->count()) {
+                            $targetCount = 5;
+                            $cursor = 0;
+                            while ($featuredItems->count() < $targetCount) {
+                                $featuredItems->push($featuredItems[$cursor % $featuredItems->count()]);
+                                $cursor++;
+                            }
+                            $featuredItems = $featuredItems->take($targetCount);
+                        }
+                    @endphp
+                    <div class="card mb-4">
                         <div class="card-body">
                             <div class="bg-image hover-overlay ripple rounded-0 ripple-surface-light"
                                 data-mdb-ripple-color="light">
@@ -97,87 +107,67 @@
                         </div>
                     </div>
 
+                    @if ($featuredItems->count())
+                        <div class="card mb-4 featured-carousel-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="mb-2 fw-semibold" style="color:#2A6B20">{{ __('Últimos artigos') }}</p>
+                                    </div>
+                                </div>
 
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <p class="mb-4" style="color:#2A6B20">{{ __('Últimos artigos') }}</p>
+                                <div id="featured-carousel" class="carousel slide" data-mdb-ride="carousel" data-mdb-interval="4000">
+                                    <div class="carousel-inner">
+                                        @foreach ($featuredItems as $index => $publication)
+                                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                                <div class="p-3 rounded featured-carousel-item">
+                                                    <x-publication-title :publication=$publication displayType="0" displayAccessPubButton="1" />
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
 
-                            @foreach ($lastOutputs as $publication)
-                                <x-publication-title :publication=$publication displayType="0"
-                                    displayAccessPubButton="1" />
-                                <hr>
-                            @endforeach
+                                    @if ($featuredItems->count() > 1)
+                                        <div class="carousel-indicators">
+                                            @foreach ($featuredItems as $index => $publication)
+                                                <button type="button" data-mdb-target="#featured-carousel"
+                                                    data-mdb-slide-to="{{ $index }}"
+                                                    class="{{ $index === 0 ? 'active' : '' }}"
+                                                    aria-label="{{ __('Slide') }} {{ $index + 1 }}"></button>
+                                            @endforeach
+                                        </div>
+                                    @endif
 
-
-                            @if (Auth::check())
-                                <a href="{{ route('outputs.index') }}">
-                                    <button type="button" class="btn btn-link " style="color:#343a40"
-                                        data-mdb-ripple-color="dark"> {{ __('Mostrar todas as Publicações') }} <i
-                                            class="fas fa-arrow-right ps-2"></i></button>
-                                </a>
-                            @endif
-
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-
+                    @endif
                 </div>
                 <!-- Start Section 3-->
                 <div class="col-xl-4">
                     <!-- Start Search-->
-                    <div class="card mb-3">
+                    <div class="card mb-4">
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12 mb-4 mt-4 mb-md-0">
-                                    <div class="card">
-                                        <div class="p-2">
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shrink-0">
-                                                    <div class="p-3 badge-primary rounded-4 "
-                                                        style="background-color:#2A6B20">
-                                                        <i class="fas fa-user fa-lg fa-fw" style="color:white;"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1 ms-4">
-                                                    <p class="text-muted mb-1">{{ __('Autores') }}</p>
-                                                    <div>
-                                                        <h2 class="mb-0 counter" id="number-of-authors"
-                                                            data-count="{{ $numberOfAuthors }}">
-                                                            {{ $numberOfAuthors }}
-                                                        </h2>
-                                                    </div>
-
-                                                </div>
-                                            </div>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="saas-stat">
+                                        <div class="saas-stat-icon"><i class="fas fa-user"></i></div>
+                                        <div class="saas-stat-body">
+                                            <div class="saas-stat-label">{{ __('Autores') }}</div>
+                                            <div class="saas-stat-value counter" id="number-of-authors" data-count="{{ $numberOfAuthors }}">{{ $numberOfAuthors }}</div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="col-md-12 mb-4 mt-4 mb-md-0">
-                                    <div class="card">
-                                        <div class="p-2">
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shrink-0">
-                                                    <div class="p-3 badge-primary rounded-4 "
-                                                        style="background-color:#2A6B20">
-                                                        <i class="fas fa-newspaper fa-lg fa-fw"
-                                                            style="color:white;"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1 ms-4">
-                                                    <p class="text-muted mb-1">{{ __('Artigos') }}</p>
-                                                    <div title="Artigos">
-                                                        <h2 class="mb-0 counter" id="number-of-outputs"
-                                                            data-count="{{ $numberOfOutputs }}">
-                                                            {{ $numberOfOutputs }}
-                                                        </h2>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                <div class="col-12">
+                                    <div class="saas-stat">
+                                        <div class="saas-stat-icon"><i class="fas fa-newspaper"></i></div>
+                                        <div class="saas-stat-body">
+                                            <div class="saas-stat-label">{{ __('Artigos') }}</div>
+                                            <div class="saas-stat-value counter" id="number-of-outputs" data-count="{{ $numberOfOutputs }}">{{ $numberOfOutputs }}</div>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                         <!-- Section: Design Block -->
@@ -185,11 +175,13 @@
 
 
                     <!-- Start Ads-->
-                    <div class="card mb-3">
+                    <div class="card mb-4">
                         <div class="card-body">
-                            <p class="mb-4" style="color:#2A6B20">{{ __('Links Úteis') }}</p>
+                            <p class="mb-2 fw-semibold" style="color:#2A6B20">{{ __('Links Úteis') }}</p>
                            <div class="d-flex align-items-center w-100 ps-3">
                             <div class="w-100">
+
+                                <p class="text-uppercase small text-muted mb-2">{{ __('Recursos') }}</p>
 
                                 @if(!empty($coursesFinal) && count($coursesFinal))
                                     @foreach ($coursesFinal as $course)
@@ -210,6 +202,7 @@
                                     <div class="list-group-item border-0 py-1 text-muted">{{ __('Sem cursos recentes') }}</div>
                                 @endif
 
+                                <p class="text-uppercase small text-muted mt-3 mb-2">{{ __('Pesquisa') }}</p>
                                 <a href="https://www.webofscience.com/wos/woscc/basic-search"
                                     class="list-group-item list-group-item-action border-0 py-1 text-truncate"
                                     target="_blank" rel="noopener noreferrer">
@@ -235,6 +228,66 @@
             </div>
         </div>
     </main>
+
+    <style>
+        .home-layout {
+            max-width: 1440px;
+        }
+
+        .home-layout .card {
+            border: 1px solid #e4efe7;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+        }
+        .featured-carousel-card {
+            background: linear-gradient(135deg, #f3fbf7 0%, #ffffff 60%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-carousel-card::before {
+            content: "";
+            position: absolute;
+            inset: -40% auto auto -30%;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(46, 125, 50, 0.12), rgba(46, 125, 50, 0));
+        }
+
+        .featured-carousel-card .card-body {
+            position: relative;
+        }
+
+        .featured-carousel-item {
+            background: #f7fbf8;
+            border: 1px solid #e4efe7;
+            padding-bottom: 22px;
+        }
+
+        .featured-carousel-card .carousel-indicators {
+            position: static;
+            margin-top: 12px;
+        }
+
+        .featured-carousel-card .carousel-indicators [data-mdb-target] {
+            background-color: #2a6b20;
+            opacity: 0.25;
+        }
+
+        .featured-carousel-card .carousel-indicators .active {
+            opacity: 0.85;
+        }
+
+        .featured-carousel-card .carousel-control-prev-icon,
+        .featured-carousel-card .carousel-control-next-icon {
+            filter: invert(30%) sepia(12%) saturate(350%) hue-rotate(85deg);
+        }
+
+        @media (max-width: 1199.98px) {
+            .home-layout {
+                max-width: 100%;
+            }
+        }
+    </style>
 
     <script>
         function animateValue(obj, start, end, duration) {

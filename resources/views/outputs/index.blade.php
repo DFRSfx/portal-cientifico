@@ -9,6 +9,33 @@
             background-color: transparent;
             color: black;
         }
+
+        .outputs-table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .outputs-table thead th {
+            background: #e6f1ea;
+            color: #1f4d2f;
+            font-weight: 700;
+            border-bottom: 1px solid #cfe2d6;
+            padding: 12px 14px;
+        }
+
+        .outputs-table tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #dfeae3;
+            vertical-align: middle;
+        }
+
+        .outputs-table tbody tr:nth-child(even) {
+            background: #f2f8f4;
+        }
+
+        .outputs-table tbody tr:hover {
+            background: #e3f2e8;
+        }
     </style>
 
     @push('header-links')
@@ -26,11 +53,11 @@
         </script>
     @endpush
 
-    <section>
-        <div class="container mt-4">
+    <section class="saas-list-compact">
+        <div class="container saas-wide mt-3">
             <div class="row">
                 <div class="col-xl-3">
-                    <div class="card">
+                    <div class="card saas-sticky">
 
                         <form id="form-filter" name="form-filter" method="POST">
                             @csrf
@@ -93,7 +120,6 @@
                                         value="In print" id="in-print" />
                                     <label class=" form-check-label" for="in-print">{{ __('Na impressão') }}</label>
                                 </div>
-                                <hr>
                                 <h6 class=" my-3" style="color:#2A6B20">{{ __('Palavras chave') }}</h6>
                                 <div id="keywords-container">
                                     <select class="select" id="select-keywords" multiple
@@ -146,8 +172,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="table-responsive p-2 ">
-                            <table class="table align-middle mb-0 bg-white responsive nowrap" style="width:100% "
+                        <div class="table-responsive p-1 ">
+                            <table class="table align-middle mb-0 bg-white outputs-table" style="width:100% "
                                 id="outputs_table">
                                 <thead class="bg-light">
                                     <tr>
@@ -277,7 +303,7 @@
             })
 
             const TABLE = $('#outputs_table').DataTable({
-                responsive: true,
+                responsive: false,
 
                 buttons: buttonsToInsert,
                 "language": {
@@ -309,12 +335,26 @@
             });
         }
 
+        function initializeLoader() {
+            // No-op: keeps filtering working if loader helper is unavailable.
+        }
+
+        function getSelectedValues(selectId) {
+            const selectElement = document.getElementById(selectId)
+
+            if (!selectElement) {
+                return []
+            }
+
+            return Array.from(selectElement.selectedOptions).map(option => option.value)
+        }
+
         function formHandler() {
             const data = {
-                "category": getSelectedOptions(".output-type:checked", "checkbox", "class"),
+                "category": getSelectedValues("select-output-type"),
                 "title": document.getElementById("title").value,
-                "keywords": getSelectedOptions(".output-keywords:checked", "checkbox", "class"),
-                "citationNames": getSelectedOptions(".citation-names:checked", "checkbox", "class"),
+                "keywords": getSelectedValues("select-keywords"),
+                "citationNames": getSelectedValues("select-citations"),
                 "status": getSelectedOptions(".output-status:checked", "checkbox", "class")
             }
 
@@ -332,10 +372,11 @@
 
             $.ajax({
                 type: 'GET',
-                url: 'https://portalcientifico.islagaia.pt/outputs/filter',
+                url: '{{ route('outputs.filter') }}',
                 data,
                 success: function(data, status) {
                     const output = data[0].filteredResults;
+
 
                     let link, publisherSpan;
 
@@ -381,8 +422,8 @@
                                     </div>
                                 </div>
                             </div>`,
-                            `<span class="badge badge-success rounded-pill d-inline ">${(element.polymorphic.status)?? "{{ __('Sem Estado') }}"}</span>`,
-                            `<span class="badge badge-success rounded-pill d-inline ">${(element.type.name)?? "{{ __('Sem Tipo') }}"}</span>`,
+                            `<span class="badge badge-${statusBadgeClass(element.polymorphic?.status)} rounded-pill d-inline">${(element.polymorphic?.status) ?? "{{ __('Sem Estado') }}"}</span>`,
+                            `<span class="badge badge-${typeBadgeClass(element.type?.name)} rounded-pill d-inline">${(element.type?.name) ?? "{{ __('Sem Tipo') }}"}</span>`,
                         ]);
 
                     });
@@ -462,6 +503,32 @@
             return contentToshow
         }
 
+        function statusBadgeClass(status) {
+            const map = {
+                'published': 'success',
+                'accepted': 'primary',
+                'in review': 'warning',
+                'under revision': 'warning',
+                'submitted': 'danger',
+                'in print': 'info'
+            }
+
+            const key = (status || '').toString().toLowerCase()
+            return map[key] || 'secondary'
+        }
+
+        function typeBadgeClass(typeName) {
+            const key = (typeName || '').toString().toLowerCase()
+
+            if (key.includes('book')) return 'success'
+            if (key.includes('journal')) return 'primary'
+            if (key.includes('conference')) return 'info'
+            if (key.includes('abstract')) return 'warning'
+            if (key.includes('thesis') || key.includes('dissertation')) return 'dark'
+
+            return 'secondary'
+        }
+
         function initalizeSearch() {
             let submitSearch = false
 
@@ -528,6 +595,7 @@
                     });
             }
 
+
             if (document.querySelectorAll('.filtred-filds').length > 0) {
                 const startYear = document.getElementById("startYear").innerHTML;
 
@@ -559,6 +627,11 @@
             initializeDataTable(['excel', 'pdf'])
 
             initalizeSearch()
+
+                const authorStatus = document.getElementById('author-status');
+                if (authorStatus) {
+                    authorStatus.addEventListener('change', submitForm);
+                }
 
             $(':checkbox').change(function(handler) {
                 const checkBoxChecked = handler.currentTarget.checked
@@ -623,6 +696,7 @@
 
                 submitForm();
             });
+
 
             /*
                     

@@ -28,12 +28,17 @@
                                 href="{{ route('dashboard') }}">{{ __('Painel') }}</a>
                         </li>
 
-                        @if (auth()->user()->type == 'administrative')
+                    @if (auth()->user()->type == 'administrative')
                             <li class="nav-item dropdown px-2">
                                 <a class="nav-link dropdown-toggle" style="color: black;" href="#"
                                     id="navbarDropdownMenuLink" role="button" data-mdb-toggle="dropdown"
                                     aria-expanded="false">
                                     {{ __('Utilizadores') }}
+                                    @if (($pendingApprovalCount ?? 0) > 0 || ($pendingVerificationCount ?? 0) > 0)
+                                        <span class="badge rounded-pill bg-danger ms-1">
+                                            {{ ($pendingApprovalCount ?? 0) + ($pendingVerificationCount ?? 0) }}
+                                        </span>
+                                    @endif
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuInvestigação">
                                     <li>
@@ -42,8 +47,19 @@
                                     </li>
                                     <li>
                                         <a class="dropdown-item " aria-current="pageAuthors"
-                                            href="{{ route('user.inactive') }}">{{ __('Utilizadores Inativos') }}</a>
+                                            href="{{ route('user.active') }}">{{ __('Utilizadores Ativos') }}
+                                            @if (($activeUserCount ?? 0) > 0)
+                                                <span class="badge rounded-pill bg-success text-white ms-1">{{ $activeUserCount }}</span>
+                                            @endif
+                                        </a>
                                     </li>
+                                    <li>
+                                        <a class="dropdown-item " aria-current="pageAuthors"
+                                            href="{{ route('user.inactive') }}">{{ __('Utilizadores Inativos') }}
+                                            @if (($pendingApprovalCount ?? 0) > 0)
+                                                <span class="badge rounded-pill bg-warning text-dark ms-1">{{ $pendingApprovalCount }}</span>
+                                            @endif
+                                        </a>
                                 </ul>
                             </li>
                         @else
@@ -54,29 +70,28 @@
                                     {{ __('Reporte') }}
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuInvestigação">
+                                    @php
+                                        $reportEntities = auth()->user()->entities ?? [];
+                                        if (empty($reportEntities) && !empty(auth()->user()->entidade)) {
+                                            $reportEntities = [auth()->user()->entidade];
+                                        }
+                                        $reportEntities = array_values(array_unique(array_filter($reportEntities)));
+                                    @endphp
 
-                                    {{-- <li>
-                                        <a class="dropdown-item " aria-current="pageAuthors"
-                                            href="{{ route('ceos-excel') }}">{{ __('CEOS.PP') }}</a>
-
-                                    </li> --}}
-                                    {{-- @if (Auth::user()->is_isla == 0) --}}
+                                    @foreach ($reportEntities as $entity)
                                         <li>
-                                            <a class="dropdown-item" aria-current="pageAuthors" href="#!"
-                                                id="reportLink">{{ __('CEOS.PP') }}</a>
+                                            <a class="dropdown-item report-link" aria-current="pageAuthors" href="#!"
+                                                data-entity="{{ $entity }}"
+                                                data-report-action="{{ route('ceos-excel') }}">
+                                                {{ $entity }}
+                                            </a>
                                         </li>
-<li>
+                                    @endforeach
 
- <a class="dropdown-item " aria-current="pageAuthors"
-                                            href="{{ route('ceos-excel-all') }}">{{ __('All Authors') }}</a></li>
-
-                                    {{-- @else --}}
-                                        {{-- <li>
-                                            <a class="dropdown-item  " aria-current="pagestatistics"
-                                                href="{{ route('myinfo') }}">{{ __('Reporte') }}</a>
-                                        </li> --}}
-                                    {{-- @endif
- --}}
+                                    <!--<li>
+                                        <a class="dropdown-item" aria-current="pageAuthors"
+                                            href="{{ route('ceos-excel-all') }}">{{ __('All Authors') }}</a>
+                                    </li>-->
                                 </ul>
                             </li>
                             @endif

@@ -15,9 +15,9 @@
         </script>
     @endpush
 
-    <div class="container pt-5">
+    <div class="container-fluid pt-5 px-4">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-12">
                 <div class="card">
 
                     <div class="card-body">
@@ -29,22 +29,47 @@
                                         <th>{{ __('Nome') }}</th>
                                         <th>{{ __('Email') }}</th>
                                         <th>{{ __('Ciencia Vitae Id') }}</th>
+                                        <th>{{ __('Verificacao') }}</th>
+                                        <th>{{ __('Registo') }}</th>
+                                        <th>{{ __('Acoes') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($users as $user)
                                         <tr>
+                                            <td><p class="fw-normal mb-0">{{ $user->name }}</p></td>
+                                            <td><p class="fw-normal mb-0">{{ $user->email }}</p></td>
+                                            <td><p class="fw-normal mb-0">{{ $user->ciencia_vitae ?? '-' }}</p></td>
                                             <td>
-                                                <p class="fw-normal mb-0">{{ $user->name }}</p>
+                                                <span class="badge {{ $user->email_verified_at ? 'badge-success' : 'badge-warning' }} rounded-pill">
+                                                    {{ $user->email_verified_at ? __('Verificado') : __('Pendente') }}
+                                                </span>
                                             </td>
-                                            <td>
-                                                <p class="fw-normal mb-0">{{ $user->email }}</p>
+                                            <td><p class="fw-normal mb-0">{{ $user->created_at?->format('Y-m-d') ?? '-' }}</p></td>
+                                            <td class="d-flex flex-wrap gap-2">
+                                                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">
+                                                    {{ __('Editar') }}
+                                                </a>
+                                                <form method="POST" action="{{ route('user.activate', $user->id) }}">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-success">
+                                                        {{ __('Aprovar') }}
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="{{ route('user.resend-verification', $user->id) }}">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                        {{ __('Reenviar email') }}
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="{{ route('user.destroy', $user->id) }}" onsubmit="return confirm('{{ __('Tem a certeza que deseja remover?') }}');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        {{ __('Remover') }}
+                                                    </button>
+                                                </form>
                                             </td>
-                                            <td>
-                                                <p class="fw-normal mb-0">{{ $user->ciencia_vitae ?? '-' }}</p>
-                                            </td>
-
-
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -66,31 +91,26 @@
 
     <script>
         function initializeDataTable(buttons) {
-            let buttonsToInsert = []
+            const buttonsToInsert = buttons.map(element => ({
+                extend: element,
+                className: 'btn-jstabales',
+                removeClass: 'btn-group'
+            }));
 
-            buttons.forEach(element => {
-                buttonsToInsert.push({
-                    extend: element,
-                    className: 'btn-jstabales',
-                    removeClass: 'btn-group'
-                })
-            })
-
-            const TABLE = $('#usersTable').DataTable({
+            const TABLE = $('#users_table').DataTable({
                 dom: 'Bfrtip',
                 orderCellsTop: true,
                 fixedHeader: false,
-                "bPaginate": false,
+                bPaginate: false,
                 buttons: buttonsToInsert,
-                "language": {
-                    "search": "{{ __('Procurar') }}",
-                    "lengthMenu": "{{ __('Mostrar') }} _MENU_ ",
-                    "infoEmpty": "{{ __('Mostrando') }} 0 - 0 {{ 'de' }} 0",
-                    "info": "{{ __('Mostrando') }} _START_ - _END_ {{ 'de' }} _TOTAL_",
-                    "paginate": {
-
-                        "next": '{{ __('Próximo') }}',
-                        "previous": '{{ __('Anterior') }}'
+                language: {
+                    search: "{{ __('Procurar') }}",
+                    lengthMenu: "{{ __('Mostrar') }} _MENU_ ",
+                    infoEmpty: "{{ __('Mostrando') }} 0 - 0 {{ 'de' }} 0",
+                    info: "{{ __('Mostrando') }} _START_ - _END_ {{ 'de' }} _TOTAL_",
+                    paginate: {
+                        next: '{{ __('Próximo') }}',
+                        previous: '{{ __('Anterior') }}'
                     },
                 },
                 order: [
@@ -103,7 +123,6 @@
 
         $(document).ready(function() {
             initializeDataTable(['excel', 'pdf']);
-
         });
     </script>
 

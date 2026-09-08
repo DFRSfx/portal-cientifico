@@ -17,6 +17,9 @@
 
     <link href="{{ asset('bootstrap\css\mdb.min.css') }}" rel="stylesheet">
 
+    <!-- Custom theme overrides -->
+    <link href="{{ asset('css/extra.css') }}" rel="stylesheet">
+
     @stack('header-links')
 
     <!--mdboostrap js-->
@@ -30,7 +33,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body>
+<body class="saas">
 
     <x-layouts.nav-bar />
 

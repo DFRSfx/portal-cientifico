@@ -7,6 +7,45 @@
             background-color: transparent;
             color: black;
         }
+
+        .activities-body {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        @media (min-width: 1200px) {
+            .activities-body {
+                padding-left: 6px;
+                padding-right: 6px;
+            }
+        }
+
+            .activities-table {
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            .activities-table thead th {
+                background: #e6f1ea;
+                color: #1f4d2f;
+                font-weight: 700;
+                border-bottom: 1px solid #cfe2d6;
+                padding: 12px 14px;
+            }
+
+            .activities-table tbody td {
+                padding: 12px 14px;
+                border-bottom: 1px solid #dfeae3;
+                vertical-align: middle;
+            }
+
+            .activities-table tbody tr:nth-child(even) {
+                background: #f2f8f4;
+            }
+
+            .activities-table tbody tr:hover {
+                background: #e3f2e8;
+            }
     </style>
     <div class="accordion-item">
         <div class="accordion-header" id="headingEight">
@@ -19,10 +58,10 @@
         </div>
 
         <div id="collapseEight" class="collapse show" aria-labelledby="headingEight" data-parent="#accordion">
-            <div class="card-body">
+            <div class="card-body activities-body">
                 @if ($author->service->count() > 0)
                     <div class="table-responsive">
-                        <table id="tableThree" class="table">
+                        <table id="tableThree" class="table w-100 activities-table">
                             <thead>
                                 <tr>
                                     {{-- <th scope="row">{{ __('Tipo de evento') }}</th> --}}
@@ -93,9 +132,9 @@
 
                                         </td>
                                     @empty
-                                        <td>{{ __('Sem Atividades') }}</td>
-                                    </tr>
-                                @endforelse
+                                            <td>{{ __('Sem Atividades') }}</td>
+                                        </tr>
+                                    @endforelse
                             </tbody>
                         </table>
                     </div>

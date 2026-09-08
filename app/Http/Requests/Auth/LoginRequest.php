@@ -5,9 +5,11 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
 
 class LoginRequest extends FormRequest
 {
@@ -43,6 +45,21 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         $columnToCheck = $this->columnToCheck();
+
+        $user = User::where($columnToCheck, $this->username)->first();
+        if ($user && Hash::check($this->password, $user->password)) {
+            if (method_exists($user, 'hasVerifiedEmail') && !$user->hasVerifiedEmail()) {
+                throw ValidationException::withMessages([
+                    'email' => __('Confirme o email para ativar a conta.'),
+                ]);
+            }
+
+            if (!$user->is_active) {
+                throw ValidationException::withMessages([
+                    'email' => __('A sua conta ainda esta pendente de aprovacao.'),
+                ]);
+            }
+        }
 
         if(! Auth::attempt([$columnToCheck => $this->username, 'password' => $this->password, "is_active" => 1], $this->boolean('remember'))) 
         {

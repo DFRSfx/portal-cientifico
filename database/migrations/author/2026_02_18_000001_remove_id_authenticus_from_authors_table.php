@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('authors', function (Blueprint $table) {
+            if (Schema::hasColumn('authors', 'id_authenticus')) {
+                $table->dropColumn('id_authenticus');
+            }
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('authors', function (Blueprint $table) {
+            if (!Schema::hasColumn('authors', 'id_authenticus')) {
+                $table->string('id_authenticus')->nullable()->after('id_scopus_author');
+            }
+        });
+    }
+};

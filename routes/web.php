@@ -19,6 +19,12 @@ use App\Http\Controllers\TeacherPersonalEvaluationExcel;
 | Web Routes
 |--------------------------------------------------------------------------
 |
+
+// TEMP: rota de placeholder para evitar erro "Route [ceos-excel-all] not defined" enquanto não há implementação
+Route::get('/ceos-excel-all', function () {
+    abort(404);
+})->name('ceos-excel-all');
+
 | Here is where you can register web routes for your application. These
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
@@ -70,9 +76,13 @@ Route::middleware('auth')->group(function () {
         Route::get("{id}/statistics", "App\Http\Controllers\AuthorController@getAuthorStats")->name("authors.statistics");
         Route::get("{id}/employments", "App\Http\Controllers\AuthorController@getAuthorEmployments")->name("authors.employments");
         Route::get("{authorsId}/outputs", 'App\Http\Controllers\PublicationController@showAuthorOutputs')->name("authors.outputs");
+        Route::post("{authorId}/outputs/{outputId}/quartile", "App\Http\Controllers\AuthorController@updateOutputQuartile")
+            ->name('authors.outputs.quartile.update');
         Route::get("{authorsId}/projects", 'App\Http\Controllers\AuthorController@projects')->name("authors.projects");
         Route::get("admin", "App\Http\Controllers\AdminController@allPublications")->name("admin");
         Route::get("update", "App\Http\Controllers\AuthorController@updateOneAuthorInfo")->name('update-info');
+        Route::get("update/{authorId}", "App\Http\Controllers\AuthorController@updateAuthorById")->name('authors.update.one');
+        Route::post("{authorId}/metrics", "App\Http\Controllers\AuthorController@updateMetrics")->name('authors.metrics.update');
         Route::get("myinfo", "App\Http\Controllers\ExcelController@exportOneAuthor")->name("myinfo");
         Route::get("ceos-excel", "App\Http\Controllers\CeosController@exportOneAuthor")->name("ceos-excel");
  Route::get("ceos-excel-all", "App\Http\Controllers\CeosController@exportAllAuthors")->name("ceos-excel-all");
@@ -81,6 +91,8 @@ Route::middleware('auth')->group(function () {
 
 
 Route::get('/authors/update-all', [AuthorController::class, 'updateAllAuthors'])->name('authors.update.all');
+Route::post('/authors/update-all-job', [AuthorController::class, 'startUpdateAllAuthorsJob'])->name('authors.update.job');
+Route::get('/authors/update-all-job/{runId}', [AuthorController::class, 'getUpdateAllAuthorsJobStatus'])->name('authors.update.job.status');
 
 
     Route::resource("authors", "App\Http\Controllers\AuthorController")->only([
@@ -88,14 +100,19 @@ Route::get('/authors/update-all', [AuthorController::class, 'updateAllAuthors'])
         "show"
     ]);
 
-
-
-    Route::prefix('users')->group(function () {
+Route::prefix('users')->group(function () {
         Route::post('/import', [UserController::class, 'import'])->name('import');
         Route::get("create", [UserController::class, "create"])->name("user.create");
         Route::post("store", [UserController::class, "store"])->name("user.store");
         Route::get("inactive", [UserController::class, "getAllInactiveUsers"])->name("user.inactive");
+        Route::get("active", [UserController::class, "getAllActiveUsers"])->name("user.active");
+        Route::get("{userId}/edit", [UserController::class, "edit"])->name("user.edit");
+        Route::patch("{userId}", [UserController::class, "update"])->name("user.update");
         Route::post("{userId}/resend-notification", [UserController::class, "reesendUserToken"])->name("user.resend-notification");
+        Route::post("{userId}/activate", [UserController::class, "activate"])->name("user.activate");
+        Route::post("{userId}/deactivate", [UserController::class, "deactivate"])->name("user.deactivate");
+        Route::post("{userId}/resend-verification", [UserController::class, "resendVerification"])->name("user.resend-verification");
+        Route::delete("{userId}", [UserController::class, "destroy"])->name("user.destroy");
     });
 
     Route::prefix("statistics")->group(function () {

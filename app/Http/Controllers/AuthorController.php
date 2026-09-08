@@ -6,6 +6,8 @@ use App\Models\Author;
 use App\Models\Output;
 use App\Models\Language;
 use App\Models\OutputType;
+use App\Models\CvUpdateRun;
+use App\Jobs\UpdateAllAuthorsJob;
 use Illuminate\Http\Request;
 use GuzzleHttp\Psr7\Response;
 use App\Models\EventParticipation;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\EventAdministration;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DomainActivitiesTopic;
+use App\Models\Entity;
 use App\Http\Requests\AuthorSearchRequest;
 use App\Http\Controllers\CienciaVitaeController;
 
@@ -54,7 +57,11 @@ class AuthorController extends Controller
 
         $outputsKeyWords = DB::table("keywords")->select("keyword", "id")->orderBy("keyword")->distinct()->cursor();
 
-        return View('authors.index', compact(["authors", "topics", "languages", "outputsKeyWords"]));
+        $entitiesList = Entity::orderByRaw("case when name = 'OTHER' then 1 else 0 end")
+            ->orderBy('name')
+            ->get();
+
+        return View('authors.index', compact(["authors", "topics", "languages", "outputsKeyWords", "entitiesList"]));
     }
 
 public function getAllAuthorIds()
@@ -155,6 +162,8 @@ public function updateAllAuthors(Request $request)
                     'id_google_scholar' => "",
                     'id_researcher' => "",
                     'id_scopus_author' => "",
+                    'researchgate_profile' => "",
+                    'id_lattes' => "",
                     "resume" => ""
                 ]);
 
@@ -212,6 +221,59 @@ public function updateAllAuthors(Request $request)
     ], 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
 }
 
+    /**
+     * Starts a background CV update run (admin only)
+     */
+    public function startUpdateAllAuthorsJob(Request $request): \Illuminate\Http\JsonResponse
+    {
+        abort_if(auth()->user()->type != "administrative", 403);
+
+        $batchSize = (int) $request->input('batchSize', 10);
+        if ($batchSize < 1) {
+            $batchSize = 10;
+        }
+
+        $run = CvUpdateRun::create([
+            'status' => 'queued',
+            'started_by' => auth()->id(),
+        ]);
+
+        UpdateAllAuthorsJob::dispatch($run->id, $batchSize);
+
+        return response()->json([
+            'runId' => $run->id,
+            'message' => 'Atualizacao em background iniciada.'
+        ]);
+    }
+
+    /**
+     * Returns status for a background CV update run (admin only)
+     */
+    public function getUpdateAllAuthorsJobStatus(int $runId): \Illuminate\Http\JsonResponse
+    {
+        abort_if(auth()->user()->type != "administrative", 403);
+
+        $run = CvUpdateRun::find($runId);
+
+        if (!$run) {
+            return response()->json(['message' => 'Run not found.'], 404);
+        }
+
+        return response()->json([
+            'status' => $run->status,
+            'total' => $run->total,
+            'processed' => $run->processed,
+            'updated' => $run->updated,
+            'failed' => $run->failed,
+            'skipped' => $run->skipped,
+            'private' => $run->private,
+            'lastId' => $run->last_id,
+            'errors' => $run->errors,
+            'startedAt' => $run->started_at,
+            'finishedAt' => $run->finished_at,
+        ]);
+    }
+
 
 
     /**
@@ -229,6 +291,10 @@ public function updateAllAuthors(Request $request)
                 "languages",
                 "activity",
                 "project",
+                "emails",
+                "phones",
+                "addresses",
+                "websites",
                 "degrees" => function ($query) {
                     $query->orderBy("end_date_year", "desc");
                 },
@@ -254,9 +320,17 @@ public function updateAllAuthors(Request $request)
 
         // Aplica filtro por tipo se fornecido
         if ($request->has('type')) {
-            $typeId = (int) $request->input('type');
+            $rawType = (string) $request->input('type');
+            $typeId = (int) $rawType;
+
             if ($typeId > 0) {
                 $query->where('type_id', $typeId);
+            } else {
+                $typeIdByName = OutputType::where('name', $rawType)->value('id');
+
+                if ($typeIdByName) {
+                    $query->where('type_id', $typeIdByName);
+                }
             }
         }
 
@@ -363,6 +437,119 @@ public function updateAllAuthors(Request $request)
         return response()->json(["message" => $message], $code);
     }
 
+    /**
+     * Updates a specific author curriculum (admin only)
+     * @param int $authorId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateAuthorById(int $authorId): \Illuminate\Http\JsonResponse
+    {
+        abort_if(auth()->user()->type != "administrative", 403);
+
+        $author = Author::with("userInformation")->find($authorId);
+
+        if (!$author || !$author->userInformation || !$author->userInformation->ciencia_vitae) {
+            return response()->json(["message" => "Autor sem Ciencia Vitae associado."], 400);
+        }
+
+        $authorCurriculumIsPublic = $this->cienciaVitaeApi->authorCurriculumIsPub($author->userInformation->ciencia_vitae);
+
+        if ($authorCurriculumIsPublic === 1) {
+            sleep(1);
+
+            $endPoint = "curriculum/" . urlencode($author->userInformation->ciencia_vitae);
+            $responseArray = $this->cienciaVitaeApi->cienciaVitaeRequest($endPoint);
+
+            if (gettype($responseArray) != "array") {
+                return response()->json(["message" => "The request failed!"], 500);
+            }
+
+            $response = $this->cienciaVitaeApi->updateAuthorInformation($responseArray, $author);
+            $code = ($response["error"]) ? 500 : 200;
+
+            return response()->json(["message" => $response["message"]], $code);
+        }
+
+        if ($authorCurriculumIsPublic === 0) {
+            $author->update([
+                "profile_is_public" => 0,
+                "profile_image_is_public" => 0,
+                "profile_updated_date" => null,
+                "orcid" => "",
+                'id_google_scholar' => "",
+                'id_researcher' => "",
+                'id_scopus_author' => "",
+                "resume" => ""
+            ]);
+
+            return response()->json(["message" => "The Curriculum is not Published!"], 400);
+        }
+
+        return response()->json(["message" => "Error!"], 500);
+    }
+
+    /**
+     * Update self-declared metrics for an author
+     */
+    public function updateMetrics(Request $request, int $authorId): \Illuminate\Http\RedirectResponse
+    {
+        $author = Author::with('userInformation')->findOrFail($authorId);
+
+        $user = auth()->user();
+        $canEdit = $user && ($user->type === 'administrative'
+            || ($user->authorInformation && $user->authorInformation->id === $author->id));
+
+        abort_if(!$canEdit, 403);
+
+        $data = $request->validate([
+            'h_index' => ['nullable', 'integer', 'min:0', 'max:200'],
+            'h_index_source' => ['nullable', 'string', 'max:100'],
+            'h_index_reported_at' => ['nullable', 'date'],
+        ]);
+
+        if ($data['h_index'] === null) {
+            $author->h_index = null;
+            $author->h_index_source = null;
+            $author->h_index_reported_at = null;
+            $author->h_index_is_self_declared = null;
+        } else {
+            $author->h_index = $data['h_index'];
+            $author->h_index_source = $data['h_index_source'] ?? null;
+            $author->h_index_reported_at = $data['h_index_reported_at'] ?? null;
+            $author->h_index_is_self_declared = true;
+        }
+
+        $author->save();
+
+        return redirect()
+            ->back()
+            ->with('status', __('Indicadores atualizados.'));
+    }
+
+    /**
+     * Update quartile (self-declared) for a publication
+     */
+    public function updateOutputQuartile(Request $request, int $authorId, int $outputId): \Illuminate\Http\RedirectResponse
+    {
+        $author = Author::with('userInformation')->findOrFail($authorId);
+
+        $user = auth()->user();
+        $canEdit = $user && ($user->type === 'administrative'
+            || ($user->authorInformation && $user->authorInformation->id === $author->id));
+
+        abort_if(!$canEdit, 403);
+
+        $data = $request->validate([
+            'quartile' => ['nullable', 'in:Q1,Q2,Q3,Q4'],
+        ]);
+
+        $output = $author->output()->where('outputs.id', $outputId)->firstOrFail();
+        $output->quartile = $data['quartile'] ?? null;
+        $output->save();
+
+        return redirect()->back();
+    }
+
     public function projects($authorsId)
     {
         $author = Author::with(['project'])->findOrFail($authorsId);
@@ -386,6 +573,20 @@ public function updateAllAuthors(Request $request)
                 $q->where('name', 'like', '%' . $dataValidated["name"] . '%');
             });
         })
+            ->when($request->filled("entities"), function ($query) use ($dataValidated) {
+                $entities = array_values(array_filter($dataValidated["entities"]));
+
+                return $query->whereHas("userInformation", function ($q) use ($entities) {
+                    $q->where(function ($sub) use ($entities) {
+                        $sub->whereIn("entidade", $entities);
+
+                        foreach ($entities as $entity) {
+                            $sub->orWhere("entidade", "like", "%" . $entity . "%")
+                                ->orWhereJsonContains("entities", $entity);
+                        }
+                    });
+                });
+            })
             ->when($request->filled("domainActivity"), function ($query) use ($dataValidated) {
 
                 return $query->whereHas("activity", function ($q) use ($dataValidated) {
@@ -424,7 +625,6 @@ public function updateAllAuthors(Request $request)
     }
     public function getAuthorActivities($id)
     {
-
         $author = Author::with([
             "service.polymorphic",
             "service" => function ($query) {
@@ -432,7 +632,6 @@ public function updateAllAuthors(Request $request)
             },
             "service.type"
         ])->findOrFail($id);
-
 
         return view("authors.authorsInformation.activities", compact(["author"]));
     }

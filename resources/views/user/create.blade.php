@@ -60,8 +60,8 @@
                                             'value' => 'student',
                                         ],
                                         [
-                                            'name' => 'Professor',
-                                            'value' => 'teacher',
+                                            'name' => 'Investigador',
+                                            'value' => 'researcher',
                                         ],
                                         [
                                             'name' => 'Administrativo',

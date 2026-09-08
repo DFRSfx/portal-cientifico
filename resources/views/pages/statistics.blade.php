@@ -9,21 +9,51 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js" integrity="sha512-6HrPqAvK+lZElIZ4mZ64fyxIBTsaX5zAFZg2V/2WT+iKPrFzTzvx6QAsLW2OaLwobhMYBog/+bvmIEEGXi0p1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         @endPushOnce
 
+        @pushOnce('scripts')
+        <script src="{{ asset('javascript/authors/updateProfile2.js') }}" defer></script>
+        @endPushOnce
+
         <section>
             <div class="container pt-5">
 
                 <div class="container d-flex justify-content-end">
-                    <div class="row">
-                        <div class="col">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-auto">
                             <form action="{{ route('pub.export') }}">
                                 <button class="btn btn-primary">{{ __('Gerar Excel') }}</button>
                             </form>
                         </div>
+                        @if (auth()->user()->type === 'administrative')
+                            <div class="col-auto">
+                                <button id="update-all-authors" type="button" class="btn btn-danger">
+                                    {{ __('Atualizar TODOS os autores') }}
+                                </button>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-4 mb-4 mb-md-0">
+                @if (auth()->user()->type === 'administrative')
+                    <div id="update-all-message-container" class="mt-2 position-relative"></div>
+                    <div id="update-all-status" class="mt-2" style="display:none;">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap gap-3 align-items-center">
+                                    <div><strong>{{ __('Estado') }}:</strong> <span id="update-all-status-text">-</span></div>
+                                    <div><strong>{{ __('Progresso') }}:</strong> <span id="update-all-progress-text">-</span></div>
+                                    <div><strong>{{ __('ETA') }}:</strong> <span id="update-all-eta-text">-</span></div>
+                                </div>
+                                <div class="mt-2" id="update-all-errors-wrapper" style="display:none;">
+                                    <strong>{{ __('Ultimos erros') }}:</strong>
+                                    <ul id="update-all-errors" class="mb-0"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="row g-3">
+                    <div class="col-md-3">
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
@@ -40,7 +70,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4 mb-md-0">
+                    <div class="col-md-3">
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
@@ -51,6 +81,40 @@
                                         <p class="text-muted mb-1">{{ __('Média de Publicações') }}</p>
                                         <h2 class="mb-0">
                                             {{ $average }}
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="p-3 badge-primary rounded-4 " style="background-color:#2A6B20">
+                                        <i class="fas fa-user-check fa-lg fa-fw" style="color:white;"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-4">
+                                        <p class="text-muted mb-1">{{ __('Utilizadores Ativos') }}</p>
+                                        <h2 class="mb-0">
+                                            {{ $activeUsersCount ?? 0 }}
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="p-3 badge-primary rounded-4 " style="background-color:#2A6B20">
+                                        <i class="fas fa-user-clock fa-lg fa-fw" style="color:white;"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-4">
+                                        <p class="text-muted mb-1">{{ __('Por Aprovar / Verificar') }}</p>
+                                        <h2 class="mb-0">
+                                            {{ ($pendingUsersCount ?? 0) + ($pendingVerificationCount ?? 0) }}
                                         </h2>
                                     </div>
                                 </div>
@@ -166,8 +230,8 @@
 
                 const endYear = document.getElementById("endYear").innerHTML
 
-                let url = (type == "events") ? "https://portalcientifico.islagaia.pt/statistics/events" :
-                    "https://portalcientifico.islagaia.pt/statistics/publications"
+                let url = (type == "events") ? "/statistics/events" :
+                    "/statistics/publications"
 
                 try {
                     const response = await fetch(url + "?statsType=" + statsType + "&startYear=" + startYear + "&endYear=" +

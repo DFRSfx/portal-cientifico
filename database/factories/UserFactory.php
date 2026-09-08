@@ -21,8 +21,15 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'password' => 'password',
             'remember_token' => Str::random(10),
+            'type' => 'teacher',
+            'entidade' => 'Entidade Teste',
+            'entities' => ['Entidade Teste'],
+            'is_active' => 1,
+            'is_admin' => 0,
+            'set_password_token' => Str::random(30),
+            'ciencia_vitae' => fake()->uuid(),
         ];
     }
 
@@ -33,6 +40,13 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    public function pendingApproval(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => 0,
         ]);
     }
 }

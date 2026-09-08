@@ -23,9 +23,11 @@ class AuthorSearchRequest extends FormRequest
     {
         return [
             "name" => "nullable|string",
+            "entities" => "nullable|array",
             "domainActivity" => "nullable|array",
             "keywords"=> "nullable|array",
             "language" => "nullable|array",
+            "entities.*" => "required_with:entities|string",
             "domainActivity.*" => "required_with:domainActivity|int",
             "language.*" => "required_with:language|int",
             "keywords.*" => "required_with:keywords|int"

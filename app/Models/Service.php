@@ -19,7 +19,7 @@ class Service extends Model
         "model_id",
         "service_type_class",
         "type_id",
-        "author_id",
+        "author_id"
     ];
 
     public function polymorphic()

@@ -1,6 +1,38 @@
 @extends('authors.show')
 
 @section('author-information')
+    <style>
+        .affiliation-table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .affiliation-table thead th {
+            background: #e6f1ea;
+            color: #1f4d2f;
+            font-weight: 700;
+            border-bottom: 1px solid #cfe2d6;
+            padding: 12px 14px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .affiliation-table tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #dfeae3;
+            vertical-align: middle;
+        }
+
+        .affiliation-table tbody tr:nth-child(even) {
+            background: #f2f8f4;
+        }
+
+        .affiliation-table tbody tr:hover {
+            background: #e3f2e8;
+        }
+
+    </style>
+
     <div class="accordion-item">
         <div class="accordion-header" id="headingSeven">
             <h5 class="mb-0">
@@ -12,33 +44,41 @@
         </div>
         <div id="collapseSeven" class="collapse show" aria-labelledby="headingSeven" data-parent="#accordion">
             <div class="card-body">
-                @if (count($author->employments) > 0)
+                @php
+                    $employments = $author->employments->sortBy(function ($employment) {
+                        return $employment->start_date ?? '9999-12-31';
+                    });
+                @endphp
+                @if ($employments->count() > 0)
                     <div class="table-responsive">
-                        <table id="emplymentsTable" class="table">
+                        <table id="emplymentsTable" class="table affiliation-table">
                             <thead>
                                 <tr>
-                                    <th scope="row">{{ __('Ano') }}</th>
-                                    <th scope="row">{{ __('Função') }}</th>
-                                    <th scope="row">{{ __('Empregador') }}</th>
+                                    <th scope="col" class="position-relative">{{ __('Ano') }}</th>
+                                    <th scope="col">{{ __('Função') }}</th>
+                                    <th scope="col">{{ __('Empregador') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @php
-                                    $class = '';
-                                    $hasMoreThanFiveOutputs = false;
-                                @endphp
+                                @forelse ($employments as $employment)
+                                    @php
+                                        $startYear = $employment->start_date_year ?? null;
+                                        $startMonth = $employment->start_date_month ?? null;
+                                        $startDay = $employment->start_date_day ?? null;
+                                        $endYear = $employment->end_date_year ?? null;
+                                        $endMonth = $employment->end_date_month ?? null;
+                                        $endDay = $employment->end_date_day ?? null;
 
-                                @forelse ($author->employments as $employment)
-                                    {{-- Hides the publication after 5 publications --}}
-                                    @if ($loop->index >= 5)
-                                        @php($hasMoreThanFiveOutputs = true)
-                                        @php($class = 'hide_content elements-hidden')
-                                    @endif
+                                        $sortYear = $startYear ?? $endYear ?? 9999;
+                                        $sortMonth = $startMonth ?? $endMonth ?? 12;
+                                        $sortDay = $startDay ?? $endDay ?? 31;
+                                        $orderKey = sprintf('%04d%02d%02d', $sortYear, $sortMonth, $sortDay);
+                                    @endphp
 
-                                    <tr class="{{ $class }}">
+                                    <tr>
 
                                         {{-- Valida se a categoria não foi lida --}}
-                                        <td>
+                                        <td data-order="{{ $orderKey }}">
                                             <x-date-component :model=$employment initialDateAttribute="start_date" finalDateAttribute="end_date"/>
                                         </td>
                                         {{-- institution/organization --}}
@@ -59,10 +99,6 @@
 
                     </div>
                     <div class="row justify-content-center">
-                        <div class="col-4">
-                            <x-show-more-button moreThanFiveElements="{{ $hasMoreThanFiveOutputs }}"/>
-                        </div>
-
                         <div class="col-4">
                             <div class="container d-flex justify-content-center" id="datatables-buttons"></div>
                         </div>
@@ -90,6 +126,8 @@
                 orderCellsTop: true,
                 fixedHeader: false,
                 "bPaginate": false,
+                "ordering": true,
+                "order": [[0, 'desc']],
                 buttons: buttonsToInsert,
                 "language": {
                     "search": "{{ __('Procurar') }}",

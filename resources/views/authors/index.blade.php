@@ -8,6 +8,40 @@
                 background-color: transparent;
                 color: black;
             }
+
+            .authors-table {
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+
+            .authors-table thead th {
+                background: #e6f1ea;
+                color: #1f4d2f;
+                font-weight: 700;
+                border-bottom: 1px solid #cfe2d6;
+                padding: 12px 14px;
+            }
+
+            .authors-table tbody td {
+                padding: 12px 14px;
+                border-bottom: 1px solid #dfeae3;
+                vertical-align: middle;
+            }
+
+            .authors-table tbody tr:nth-child(even) {
+                background: #f2f8f4;
+            }
+
+            .authors-table tbody tr:hover {
+                background: #e3f2e8;
+            }
+
+            .authors-table .badge {
+                padding: 4px 10px;
+                border-radius: 999px;
+                font-weight: 600;
+                font-size: 12px;
+            }
         </style>
 
         @once
@@ -22,11 +56,11 @@
         @endpush
         @endonce
 
-        <section>
-            <div class="container pt-5">
+        <section class="saas-list-compact">
+            <div class="container saas-wide py-3">
                 <div class="row">
                     <div class="col-xl-3">
-                        <div class="card mb-3">
+                        <div class="card mb-3 saas-sticky">
                             <form id="form-filter" name="form-filter" action="{{ route('author.filter') }}">
                                 @csrf
                                 <div class="card-body">
@@ -35,6 +69,21 @@
                                         {{ __('Limpar') }}</button>
 
                                     <hr>
+                                    <h6 class=" my-3" style="color:#2A6B20 ;">{{ __('Entidades') }}</h6>
+                                    <div class="overflow-auto">
+                                        <div id="entities-container">
+                                            <select class="select" id="select-entities" multiple data-mdb-filter="true" data-mdb-container="#entities-container">
+                                                @foreach ($entitiesList as $entity)
+                                                    <option value="{{ $entity->name }}" class="entities">
+                                                        {{ $entity->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+                                    <!-- lista de entidade -->
                                     <h6 class=" my-3" style="color:#2A6B20 ;">{{ __('Interesses') }}</h6>
                                     <div class="overflow-auto">
 
@@ -81,8 +130,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive p-2 ">
-                                <table class="table align-middle mb-0 bg-white responsive nowrap" style="width:100% " id="authors_table">
+                            <div class="table-responsive p-1 ">
+                                <table class="table align-middle mb-0 bg-white authors-table responsive nowrap" style="width:100% " id="authors_table">
                                     <thead class="bg-light">
                                         <tr>
                                             <th>{{ __('Autores') }}</th>
@@ -97,7 +146,7 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
 
-                                                    <x-user-image showLogedUserImage="0" cienciaVitae="{{ $author->userInformation->ciencia_vitae }}" cienciaVitaeImageIsPublic="{{ $author->profile_is_public && $author->profile_image_is_public }}" class="rounded-circle" height="45" />
+                                                    <x-user-image showLogedUserImage="0" cienciaVitae="{{ $author->userInformation->ciencia_vitae }}" cienciaVitaeImageIsPublic="{{ $author->profile_is_public && $author->profile_image_is_public }}" class="rounded-circle" height="36" />
 
                                                     <div class="ms-3">
                                                         <p class="fw-bold mb-1">{{ $author->userInformation->name }}
@@ -176,6 +225,7 @@
                 )
 
                 const data = {
+                    entities: getSelectedOptions('.entities:checked', 'checkbox', 'class'),
                     domainActivity: getSelectedOptions(
                         '.topics:checked',
                         'checkbox',
@@ -207,17 +257,19 @@
                                 `https://www.cienciavitae.pt/fotos/publico/${element['user_information'].ciencia_vitae}.jpg` :
                                 'https://portalcientifico.islagaia.pt/logo/user.jpg'
 
+                            const userType = element['user_information']['type'] ?? ''
+
                             table.row.add([
                                 `
                  <div class="d-flex align-items-center">
-                    <img src="${imageSrc}" onerror="this.onerror=null;this.src='https://portalcientifico.islagaia.pt/logo/user.jpg';" style="width: 45px; height: 45px" class="rounded-circle" alt="gfvg">
+                    <img src="${imageSrc}" onerror="this.onerror=null;this.src='https://portalcientifico.islagaia.pt/logo/user.jpg';" style="width: 36px; height: 36px" class="rounded-circle" alt="gfvg">
 
                                             <div class="ms-3">
                                             <p class="fw-bold mb-1">${element['user_information']['name']}</p>
                                             <p class="text-muted mb-0">${element['user_information']['email']}</p>
                                           </div>
                                         </div>`,
-                                '<span class="badge badge-success rounded-pill d-inline">Teacher</span>',
+                                `<span class="badge badge-success rounded-pill d-inline">${userType}</span>`,
                                 `<a href="${perfileLink}">Ver perfil</a>`
                             ])
                         })
@@ -246,18 +298,18 @@
                 let submitSearch = false
 
                 const bb = Array.from(document.querySelectorAll('option:checked')).map(option => {
-                    let chipElementExists = document.querySelectorAll(`[parent-id="${option.id}"]`).length > 0
+                    let chipElementExists = document.querySelectorAll(`[parent-id="${option.value}"]`).length > 0
 
                     if (option.parentElement.name != 'authors_table_length') {
                         createElement(
                             'DIV',
                             'filtred-filds',
-                            `${option.id} <i class="fas fa-times fa-lg">`,
+                            `${option.text} <i class="fas fa-times fa-lg">`,
                             'element-id',
-                            option.id, {
+                            option.value, {
                                 type: 'button',
                                 class: 'chip filtred-filds',
-                                'element-id': option.id,
+                                'element-id': option.value,
                                 'parent-type': 'option',
                                 useAttribute: true
                             }
@@ -288,21 +340,21 @@
                     for (let i = 0; i < selectedValues.length; i++) {
                         let chipElementExists =
                             document.querySelectorAll(
-                                `[element-id="${selectedValues[i].id}"]`
+                                `[element-id="${selectedValues[i].value}"]`
                             ).length > 0
 
                         if (chipElementExists && !selectedValues[i].selected) {
-                            deleteElement('element-id', selectedValues[i].id)
+                            deleteElement('element-id', selectedValues[i].value)
                         } else if (selectedValues[i].selected) {
                             createElement(
                                 'DIV',
                                 'filtred-filds',
-                                `${selectedValues[i].id} <i class="fas fa-times fa-lg">`,
+                                `${selectedValues[i].text} <i class="fas fa-times fa-lg">`,
                                 'element-id',
-                                selectedValues[i].id, {
+                                selectedValues[i].value, {
                                     type: 'button',
                                     class: 'chip filtred-filds',
-                                    'element-id': selectedValues[i].id,
+                                    'element-id': selectedValues[i].value,
                                     'parent-type': 'option',
                                     useAttribute: true
                                 }

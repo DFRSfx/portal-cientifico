@@ -18,7 +18,9 @@ class UserImage extends Component
     public function __construct(public bool $showLogedUserImage, public $cienciaVitae = null, public bool $cienciaVitaeImageIsPublic = true)
     {
 
-        if ($showLogedUserImage && Auth::check() && auth()->user()->authorInformation->profile_image_is_public) 
+        $authorInfo = Auth::check() ? auth()->user()->authorInformation : null;
+
+        if ($showLogedUserImage && $authorInfo && $authorInfo->profile_image_is_public) 
         {
             $this->profileImageIsPublic = true;
             
