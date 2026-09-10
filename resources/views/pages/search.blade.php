@@ -6,7 +6,7 @@
                 <div class="card mb-3">
                     <div class="card-body">
                         <div class="card-title">
-                            <h4  style="color:#2A6B20">Pesquisa</h4>
+                            <h4 class="text-base font-bold text-emerald-800">{{ __('Pesquisa') }}</h4>
                         </div>
                         <form>
                             <div class="form-group">
@@ -34,7 +34,7 @@
                 <div class="card mb-3">
                     <div class="card-body">
                         <div class="card-title">
-                            <h4 style="color:#2A6B20">Resultados da pesquisa</h4>
+                            <h4 class="text-base font-bold text-emerald-800">{{ __('Resultados da pesquisa') }}</h4>
                         </div>
                        <div id="results">
                             <!-- Aqui vão os resultados da pesquisa, gerados dinamicamente -->

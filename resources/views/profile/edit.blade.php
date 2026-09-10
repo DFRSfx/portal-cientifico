@@ -26,15 +26,16 @@
                     </div>
                 </div>
                 <div class="col-xl-3">
-                    <div class="card testimonial-card mb-3">
-                        <div class="card-up"></div>
-                        <div class="avatar mx-auto white">
+                    <div class="card mb-4 text-center">
+                        <div class="bg-gradient-to-r from-emerald-800 to-emerald-700 h-20"></div>
+                        <div class="mx-auto relative -mt-10 w-20 h-20 rounded-full border-4 border-white shadow-md overflow-hidden bg-white">
                             <x-user-image showLogedUserImage="{{ auth()->user()->type != 'administrative' }}"
-                                class="rounded-circle img-fluid" height="36" />
+                                class="w-full h-full object-cover" height="36" />
                         </div>
 
-                        <div class="card-body">
-                            <h5 class="font-weight-bolder mb-1">{{ $user->name }}</h5>
+                        <div class="card-body p-4 text-center">
+                            <h5 class="font-bold text-slate-900 mb-1">{{ $user->name }}</h5>
+                            <p class="text-xs text-slate-500 uppercase font-semibold mb-0">{{ $user->type }}</p>
                         </div>
                     </div>
                 </div>

@@ -264,4 +264,33 @@
     @apply rounded-full;
 }
 
+/* ==========================================================================
+   Cards e Painéis (Tailwind CSS v4)
+   Substituição de .card e variantes Bootstrap
+   ========================================================================== */
+.card {
+    @apply rounded-2xl border border-slate-200/80 bg-white/95 shadow-xs transition-all overflow-hidden backdrop-blur-xs;
+}
+
+.card-body {
+    @apply p-5 sm:p-6 text-slate-700;
+}
+
+.card-header {
+    @apply px-5 py-4 border-b border-slate-100 bg-slate-50/60 font-bold text-slate-900;
+}
+
+.card-footer {
+    @apply px-5 py-3 border-t border-slate-100 bg-slate-50/60 text-xs text-slate-500;
+}
+
+.card-title {
+    @apply text-base sm:text-lg font-bold text-slate-900 mb-2;
+}
+
+.card-text {
+    @apply text-sm text-slate-600 leading-relaxed;
+}
+
+
 
