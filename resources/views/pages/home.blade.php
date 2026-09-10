@@ -69,11 +69,8 @@
                                 @endif
 
                             </div>
-                            <hr>
-
-                            <a href="https://investigacao.islagaia.pt/events/" target="_blank" rel="noopner noreferrer">
-                                <button type="button" class="btn btn-link" style="color:#343a40"
-                                    data-mdb-ripple-color="dark"> {{ __('Mostrar todos os Eventos') }} <i
+                                                        <a href="https://investigacao.islagaia.pt/events/" target="_blank" rel="noopner noreferrer">
+                                <button type="button" class="btn btn-link text-slate-700 hover:text-emerald-800"> {{ __('Mostrar todos os Eventos') }} <i
                                         class="fas fa-arrow-right ps-2"></i></button>
                             </a>
                         </div>
@@ -95,8 +92,7 @@
                     @endphp
                     <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
                         <div class="card-body">
-                            <div class="bg-image hover-overlay ripple rounded-0 ripple-surface-light"
-                                data-mdb-ripple-color="light">
+                            <div class="overflow-hidden rounded-xl">
                                 <img src="{{ asset('logo/bg-portal.avif') }}" alt="Logo POCH" class="img-fluid"
                                     width="auto" height="2.2rem">
                             </div>
@@ -104,37 +100,74 @@
                     </div>
 
                     @if ($featuredItems->count())
-                        <div class="card mb-4 featured-carousel-card rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
+                        <div class="card mb-4 featured-carousel-card rounded-2xl border border-emerald-100 shadow-sm overflow-hidden"
+                             x-data="{
+                                 active: 0,
+                                 total: {{ $featuredItems->count() }},
+                                 timer: null,
+                                 init() {
+                                     if (this.total > 1) {
+                                         this.timer = setInterval(() => this.next(), 4000);
+                                     }
+                                 },
+                                 next() {
+                                     this.active = (this.active + 1) % this.total;
+                                 },
+                                 prev() {
+                                     this.active = (this.active - 1 + this.total) % this.total;
+                                 },
+                                 goTo(index) {
+                                     this.active = index;
+                                 }
+                             }"
+                             @mouseenter="if (timer) clearInterval(timer)"
+                             @mouseleave="if (total > 1) timer = setInterval(() => next(), 4000)">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
                                     <div>
-                                        <p class="mb-2 fw-semibold" style="color:#2A6B20">{{ __('Últimos artigos') }}</p>
+                                        <p class="mb-0 fw-semibold text-emerald-800">{{ __('Últimos artigos') }}</p>
                                     </div>
-                                </div>
-
-                                <div id="featured-carousel" class="carousel slide" data-mdb-ride="carousel" data-mdb-interval="4000">
-                                    <div class="carousel-inner">
-                                        @foreach ($featuredItems as $index => $publication)
-                                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                                <div class="p-3 rounded featured-carousel-item">
-                                                    <x-publication-title :publication=$publication displayType="0" displayAccessPubButton="1" />
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-
                                     @if ($featuredItems->count() > 1)
-                                        <div class="carousel-indicators">
-                                            @foreach ($featuredItems as $index => $publication)
-                                                <button type="button" data-mdb-target="#featured-carousel"
-                                                    data-mdb-slide-to="{{ $index }}"
-                                                    class="{{ $index === 0 ? 'active' : '' }}"
-                                                    aria-label="{{ __('Slide') }} {{ $index + 1 }}"></button>
-                                            @endforeach
+                                        <div class="flex items-center gap-1">
+                                            <button type="button" @click="prev()" aria-label="{{ __('Anterior') }}"
+                                                class="w-7 h-7 rounded-full flex items-center justify-center text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition border-0 bg-transparent cursor-pointer">
+                                                <i class="fas fa-chevron-left text-xs"></i>
+                                            </button>
+                                            <button type="button" @click="next()" aria-label="{{ __('Seguinte') }}"
+                                                class="w-7 h-7 rounded-full flex items-center justify-center text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition border-0 bg-transparent cursor-pointer">
+                                                <i class="fas fa-chevron-right text-xs"></i>
+                                            </button>
                                         </div>
                                     @endif
-
                                 </div>
+
+                                <div class="relative min-h-[110px]">
+                                    @foreach ($featuredItems as $index => $publication)
+                                        <div x-show="active === {{ $index }}"
+                                             x-transition:enter="transition ease-out duration-300"
+                                             x-transition:enter-start="opacity-0 translate-y-1"
+                                             x-transition:enter-end="opacity-100 translate-y-0"
+                                             x-transition:leave="transition ease-in duration-200 absolute inset-0 pointer-events-none"
+                                             x-transition:leave-start="opacity-100"
+                                             x-transition:leave-end="opacity-0"
+                                             class="p-3 rounded-xl featured-carousel-item"
+                                             style="{{ $index !== 0 ? 'display: none;' : '' }}">
+                                            <x-publication-title :publication=$publication displayType="0" displayAccessPubButton="1" />
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                @if ($featuredItems->count() > 1)
+                                    <div class="flex justify-center items-center gap-1.5 pt-3">
+                                        @foreach ($featuredItems as $index => $publication)
+                                            <button type="button"
+                                                @click="goTo({{ $index }})"
+                                                :class="active === {{ $index }} ? 'w-6 bg-emerald-600' : 'w-2 bg-slate-300 hover:bg-slate-400'"
+                                                class="h-1.5 rounded-full transition-all duration-300 cursor-pointer border-0 p-0 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                                                aria-label="{{ __('Slide') }} {{ $index + 1 }}"></button>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @endif
@@ -212,8 +245,7 @@
                             <hr>
 
                             <a href="https://ci-islagaia.pt/formacao-online/" target="_blank" rel="noopner noreferrer">
-                                <button type="button" class="btn btn-link " style="color:#343a40"
-                                    data-mdb-ripple-color="dark"> {{ __('Mostrar todos os links úteis') }} <i
+                                <button type="button" class="btn btn-link text-slate-700 hover:text-emerald-800"> {{ __('Mostrar todos os links úteis') }} <i
                                         class="fas fa-arrow-right ps-2"></i></button>
                             </a>
 

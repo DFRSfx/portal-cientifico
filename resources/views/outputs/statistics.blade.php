@@ -37,97 +37,83 @@
                         <div class="card">
                             <div class="card-body">
                                 <!-- Pills navs -->
-                                <ul class="nav nav-pills nav-fill mb-3" id="ex1" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <a class="nav-link active" id="ex2-tab-1" data-mdb-toggle="pill"
-                                            href="#ex2-pills-1" role="tab" aria-controls="ex2-pills-1"
-                                            aria-selected="true">
-                                            <i class="fas fa-chart-pie fa-fw me-2"></i>{{ __('Número de Outputs') }}
-                                        </a>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <a class="nav-link" id="ex2-tab-2" data-mdb-toggle="pill" href="#ex2-pills-2"
-                                            role="tab" aria-controls="ex2-pills-2" aria-selected="false"> <i
-                                                class="fa-solid fa-arrow-up-9-1 fa-fw me-2"></i>
-                                            {{ __('Recolha científica em números') }}
-                                        </a>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <a class="nav-link" id="ex2-tab-3" data-mdb-toggle="pill" href="#ex2-pills-3"
-                                            role="tab" aria-controls="#ex2-pills-3" aria-selected="false"> <i
-                                                class="fa-solid fa-arrow-up-9-1 fa-fw me-2"></i>{{ __('Média') }}
-                                        </a>
-                                    </li>
-                                    <!--  <li class="nav-item" role="presentation">
-                                                                                                                                        <a class="nav-link" id="ex2-tab-3" data-mdb-toggle="pill" href="#ex2-pills-3" role="tab" aria-controls="ex2-pills-3" aria-selected="false">Another link</a>
-                                                                                                                                      </li>-->
-                                </ul>
-                                <!-- Pills navs end -->
-                                <!-- Pills content -->
-                                <div class="tab-content" id="ex2-content" style="height:fit-content">
-                                    <div class="tab-pane fade show active" id="ex2-pills-1" role="tabpanel"
-                                        aria-labelledby="ex2-tab-1">
-                                        <div class="card text-center">
-                                            <div class="card-header">
-                                                <span style="color:#33642b">{{ __('Publicações por ano') }}</span>
-                                            </div>
-                                            <div class="card-body">
-                                                <canvas id="myChart"></canvas>
+                                <div x-data="{ activeTab: 'outputs' }">
+                                    <ul class="nav nav-pills nav-fill mb-4 gap-2" id="ex1" role="tablist">
+                                        <li class="nav-item flex-1" role="presentation">
+                                            <button type="button" class="nav-link w-full cursor-pointer border-0 py-2.5 px-4 rounded-xl text-sm font-semibold transition"
+                                                :class="activeTab === 'outputs' ? 'bg-emerald-700 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                                                @click="activeTab = 'outputs'"
+                                                role="tab"
+                                                :aria-selected="activeTab === 'outputs'">
+                                                <i class="fas fa-chart-pie fa-fw me-2"></i>{{ __('Número de Outputs') }}
+                                            </button>
+                                        </li>
+                                        <li class="nav-item flex-1" role="presentation">
+                                            <button type="button" class="nav-link w-full cursor-pointer border-0 py-2.5 px-4 rounded-xl text-sm font-semibold transition"
+                                                :class="activeTab === 'recolha' ? 'bg-emerald-700 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                                                @click="activeTab = 'recolha'"
+                                                role="tab"
+                                                :aria-selected="activeTab === 'recolha'">
+                                                <i class="fa-solid fa-arrow-up-9-1 fa-fw me-2"></i>{{ __('Recolha científica em números') }}
+                                            </button>
+                                        </li>
+                                        <li class="nav-item flex-1" role="presentation">
+                                            <button type="button" class="nav-link w-full cursor-pointer border-0 py-2.5 px-4 rounded-xl text-sm font-semibold transition"
+                                                :class="activeTab === 'media' ? 'bg-emerald-700 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
+                                                @click="activeTab = 'media'"
+                                                role="tab"
+                                                :aria-selected="activeTab === 'media'">
+                                                <i class="fa-solid fa-calculator fa-fw me-2"></i>{{ __('Média') }}
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    <!-- Pills navs end -->
 
-                                            </div>
-                                            <div class="card-footer">
-                                                <div
-                                                    class="container d-flex justify-content-around  align-items-center">
-                                                    <a href="#" id="downloadPdf"><i
-                                                            class="fa-solid fa-file-arrow-down"></i>
-                                                        {{ __('Download do gráfico em PDF') }} </a>
-
-                                                    <a id="downloadImg" download="Gráfico.png" href="#"
-                                                        title="Descargar Gráfico">
-
-                                                        <!-- Download Icon -->
-                                                        <i class="fa-solid  fa-download"></i>
-                                                        {{ __('Download do gráfico em PNG') }}
-                                                    </a>
+                                    <!-- Pills content -->
+                                    <div class="tab-content" id="ex2-content" style="height:fit-content">
+                                        <div x-show="activeTab === 'outputs'" class="tab-pane fade show active" id="ex2-pills-1" role="tabpanel">
+                                            <div class="card text-center">
+                                                <div class="card-header">
+                                                    <span style="color:#33642b">{{ __('Publicações por ano') }}</span>
                                                 </div>
+                                                <div class="card-body">
+                                                    <canvas id="myChart"></canvas>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div class="container d-flex justify-content-around align-items-center">
+                                                        <a href="#" id="downloadPdf"><i class="fa-solid fa-file-arrow-down"></i> {{ __('Download do gráfico em PDF') }}</a>
+                                                        <a id="downloadImg" download="Gráfico.png" href="#" title="Descargar Gráfico">
+                                                            <i class="fa-solid fa-download"></i> {{ __('Download do gráfico em PNG') }}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--fim tab pane-->
+                                        <div x-show="activeTab === 'recolha'" style="display: none;" class="tab-pane fade show active" id="ex2-pills-2" role="tabpanel">
+                                            <div class="card text-center">
+                                                <div class="card-header">
+                                                    <span style="color:#33642b">{{ __('Recolha científica em números') }}</span>
+                                                </div>
+                                                <div class="card-body">
+                                                    <h2 class="card-title" style="color:#33642b"> {{ $allPubsCount }}</h2>
+                                                    <p class="card-text"><span class="text-muted">{{ __('Total') }}</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
 
+                                        <div x-show="activeTab === 'media'" style="display: none;" class="tab-pane fade show active" id="ex2-pills-3" role="tabpanel">
+                                            <div class="card text-center">
+                                                <div class="card-header">
+                                                    <span style="color:#33642b">{{ __('Média') }}</span>
+                                                </div>
+                                                <div class="card-body">
+                                                    <h2 class="card-title" style="color:#33642b"> {{ $average }}</h2>
+                                                    <p class="card-text"><span class="text-muted">{{ __('Média') }}</span></p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <!--fim tab pane-->
-                                    <div class="tab-pane fade" id="ex2-pills-2" role="tabpanel"
-                                        aria-labelledby="ex2-tab-2">
-                                        <div class="card text-center">
-                                            <div class="card-header"><span
-                                                    style="color:#33642b"><span>{{ __('Recolha científica em números') }}</span>
-                                            </div>
-                                            <div class="card-body">
-                                                <h2 class="card-title" style="color:#33642b"> {{ $allPubsCount }}
-                                                </h2>
-                                                <p class="card-text"><span
-                                                        class="text-muted">{{ __('Total') }}</span></p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="tab-pane fade" id="ex2-pills-3" role="tabpanel"
-                                        aria-labelledby="ex2-tab-3">
-                                        <div class="card text-center">
-                                            <div class="card-header"><span
-                                                    style="color:#33642b">{{ __('Média') }}</span></div>
-                                            <div class="card-body">
-                                                <h2 class="card-title" style="color:#33642b"> {{ $average }}
-                                                </h2>
-                                                <p class="card-text"><span
-                                                        class="text-muted">{{ __('Média') }}</span></p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <!-- <div class="tab-pane fade" id="ex2-pills-3" role="tabpanel" aria-labelledby="ex2-tab-3">
-                                                                                                                                        Tab 3 content
-                                                                                                                                      </div>-->
                                 </div>
 
                                 <!-- Pills content -->

@@ -243,13 +243,13 @@
                             @endif
                             @if ($entityName)
                                 @if ($entityCount > 1)
-                                    <div class="dropdown d-inline-block mt-1">
+                                    <div class="dropdown d-inline-block mt-1" x-data="{ open: false }" @click.outside="open = false">
                                         <button class="btn btn-sm btn-light dropdown-toggle" type="button"
-                                            id="authorEntitiesDropdown" data-mdb-toggle="dropdown" aria-expanded="false"
+                                            id="authorEntitiesDropdown" @click="open = !open" :aria-expanded="open"
                                             style="padding: 6px 12px; border: 1px solid #2ac41cff; border-radius: 6px;">
                                             {{ $entityName }}
                                         </button>
-                                        <ul class="dropdown-menu" aria-labelledby="authorEntitiesDropdown">
+                                        <ul class="dropdown-menu" :class="{ 'show': open }" x-show="open" style="display: none;" aria-labelledby="authorEntitiesDropdown">
                                             @foreach($expandedEntities as $entityLabel)
                                                 <li><span class="dropdown-item-text">{{ $entityLabel }}</span></li>
                                             @endforeach
@@ -399,7 +399,6 @@
                                         <button class="btn w-100 d-flex justify-content-between align-items-center"
                                                 type="button"
                                                 id="dropdownIdentifiers"
-                                                data-mdb-toggle="dropdown"
                                                 aria-expanded="false"
                                                 style="
                                                     background-color: rgba(255, 255, 255, 0.9);
@@ -502,7 +501,6 @@
                                         <button class="btn w-100 d-flex justify-content-between align-items-center"
                                                 type="button"
                                                 id="dropdownScientificProduction"
-                                                data-mdb-toggle="dropdown"
                                                 aria-expanded="false"
                                                 style="
                                                     background-color: rgba(255, 255, 255, 0.9);
@@ -653,13 +651,15 @@
                     if (window.innerWidth <= 768) {
                         event.preventDefault();
                         event.stopPropagation();
-                        identifiersBtn.removeAttribute('data-mdb-toggle');
                         identifiersMenu.classList.remove('show');
                         identifiersMenu.style.display = 'none';
                         aiPanel.classList.add('open');
                         aiPanel.setAttribute('aria-hidden', 'false');
                         aiBackdrop.classList.add('open');
                         document.body.style.overflow = 'hidden';
+                    } else {
+                        event.preventDefault();
+                        identifiersMenu.classList.toggle('show');
                     }
                 });
 
@@ -675,6 +675,7 @@
                 document.addEventListener('keydown', function (event) {
                     if (event.key === 'Escape') {
                         closeIdentifiersPanel();
+                        identifiersMenu?.classList.remove('show');
                     }
                 });
             }
@@ -717,12 +718,13 @@
                 if (window.innerWidth <= 768) {
                     event.preventDefault();
                     event.stopPropagation();
-                    btn.removeAttribute('data-mdb-toggle');
                     menu.classList.remove('show');
                     menu.style.display = 'none';
                     openPanel();
                     return;
                 }
+                event.preventDefault();
+                menu.classList.toggle('show');
                 positionMenu();
                 requestAnimationFrame(positionMenu);
                 setTimeout(positionMenu, 0);
@@ -733,19 +735,20 @@
             document.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') {
                     closePanel();
+                    menu?.classList.remove('show');
+                }
+            });
+            document.addEventListener('click', function (event) {
+                if (identifiersBtn && identifiersMenu && !identifiersBtn.contains(event.target) && !identifiersMenu.contains(event.target)) {
+                    identifiersMenu.classList.remove('show');
+                }
+                if (btn && menu && !btn.contains(event.target) && !menu.contains(event.target)) {
+                    menu.classList.remove('show');
                 }
             });
             window.addEventListener('resize', positionMenu);
         });
     </script>
-
-    <div class="alert alert-dismissible fade " id="show-message" role="alert" data-mdb-color="primary"
-        data-mdb-width="600px" data-mdb-hidden="true" data-mdb-autohide="true" data-mdb-append-to-body="true"
-        data-mdb-delay="2000" data-mdb-position="bottom-right">
-        <i class="dsadasd"></i>
-        <button type="button" class="btn-close ms-2" data-mdb-dismiss="alert"
-            aria-label="{{ __('Close') }}"></button>
-    </div>
 
 
 </x-app-layout>

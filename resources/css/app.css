@@ -488,6 +488,215 @@
     @apply text-slate-500;
 }
 
+/* ==========================================================================
+   Etapa 5 & 6: Componentes Interativos, Badges, Tabs, Dropdowns e Accordions
+   Substituição completa do MDB/Bootstrap CSS por Tailwind CSS v4
+   ========================================================================== */
+
+/* Badges */
+.badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold leading-normal;
+}
+.badge-primary, .bg-primary {
+    @apply bg-emerald-700 text-white;
+}
+.badge-secondary, .bg-secondary {
+    @apply bg-slate-100 text-slate-700;
+}
+.badge-success, .bg-success {
+    @apply bg-emerald-100 text-emerald-800;
+}
+.badge-danger, .bg-danger {
+    @apply bg-rose-100 text-rose-800;
+}
+.badge-warning, .bg-warning {
+    @apply bg-amber-100 text-amber-800;
+}
+.badge-info, .bg-info {
+    @apply bg-sky-100 text-sky-800;
+}
+.badge-light, .bg-light {
+    @apply bg-slate-100 text-slate-800;
+}
+.badge-dark, .bg-dark {
+    @apply bg-slate-900 text-white;
+}
+.rounded-pill {
+    @apply rounded-full;
+}
+
+/* Accordions & Collapses */
+.accordion {
+    @apply divide-y divide-slate-200 rounded-xl border border-slate-200 overflow-hidden bg-white;
+}
+.accordion-borderless {
+    @apply border-0 divide-y-0 bg-transparent space-y-3;
+}
+.accordion-item {
+    @apply border-b border-slate-100 last:border-b-0;
+}
+.accordion-borderless .accordion-item {
+    @apply border border-slate-200/80 rounded-xl overflow-hidden bg-white shadow-xs;
+}
+.accordion-header {
+    @apply m-0 p-0;
+}
+.accordion-button {
+    @apply w-full px-5 py-4 text-left font-semibold text-slate-800 flex justify-between items-center bg-white hover:bg-slate-50 transition cursor-pointer border-0;
+}
+.accordion-button:not(.collapsed) {
+    @apply text-emerald-800 bg-emerald-50/50;
+}
+.accordion-button::after {
+    content: "\f078";
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", sans-serif;
+    font-weight: 900;
+    @apply text-xs text-slate-400 transition-transform duration-200;
+}
+.accordion-button:not(.collapsed)::after {
+    transform: rotate(-180deg);
+    @apply text-emerald-700;
+}
+.accordion-body {
+    @apply px-5 py-4 text-slate-600 text-sm leading-relaxed bg-white border-t border-slate-100;
+}
+.collapse:not(.show) {
+    display: none !important;
+}
+.collapse.show {
+    display: block !important;
+}
+
+/* Dropdowns */
+.dropdown {
+    @apply relative inline-block;
+}
+.dropdown-menu {
+    @apply absolute left-0 z-50 mt-1 min-w-[12rem] bg-white rounded-xl shadow-xl border border-slate-200/90 py-1.5 list-none;
+    display: none;
+}
+.dropdown-menu.show {
+    display: block !important;
+}
+.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
+}
+.dropdown-item {
+    @apply block w-full px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition text-left cursor-pointer border-0 bg-transparent;
+}
+.dropdown-item.active, .dropdown-item:active {
+    @apply bg-emerald-700 text-white;
+}
+.dropdown-item-text {
+    @apply block px-4 py-2 text-sm text-slate-700;
+}
+.dropdown-divider {
+    @apply my-1 border-t border-slate-100;
+}
+
+/* Tabs & Pills */
+.nav {
+    @apply flex flex-wrap list-none p-0 m-0;
+}
+.nav-tabs {
+    @apply border-b border-slate-200 gap-1;
+}
+.nav-tabs .nav-link {
+    @apply px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-emerald-800 hover:border-slate-300 transition;
+}
+.nav-tabs .nav-link.active {
+    @apply text-emerald-800 border-emerald-600 font-semibold bg-emerald-50/50 rounded-t-lg;
+}
+.nav-pills {
+    @apply gap-2;
+}
+.nav-pills .nav-link {
+    @apply px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-100 transition;
+}
+.nav-pills .nav-link.active {
+    @apply bg-emerald-700 text-white font-semibold shadow-xs;
+}
+.nav-fill .nav-item, .nav-justified .nav-item {
+    @apply flex-1 text-center;
+}
+.tab-content > .tab-pane {
+    display: none;
+}
+.tab-content > .tab-pane.active,
+.tab-content > .tab-pane.show {
+    display: block;
+}
+
+/* Alerts */
+.alert {
+    @apply relative px-4 py-3 rounded-xl border text-sm flex items-center gap-2;
+}
+.alert-primary {
+    @apply bg-emerald-50 border-emerald-200 text-emerald-900;
+}
+.alert-success {
+    @apply bg-emerald-50 border-emerald-200 text-emerald-900;
+}
+.alert-danger {
+    @apply bg-rose-50 border-rose-200 text-rose-900;
+}
+.alert-warning {
+    @apply bg-amber-50 border-amber-200 text-amber-900;
+}
+.alert-info {
+    @apply bg-sky-50 border-sky-200 text-sky-900;
+}
+.alert-dismissible {
+    @apply pr-10;
+}
+.alert-dismissible .btn-close {
+    @apply absolute top-3 right-3;
+}
+
+/* Tabelas Genéricas */
+.table {
+    @apply w-full text-left text-sm text-slate-700;
+}
+.table-responsive {
+    @apply overflow-x-auto w-full;
+}
+.table th {
+    @apply font-semibold px-4 py-3 bg-slate-50 text-slate-900 border-b border-slate-200;
+}
+.table td {
+    @apply px-4 py-3 border-b border-slate-100 align-middle;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    @apply bg-slate-50/60;
+}
+.table-hover tbody tr:hover {
+    @apply bg-emerald-50/40;
+}
+
+/* Tipografia e Utilitários Bootstrap */
+.fw-bold { @apply font-bold; }
+.fw-semibold { @apply font-semibold; }
+.fw-medium { @apply font-medium; }
+.fw-light { @apply font-light; }
+.fst-italic { @apply italic; }
+.text-center { @apply text-center; }
+.text-start { @apply text-left; }
+.text-end { @apply text-right; }
+.text-danger { @apply text-rose-600; }
+.text-success { @apply text-emerald-600; }
+.text-primary { @apply text-emerald-700; }
+.text-secondary { @apply text-slate-600; }
+.text-bolder { @apply font-extrabold; }
+.bg-white { @apply bg-white; }
+.border-top { @apply border-t border-slate-200; }
+.border-bottom { @apply border-b border-slate-200; }
+.border-0 { @apply border-0; }
+.img-fluid { @apply max-w-full h-auto; }
+.rounded-circle { @apply rounded-full; }
+.rounded-0 { @apply rounded-none; }
+
+
 
 
 
