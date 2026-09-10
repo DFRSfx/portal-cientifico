@@ -1,8 +1,4 @@
-<button type="button" class="btn btn-success btn-floating btn-lg" id="btn-back-to-top"
-    style="position: fixed;
-    bottom: 32px;
-    right: 32px;
-    display: none;" onclick="backToTop()">
+<button type="button" class="fixed bottom-8 right-8 z-50 w-11 h-11 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white shadow-lg hover:shadow-xl items-center justify-center transition-all duration-200 border-0 cursor-pointer" id="btn-back-to-top" style="display: none;" onclick="backToTop()">
     <i class="fas fa-arrow-up"></i>
 </button>
 

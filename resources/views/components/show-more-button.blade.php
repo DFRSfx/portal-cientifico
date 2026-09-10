@@ -1,7 +1,7 @@
 @props(["tableId" => ""])
 
 <div class="container d-flex justify-content-center">
-    <button class="btn btn-link ripple-surface-dark" type="button" id="show-more-content">
+    <button class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-emerald-700 hover:text-emerald-900 bg-emerald-50/60 hover:bg-emerald-100 rounded-xl transition-all cursor-pointer border-0" type="button" id="show-more-content">
         <span>{{ __('Mostar Mais') }}</span> <i class="fas fa-arrow-down fa-sm" id="grouth-symbol"></i></button>
 </div>
 

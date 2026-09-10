@@ -29,7 +29,7 @@
                 <input type="text" name="title" id="title" value="{{$authors->id_scopus_author}}" class="form-control" />
                 <label class="form-label" for="name">Id scopus_autorh</label>
             </div>
-            <button type="button" class="btn btn-primary" value="submit" name="submit" type="submit">Editar</button>
+            <button type="submit" class="btn btn-primary">{{ __('Editar') }}</button>
         </div>
         </form>
 @endsection

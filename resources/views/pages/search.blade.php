@@ -24,7 +24,7 @@
                                     <option value="journal">Revista</option>
                                 </select>
                             </div>
-                            <button class="btn ripple-surface-dark mt-3" type="submit" data-mdb-ripple-color="dark" style="background-color: rgb(42, 107, 32);"><span class="text-white">Pesquisar</span></button>
+                            <button class="btn btn-primary mt-3 w-full" type="submit">{{ __('Pesquisar') }}</button>
                           
                         </form>
                     </div>

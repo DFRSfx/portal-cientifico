@@ -74,8 +74,7 @@
                                 <p>
                                     {{ __('Estamos aqui para ajudá-lo! Se precisar de assistência com qualquer aspecto do nosso site, entre em contacto com a nossa equipa de suporte e teremos o prazer de ajudá-lo.') }}
                                 </p>
-                                <a href="mailto:info@islagaia.pt" class="btn btn-rounded text-white" role="button"
-                                    style="background-color:rgb(42, 107, 32)">{{ __('Contato') }}</a>
+                                <a href="mailto:info@islagaia.pt" class="btn btn-primary btn-rounded" role="button">{{ __('Contato') }}</a>
                             </div>
                         </div>
                     </div>

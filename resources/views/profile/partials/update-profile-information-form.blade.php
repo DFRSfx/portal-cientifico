@@ -44,8 +44,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <button type="submit" class="btn btn-rounded gain-bg text-white ripple-surface-dark"
-                data-mdb-ripple-color="dark" style="background-color: rgb(51, 100, 43);">
+            <button type="submit" class="btn btn-primary btn-rounded">
                 {{ __('Save') }}
             </button>
 

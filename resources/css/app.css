@@ -212,3 +212,56 @@
     @apply bg-white/90 border border-emerald-100/90 rounded-xl p-4 transition-all;
 }
 
+/* ==========================================================================
+   Botões Institucionais (Tailwind CSS v4)
+   Substituição progressiva e definitiva de .btn e variantes Bootstrap
+   ========================================================================== */
+.btn {
+    @apply inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none cursor-pointer;
+}
+
+.btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 shadow-xs hover:shadow transition-all duration-150 border-0 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 border border-slate-300 shadow-2xs transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 shadow-xs hover:shadow transition-all duration-150 border-0 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-success {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 shadow-xs hover:shadow transition-all duration-150 border-0 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-warning {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 bg-amber-400 hover:bg-amber-500 active:bg-amber-600 shadow-xs transition-all duration-150 border-0 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-outline-primary {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50/60 hover:bg-emerald-100/80 border border-emerald-300 shadow-2xs transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-outline-danger {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-rose-700 hover:text-rose-800 bg-rose-50/60 hover:bg-rose-100/80 border border-rose-300 shadow-2xs transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-outline-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-300 shadow-2xs transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-outline-success {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50/60 hover:bg-emerald-100/80 border border-emerald-300 shadow-2xs transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-close {
+    @apply p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer border-0 bg-transparent;
+}
+
+.btn-rounded {
+    @apply rounded-full;
+}
+
+

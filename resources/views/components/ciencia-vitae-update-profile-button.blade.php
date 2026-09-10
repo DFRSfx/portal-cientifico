@@ -1,8 +1,6 @@
 <div class="list-group list-group-flush pt-3">
     <button id="update-author-information" type="button"
-        class="btn btn-rounded gain-bg ripple-surface-dark text-white"
-        style="background-color:#2A6B20;" 
-        data-mdb-ripple-color="dark"
+        class="btn btn-primary btn-rounded"
         data-author-id="{{ $authorId }}">
         {{ __('Atualizar ciencia vitae') }}
     </button>

@@ -1,7 +1,6 @@
 <div class="list-group list-group-flush pt-3 mt-3">
     <button id="update-all-authors" type="button"
-        class="btn btn-rounded ripple-surface-dark text-white"
-        style="background-color:#c92a2a;" data-mdb-ripple-color="dark">
+        class="btn btn-danger btn-rounded">
         {{ __('Atualizar TODOS os autores') }}
     </button>
     <div id="update-all-message-container" class="mt-2 position-relative"></div>

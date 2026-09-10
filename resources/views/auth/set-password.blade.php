@@ -34,9 +34,7 @@
                             </div>
                             <div class="row mb-0">
                                 <div class="col-md-8 offset-md-4">
-                                    <button type="submit"
-                                        class="btn btn-rounded gain-bg text-white ripple-surface-dark"
-                                        data-mdb-ripple-color="dark" style="background-color: rgb(51, 100, 43);">
+                                    <button type="submit" class="btn btn-primary btn-rounded">
                                         {{ __('Login') }}
                                     </button>
                                 </div>

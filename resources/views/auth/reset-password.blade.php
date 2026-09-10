@@ -19,7 +19,7 @@
                     value="" />
 
                 <!-- Submit button -->
-                <button type="submit" class="btn btn-primary btn-block">{{ __('Reset Password') }}</button>
+                <button type="submit" class="btn btn-primary w-full">{{ __('Reset Password') }}</button>
             </form>
         </div>
     </div>
