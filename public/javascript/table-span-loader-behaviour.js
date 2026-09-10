@@ -107,19 +107,21 @@ function uncheckOption(attributes, shouldSubmitForm = true)
             deleteElement('element-id', attributes['element-id'])
             break;
         case "option":
-            mdb.Select.getInstance(
-                document.getElementById(elementToUncheck.parentElement.id)
-            ).dispose()
+            if (window.mdb && window.mdb.Select && typeof window.mdb.Select.getInstance === 'function') {
+                const parentEl = document.getElementById(elementToUncheck.parentElement?.id);
+                if (parentEl) {
+                    const inst = window.mdb.Select.getInstance(parentEl);
+                    if (inst && typeof inst.dispose === 'function') inst.dispose();
+                }
+            }
 
-            elementToUncheck.selected = false
+            elementToUncheck.selected = false;
+            deleteElement('element-id', attributes['element-id']);
 
-            deleteElement('element-id', attributes['element-id'])
-
-            new mdb.Select(
-                document.getElementById(elementToUncheck.parentElement.id)
-            )
-
-
+            if (window.mdb && window.mdb.Select && typeof window.mdb.Select === 'function') {
+                const parentEl = document.getElementById(elementToUncheck.parentElement?.id);
+                if (parentEl) new window.mdb.Select(parentEl);
+            }
             break;
         case "input":
             document.getElementById(attributes['element-id']).value = ""

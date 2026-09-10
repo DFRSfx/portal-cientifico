@@ -6,18 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Scientific Portal.">
-    <link rel="icon" href="{{ asset('logo\icon-portalcientifico.svg') }}">
+    <link rel="icon" href="{{ asset('logo/icon-portalcientifico.svg') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <title>
         {{ $title ?? config('app.name', 'Laravel') }}
     </title>
-
-    <!-- Mdb Plugins -->
-    <link href="{{ asset('bootstrap\plugins\css\all.min.css') }}" default rel="stylesheet">
-
-    <!-- MDB min css -->
-    <link href="{{ asset('bootstrap\css\mdb.min.css') }}" default rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -31,17 +25,10 @@
 
     @stack('header-links')
 
-    <!-- MDB Min javascript -->
-    <script src="{{ asset('bootstrap\js\mdb.min.js') }}" defer></script>
-
-    <!-- MDB PLugins -->
-    <script src="{{ asset('bootstrap\plugins\js\all.min.js') }}" defer></script>
-
-
     <!-- Jquery -->
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 
-    <!-- Alpine.js (used by x-modal component) -->
+    <!-- Alpine.js -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 

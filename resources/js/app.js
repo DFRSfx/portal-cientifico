@@ -105,3 +105,111 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+/**
+ * MDB JavaScript Object Compatibility Layer
+ * Provides lightweight drop-in shims for legacy MDB plugin calls:
+ * - MultiRangeSlider (converts to modern dual range inputs)
+ * - Animate (handles card transitions)
+ * - Select (safe disposal and refresh)
+ * - Loading
+ */
+window.mdb = window.mdb || {};
+
+window.mdb.MultiRangeSlider = class {
+    constructor(container, options = {}) {
+        if (!container) return;
+        this.container = container;
+        this.min = options.min ?? 0;
+        this.max = options.max ?? 100;
+        const [startMin, startMax] = options.startValues || [this.min, this.max];
+        this.valMin = startMin;
+        this.valMax = startMax;
+
+        this.container.innerHTML = `
+            <div class="w-full py-2 flex flex-col gap-2">
+                <div class="flex items-center gap-3">
+                    <input type="range" class="multi-range-slider-hand w-full accent-emerald-600 h-2 bg-slate-200 rounded-lg cursor-pointer"
+                           min="${this.min}" max="${this.max}" value="${this.valMin}" id="_range_start_${Math.random().toString(36).substring(2, 7)}">
+                    <input type="range" class="multi-range-slider-hand w-full accent-emerald-600 h-2 bg-slate-200 rounded-lg cursor-pointer"
+                           min="${this.min}" max="${this.max}" value="${this.valMax}" id="_range_end_${Math.random().toString(36).substring(2, 7)}">
+                </div>
+            </div>
+        `;
+
+        const inputs = this.container.querySelectorAll('input[type="range"]');
+        const r1 = inputs[0];
+        const r2 = inputs[1];
+
+        const emit = () => {
+            let v1 = parseInt(r1.value, 10);
+            let v2 = parseInt(r2.value, 10);
+            if (v1 > v2) {
+                const temp = v1;
+                v1 = v2;
+                v2 = temp;
+            }
+            const event = new CustomEvent('value.mdb.multiRangeSlider', {
+                detail: {},
+                bubbles: true
+            });
+            event.values = { rounded: [v1, v2] };
+            this.container.dispatchEvent(event);
+        };
+
+        if (r1 && r2) {
+            r1.addEventListener('input', emit);
+            r2.addEventListener('input', emit);
+            r1.addEventListener('change', emit);
+            r2.addEventListener('change', emit);
+        }
+    }
+};
+
+window.mdb.Animate = class {
+    constructor(element, options = {}) {
+        this.element = element;
+        this.options = options;
+    }
+    init() {}
+    startAnimation() {
+        if (this.element) {
+            this.element.style.display = 'block';
+            if (typeof this.options.onStart === 'function') {
+                this.options.onStart();
+            }
+            if (typeof this.options.onEnd === 'function') {
+                setTimeout(() => this.options.onEnd(), 300);
+            }
+        }
+    }
+    stopAnimation() {
+        if (typeof this.options.onEnd === 'function') {
+            this.options.onEnd();
+        }
+    }
+    static getInstance(element) {
+        return new window.mdb.Animate(element);
+    }
+};
+
+window.mdb.Select = class {
+    constructor(element) {
+        this.element = element;
+    }
+    dispose() {}
+    static getInstance(element) {
+        return new window.mdb.Select(element);
+    }
+};
+
+window.mdb.Loading = class {
+    constructor(element, options = {}) {
+        this.element = element;
+    }
+    static getInstance(element) {
+        return {
+            dispose() {}
+        };
+    }
+};

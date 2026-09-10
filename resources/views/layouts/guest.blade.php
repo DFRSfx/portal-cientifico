@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Scientific Portal.">
-    <link rel="icon" href="{{ asset('logo\icon-portalcientifico.svg') }}">
+    <link rel="icon" href="{{ asset('logo/icon-portalcientifico.svg') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <title>
@@ -15,18 +15,16 @@
         {{ __(':title', ['title' => $AppTitle]) }}
     </title>
 
-    <link href="{{ asset('bootstrap\css\mdb.min.css') }}" rel="stylesheet">
-
     <!-- Custom theme overrides -->
     <link href="{{ asset('css/extra.css') }}" rel="stylesheet">
 
     @stack('header-links')
 
-    <!--mdboostrap js-->
-    <script src="{{ asset('bootstrap\js\mdb.min.js') }}" defer></script>
-
     <!-- JQuery-->
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     @stack('header-scripts')
 
