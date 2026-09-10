@@ -1,99 +1,207 @@
-<!--Start header-->
-<header class="sticky top-0 z-50">
-    <!-- Start Navbar with Alpine.js -->
-    <nav class="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-all" x-data="{ mobileOpen: false }">
-        <div class="container flex flex-wrap items-center justify-between py-2">
-            <a class="navbar-brand py-1 hover:opacity-90 transition-opacity flex items-center" href="/">
-                <img src="{{ asset('logo/logo-portal-cientifico.svg') }}"
-                    alt="Logotipo Global Alumni Network" width="160px" height="auto">
-            </a>
-            <!-- Mobile Toggle button -->
-            <button class="p-2 text-slate-700 hover:text-emerald-700 lg:hidden border-0 bg-transparent focus:outline-none cursor-pointer rounded-lg transition-colors" type="button"
-                @click="mobileOpen = !mobileOpen" aria-label="Toggle navigation">
-                <i class="fas fa-bars fa-lg"></i>
-            </button>
+<!-- Start Header -->
+<header class="header bg-white sticky top-0 z-50 transition-all shadow-xs" role="banner">
+    {{-- Tier 1: Top Brand & User Bar --}}
+    <div class="border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+        <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-4">
+            {{-- Brand Logo --}}
+            <div class="logo flex items-center shrink-0">
+                <a class="flex items-center hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-emerald-700/30 rounded-lg py-0.5 transition-opacity"
+                   aria-label="Portal Científico - Página inicial" href="{{ route('home') }}" data-discover="true">
+                    <img src="{{ asset('logo/logo-portal-cientifico.svg') }}" alt="Portal Científico"
+                         class="h-[30px] sm:h-[32px] w-auto" width="165" height="32" fetchpriority="high">
+                </a>
+            </div>
 
-            <!-- Collapsible menu -->
-            <div class="w-full lg:w-auto lg:flex items-center gap-1 mt-3 lg:mt-0 transition-all"
-                :class="{ 'hidden': !mobileOpen, 'block': mobileOpen }">
-                <!-- Menu links -->
-                <ul class="flex flex-col lg:flex-row items-start lg:items-center gap-1 list-none p-0 m-0 w-full lg:w-auto">
+            {{-- Right: User Area (Language + Login/Profile) --}}
+            <div class="user-area flex items-center gap-2 sm:gap-2.5 shrink-0">
+                {{-- Language Selector --}}
+                <x-flags :flags="[
+                    'en' => ['lang' => 'English'],
+                    'pt' => ['lang' => 'Português'],
+                ]" />
 
-                    <li class="nav-item px-1 w-full lg:w-auto">
-                        <a class="nav-link block font-medium text-slate-700 hover:text-emerald-700 transition-colors py-2 px-3 rounded-lg hover:bg-slate-50 lg:hover:bg-transparent" aria-current="pagestatistics"
-                            href="{{ route('about.index') }}">{{ __('Sobre') }}</a>
+                {{-- Guest 'Entrar' Button OR Logged User Profile --}}
+                @if (!Auth::check())
+                    <a href="{{ route('login') }}"
+                       class="h-9 inline-flex items-center gap-2 px-3.5 sm:px-4 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/30 transition-all duration-150 shadow-xs hover:shadow font-semibold text-xs sm:text-sm cursor-pointer border border-emerald-700"
+                       aria-label="{{ __('Entrar') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" x2="3" y1="12" y2="12"></line>
+                        </svg>
+                        <span>{{ __('Entrar') }}</span>
+                    </a>
+                @else
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                        <button type="button" @click="open = !open"
+                                class="h-9 inline-flex items-center gap-2 px-2.5 text-slate-700 hover:text-emerald-800 bg-white hover:bg-slate-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/20 transition-all border border-slate-200 hover:border-slate-300 shadow-2xs cursor-pointer"
+                                aria-label="{{ __('Menu de perfil') }}" :aria-expanded="open ? 'true' : 'false'">
+                            <x-user-image showLogedUserImage="{{ auth()->user()->type != 'administrative' }}" height="26" width="26" class="rounded-full shrink-0 ring-1 ring-slate-200" />
+                            <span class="text-xs sm:text-sm font-semibold text-slate-800 max-w-[130px] truncate">{{ auth()->user()->name }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': open }">
+                                <path d="m6 9 6 6 6-6"></path>
+                            </svg>
+                        </button>
+
+                        <ul class="dropdown-menu shadow-xl border border-slate-200/90 rounded-xl py-1.5 bg-white absolute right-0 mt-2 min-w-[190px] z-50 list-none"
+                            x-show="open" x-cloak x-transition.opacity.duration.150ms>
+                            @if (!auth()->user()->hasVerifiedEmail())
+                                <li>
+                                    <a class="dropdown-item px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center gap-2" href="javascript:void(0)" onclick="openVerifyEmailModal()">
+                                        <i class="fas fa-envelope-open-text text-emerald-600"></i>{{ __('Verificar Email') }}
+                                    </a>
+                                </li>
+                            @endif
+
+                            <li>
+                                <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center"
+                                    href="{{ route('profile.edit') }}">{{ __('Perfil') }}</a>
+                            </li>
+
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg mx-1 transition-colors w-full text-left flex items-center border-0 bg-transparent cursor-pointer">
+                                        {{ __('Logout') }}
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    {{-- Tier 2: Secondary Navigation Bar (Sub-header matching ISLA Biblioteca Digital) --}}
+    <nav id="main-navigation" class="main-nav bg-white border-b border-slate-200/90 min-h-[46px]" role="navigation" aria-label="Navegação principal">
+        <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6">
+            {{-- Desktop Navigation (md and up) --}}
+            <ul class="hidden md:flex items-center space-x-1 overflow-x-auto h-[46px] list-none p-0 m-0">
+                {{-- Início / Catálogo --}}
+                <li>
+                    <a href="{{ route('home') }}"
+                       class="nav-item flex items-center space-x-2 px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition-colors duration-150 {{ request()->routeIs('home') ? 'bg-emerald-700 text-white border-b-2 border-emerald-400 shadow-2xs' : 'text-slate-700 hover:text-emerald-800 hover:bg-slate-50' }}"
+                       title="{{ __('Início') }}" aria-current="{{ request()->routeIs('home') ? 'page' : 'false' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open shrink-0">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        <span class="whitespace-nowrap">{{ __('Início') }}</span>
+                    </a>
+                </li>
+
+                {{-- Sobre --}}
+                <li>
+                    <a href="{{ route('about.index') }}"
+                       class="nav-item flex items-center space-x-2 px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition-colors duration-150 {{ request()->routeIs('about.*') ? 'bg-emerald-700 text-white border-b-2 border-emerald-400 shadow-2xs' : 'text-slate-700 hover:text-emerald-800 hover:bg-slate-50' }}"
+                       title="{{ __('Sobre') }}" aria-current="{{ request()->routeIs('about.*') ? 'page' : 'false' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info shrink-0">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 16v-4"></path>
+                            <path d="M12 8h.01"></path>
+                        </svg>
+                        <span class="whitespace-nowrap">{{ __('Sobre') }}</span>
+                    </a>
+                </li>
+
+                @if (Auth::check())
+                    {{-- Painel --}}
+                    <li>
+                        <a href="{{ auth()->user()->hasVerifiedEmail() ? route('dashboard') : 'javascript:void(0)' }}"
+                           @if (!auth()->user()->hasVerifiedEmail()) onclick="openVerifyEmailModal()" @endif
+                           class="nav-item flex items-center space-x-2 px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition-colors duration-150 {{ request()->routeIs('dashboard') ? 'bg-emerald-700 text-white border-b-2 border-emerald-400 shadow-2xs' : 'text-slate-700 hover:text-emerald-800 hover:bg-slate-50' }}"
+                           title="{{ __('Painel') }}" aria-current="{{ request()->routeIs('dashboard') ? 'page' : 'false' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard shrink-0">
+                                <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                                <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                                <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                                <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+                            </svg>
+                            <span class="whitespace-nowrap">{{ __('Painel') }}</span>
+                        </a>
                     </li>
 
-                    @if (Auth::check())
-                        <li class="nav-item px-1 w-full lg:w-auto">
-                            @if (!auth()->user()->hasVerifiedEmail())
-                                <a class="nav-link block font-medium text-slate-700 hover:text-emerald-700 transition-colors py-2 px-3 rounded-lg hover:bg-slate-50 lg:hover:bg-transparent" href="javascript:void(0)" onclick="openVerifyEmailModal()" title="{{ __('Verificação de email necessária') }}">{{ __('Painel') }}</a>
-                            @else
-                                <a class="nav-link block font-medium text-slate-700 hover:text-emerald-700 transition-colors py-2 px-3 rounded-lg hover:bg-slate-50 lg:hover:bg-transparent" aria-current="pagestatistics"
-                                    href="{{ route('dashboard') }}">{{ __('Painel') }}</a>
-                            @endif
-                        </li>
-
-                        @if (auth()->user()->type == 'administrative')
-                            <li class="relative nav-item px-1 w-full lg:w-auto" x-data="{ open: false }">
-                                <a class="nav-link font-medium text-slate-700 hover:text-emerald-700 transition-colors flex items-center justify-between lg:justify-start gap-1.5 py-2 px-3 rounded-lg hover:bg-slate-50 lg:hover:bg-transparent cursor-pointer w-full"
-                                    href="#" @click.prevent="open = !open">
-                                    <span class="flex items-center">
-                                        {{ __('Utilizadores') }}
-                                        @if (($pendingApprovalCount ?? 0) > 0 || ($pendingVerificationCount ?? 0) > 0)
-                                            <span class="ms-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold text-white bg-rose-500 rounded-full shadow-xs">
-                                                {{ ($pendingApprovalCount ?? 0) + ($pendingVerificationCount ?? 0) }}
-                                            </span>
-                                        @endif
+                    {{-- Administrative: Utilizadores --}}
+                    @if (auth()->user()->type == 'administrative')
+                        <li class="relative" x-data="{ open: false }" @click.outside="open = false">
+                            <button type="button" @click="open = !open"
+                                    class="nav-item flex items-center space-x-2 px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition-colors duration-150 cursor-pointer border-0 bg-transparent {{ request()->routeIs('user.*') ? 'bg-emerald-700 text-white border-b-2 border-emerald-400 shadow-2xs' : 'text-slate-700 hover:text-emerald-800 hover:bg-slate-50' }}"
+                                    aria-expanded="false" :aria-expanded="open ? 'true' : 'false'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users shrink-0">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span class="whitespace-nowrap">{{ __('Utilizadores') }}</span>
+                                @if (($pendingApprovalCount ?? 0) > 0 || ($pendingVerificationCount ?? 0) > 0)
+                                    <span class="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-bold text-white bg-rose-500 rounded-full shadow-2xs">
+                                        {{ ($pendingApprovalCount ?? 0) + ($pendingVerificationCount ?? 0) }}
                                     </span>
-                                    <i class="fas fa-chevron-down text-[9px] text-slate-400 transition-transform duration-150" :class="{ 'rotate-180': open }"></i>
-                                </a>
-                                <ul class="dropdown-menu shadow-lg border border-slate-200/80 rounded-xl py-1.5 bg-white/98 backdrop-blur-md static lg:absolute lg:right-0 mt-1 min-w-[200px] z-50 list-none"
-                                    x-show="open" @click.outside="open = false" x-transition.opacity.duration.150ms style="display: none;">
-                                    <li>
-                                        <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center" aria-current="pageAuthors"
-                                            href="{{ route('user.create') }}">{{ __('Criar') }}</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center justify-between" aria-current="pageAuthors"
-                                            href="{{ route('user.active') }}">{{ __('Utilizadores Ativos') }}
-                                            @if (($activeUserCount ?? 0) > 0)
-                                                <span class="ms-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold text-white bg-emerald-600 rounded-full shadow-xs">{{ $activeUserCount }}</span>
-                                            @endif
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center justify-between" aria-current="pageAuthors"
-                                            href="{{ route('user.inactive') }}">{{ __('Utilizadores Inativos') }}
-                                            @if (($pendingApprovalCount ?? 0) > 0)
-                                                <span class="ms-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold text-slate-900 bg-amber-400 rounded-full shadow-xs">{{ $pendingApprovalCount }}</span>
-                                            @endif
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        @else
-                            <li class="relative nav-item px-1 w-full lg:w-auto" x-data="{ open: false }">
-                                <a class="nav-link font-medium text-slate-700 hover:text-emerald-700 transition-colors flex items-center justify-between lg:justify-start gap-1.5 py-2 px-3 rounded-lg hover:bg-slate-50 lg:hover:bg-transparent cursor-pointer w-full"
-                                    href="#" @click.prevent="open = !open">
-                                    <span>{{ __('Reporte') }}</span>
-                                    <i class="fas fa-chevron-down text-[9px] text-slate-400 transition-transform duration-150" :class="{ 'rotate-180': open }"></i>
-                                </a>
-                                <ul class="dropdown-menu shadow-lg border border-slate-200/80 rounded-xl py-1.5 bg-white/98 backdrop-blur-md static lg:absolute lg:right-0 mt-1 min-w-[200px] z-50 list-none"
-                                    x-show="open" @click.outside="open = false" x-transition.opacity.duration.150ms style="display: none;">
-                                    @php
-                                        $reportEntities = auth()->user()->entities ?? [];
-                                        if (empty($reportEntities) && !empty(auth()->user()->entidade)) {
-                                            $reportEntities = [auth()->user()->entidade];
-                                        }
-                                        $reportEntities = array_values(array_unique(array_filter($reportEntities)));
-                                    @endphp
-
+                                @endif
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 shrink-0" :class="{ 'rotate-180': open }">
+                                    <path d="m6 9 6 6 6-6"></path>
+                                </svg>
+                            </button>
+                            <ul class="dropdown-menu shadow-xl border border-slate-200/90 rounded-xl py-1.5 bg-white absolute left-0 mt-1 min-w-[200px] z-50 list-none"
+                                x-show="open" x-cloak x-transition.opacity.duration.150ms>
+                                <li>
+                                    <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center" href="{{ route('user.create') }}">
+                                        {{ __('Criar') }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center justify-between" href="{{ route('user.active') }}">
+                                        <span>{{ __('Utilizadores Ativos') }}</span>
+                                        @if (($activeUserCount ?? 0) > 0)
+                                            <span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold text-white bg-emerald-600 rounded-full shadow-xs">{{ $activeUserCount }}</span>
+                                        @endif
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center justify-between" href="{{ route('user.inactive') }}">
+                                        <span>{{ __('Utilizadores Inativos') }}</span>
+                                        @if (($pendingApprovalCount ?? 0) > 0)
+                                            <span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold text-slate-900 bg-amber-400 rounded-full shadow-xs">{{ $pendingApprovalCount }}</span>
+                                        @endif
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @else
+                        @php
+                            $reportEntities = auth()->user()->entities ?? [];
+                            if (empty($reportEntities) && !empty(auth()->user()->entidade)) {
+                                $reportEntities = [auth()->user()->entidade];
+                            }
+                            $reportEntities = array_values(array_unique(array_filter($reportEntities)));
+                        @endphp
+                        @if (count($reportEntities))
+                            <li class="relative" x-data="{ open: false }" @click.outside="open = false">
+                                <button type="button" @click="open = !open"
+                                        class="nav-item flex items-center space-x-2 px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition-colors duration-150 cursor-pointer border-0 bg-transparent text-slate-700 hover:text-emerald-800 hover:bg-slate-50"
+                                        aria-expanded="false" :aria-expanded="open ? 'true' : 'false'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-spreadsheet shrink-0">
+                                        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
+                                        <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+                                        <path d="M8 13h2"></path>
+                                        <path d="M14 13h2"></path>
+                                        <path d="M8 17h2"></path>
+                                        <path d="M14 17h2"></path>
+                                    </svg>
+                                    <span class="whitespace-nowrap">{{ __('Reporte') }}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 shrink-0" :class="{ 'rotate-180': open }">
+                                        <path d="m6 9 6 6 6-6"></path>
+                                    </svg>
+                                </button>
+                                <ul class="dropdown-menu shadow-xl border border-slate-200/90 rounded-xl py-1.5 bg-white absolute left-0 mt-1 min-w-[200px] z-50 list-none"
+                                    x-show="open" x-cloak x-transition.opacity.duration.150ms>
                                     @foreach ($reportEntities as $entity)
                                         <li>
-                                            <a class="dropdown-item report-link px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center" aria-current="pageAuthors" href="#!"
-                                                data-entity="{{ $entity }}"
-                                                data-report-action="{{ route('ceos-excel') }}">
+                                            <a class="dropdown-item report-link px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center" href="#!"
+                                               data-entity="{{ $entity }}" data-report-action="{{ route('ceos-excel') }}">
                                                 {{ $entity }}
                                             </a>
                                         </li>
@@ -101,88 +209,135 @@
                                 </ul>
                             </li>
                         @endif
+                    @endif
 
-                        @if (Auth::user()->is_isla == 1)
-                            <li class="relative nav-item px-1 w-full lg:w-auto" x-data="{ open: false }">
-                                <a class="nav-link font-medium text-slate-700 hover:text-emerald-700 transition-colors flex items-center justify-between lg:justify-start gap-1.5 py-2 px-3 rounded-lg hover:bg-slate-50 lg:hover:bg-transparent cursor-pointer w-full"
-                                    href="#" @click.prevent="open = !open">
-                                    <span>{{ __('Investigação') }}</span>
-                                    <i class="fas fa-chevron-down text-[9px] text-slate-400 transition-transform duration-150" :class="{ 'rotate-180': open }"></i>
+                    {{-- Investigação --}}
+                    @if (Auth::user()->is_isla == 1)
+                        <li class="relative" x-data="{ open: false }" @click.outside="open = false">
+                            <button type="button" @click="open = !open"
+                                    class="nav-item flex items-center space-x-2 px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition-colors duration-150 cursor-pointer border-0 bg-transparent {{ (request()->routeIs('authors.*') || request()->routeIs('outputs.*')) ? 'bg-emerald-700 text-white border-b-2 border-emerald-400 shadow-2xs' : 'text-slate-700 hover:text-emerald-800 hover:bg-slate-50' }}"
+                                    aria-expanded="false" :aria-expanded="open ? 'true' : 'false'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-microscope shrink-0">
+                                    <path d="M6 18h8"></path>
+                                    <path d="M3 22h18"></path>
+                                    <path d="m14 22 3-3 3 3"></path>
+                                    <path d="M9 14h2"></path>
+                                    <path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"></path>
+                                    <path d="m12 6 4-4 3 3-4 4"></path>
+                                </svg>
+                                <span class="whitespace-nowrap">{{ __('Investigação') }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 shrink-0" :class="{ 'rotate-180': open }">
+                                    <path d="m6 9 6 6 6-6"></path>
+                                </svg>
+                            </button>
+                            <ul class="dropdown-menu shadow-xl border border-slate-200/90 rounded-xl py-1.5 bg-white absolute left-0 mt-1 min-w-[200px] z-50 list-none"
+                                x-show="open" x-cloak x-transition.opacity.duration.150ms>
+                                <li>
+                                    <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center" href="{{ route('authors.index') }}">
+                                        {{ __('Autores') }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center" href="{{ route('outputs.index') }}">
+                                        {{ __('Publicações') }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
+                @endif
+
+                {{-- Ajuda / Tutorial --}}
+                <li>
+                    <a href="{{ route('help.index') }}"
+                       class="nav-item flex items-center space-x-2 px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg transition-colors duration-150 {{ request()->routeIs('help.*') ? 'bg-emerald-700 text-white border-b-2 border-emerald-400 shadow-2xs' : 'text-slate-700 hover:text-emerald-800 hover:bg-slate-50' }}"
+                       title="{{ __('Ajuda') }}" aria-current="{{ request()->routeIs('help.*') ? 'page' : 'false' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-help-circle shrink-0">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <path d="M12 17h.01"></path>
+                        </svg>
+                        <span class="whitespace-nowrap">{{ __('Ajuda') }}</span>
+                    </a>
+                </li>
+            </ul>
+
+            {{-- Mobile Sub-Nav (Horizontal Scrollable Tabs matching ISLA design) --}}
+            <div class="md:hidden relative">
+                <ul class="flex items-center space-x-1.5 overflow-x-auto scrollbar-hide py-2 list-none m-0">
+                    <li class="shrink-0">
+                        <a href="{{ route('home') }}"
+                           class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg {{ request()->routeIs('home') ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-700 bg-slate-50 border border-slate-200' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                            <span>{{ __('Início') }}</span>
+                        </a>
+                    </li>
+                    <li class="shrink-0">
+                        <a href="{{ route('about.index') }}"
+                           class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg {{ request()->routeIs('about.*') ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-700 bg-slate-50 border border-slate-200' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 16v-4"></path>
+                                <path d="M12 8h.01"></path>
+                            </svg>
+                            <span>{{ __('Sobre') }}</span>
+                        </a>
+                    </li>
+                    @if (Auth::check())
+                        <li class="shrink-0">
+                            <a href="{{ route('dashboard') }}"
+                               class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg {{ request()->routeIs('dashboard') ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-700 bg-slate-50 border border-slate-200' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                                    <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                                    <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                                    <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+                                </svg>
+                                <span>{{ __('Painel') }}</span>
+                            </a>
+                        </li>
+                        @if (auth()->user()->type == 'administrative')
+                            <li class="shrink-0">
+                                <a href="{{ route('user.active') }}"
+                                   class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg {{ request()->routeIs('user.*') ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-700 bg-slate-50 border border-slate-200' }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>{{ __('Utilizadores') }}</span>
                                 </a>
-                                <ul class="dropdown-menu shadow-lg border border-slate-200/80 rounded-xl py-1.5 bg-white/98 backdrop-blur-md static lg:absolute lg:right-0 mt-1 min-w-[200px] z-50 list-none"
-                                    x-show="open" @click.outside="open = false" x-transition.opacity.duration.150ms style="display: none;">
-                                    <li>
-                                        <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center" aria-current="pageAuthors"
-                                            href="{{ route('authors.index') }}">{{ __('Autores') }}</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center"
-                                            href="{{ route('outputs.index') }}">{{ __('Publicações') }}</a>
-                                    </li>
-                                </ul>
+                            </li>
+                        @endif
+                        @if (Auth::user()->is_isla == 1)
+                            <li class="shrink-0">
+                                <a href="{{ route('authors.index') }}"
+                                   class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-slate-700 bg-slate-50 border border-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M6 18h8"></path>
+                                        <path d="M3 22h18"></path>
+                                    </svg>
+                                    <span>{{ __('Autores') }}</span>
+                                </a>
                             </li>
                         @endif
                     @endif
-
-                    {{-- Displays the flags --}}
-                    <x-flags :flags="[
-                        'en' => [
-                            'lang' => 'Inglês',
-                        ],
-                        'pt' => [
-                            'lang' => 'Português',
-                        ],
-                    ]" />
-
-                    <li class="relative nav-item px-1 w-full lg:w-auto" x-data="{ open: false }">
-                        <a class="nav-link py-1 cursor-pointer flex items-center gap-1.5" href="#"
-                            @click.prevent="open = !open">
-                            <x-user-image
-                                showLogedUserImage="{{ Auth::check() && auth()->user()->type != 'administrative' }}"
-                                height="34" />
-                            <i class="fas fa-caret-down text-slate-500 text-xs transition-transform duration-150" :class="{ 'rotate-180': open }"></i>
+                    <li class="shrink-0">
+                        <a href="{{ route('help.index') }}"
+                           class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg {{ request()->routeIs('help.*') ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-700 bg-slate-50 border border-slate-200' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <path d="M12 17h.01"></path>
+                            </svg>
+                            <span>{{ __('Ajuda') }}</span>
                         </a>
-
-                        <ul class="dropdown-menu shadow-lg border border-slate-200/80 rounded-xl py-1.5 bg-white/98 backdrop-blur-md absolute right-0 mt-1 min-w-[180px] z-50 list-none"
-                            x-show="open" @click.outside="open = false" x-transition.opacity.duration.150ms style="display: none;">
-                            @if (!Auth::check())
-                                <li>
-                                    <a class="dropdown-item px-3 py-2 text-xs font-semibold text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center"
-                                        href="{{ route('login') }}">{{ __('Iniciar Sessão') }}</a>
-                                </li>
-                            @else
-                                @if (!auth()->user()->hasVerifiedEmail())
-                                    <li>
-                                        <a class="dropdown-item px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center gap-2" href="javascript:void(0)" onclick="openVerifyEmailModal()">
-                                            <i class="fas fa-envelope-open-text text-emerald-600"></i>{{ __('Verificar Email') }}
-                                        </a>
-                                    </li>
-                                @endif
-
-                                <li>
-                                    <a class="dropdown-item px-3 py-2 text-xs font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg mx-1 transition-colors flex items-center"
-                                        href="{{ route('profile.edit') }}">{{ __('Perfil') }}</a>
-                                </li>
-
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg mx-1 transition-colors w-full text-left flex items-center border-0 bg-transparent cursor-pointer">
-                                            {{ __('Logout') }}
-                                        </button>
-                                    </form>
-                                </li>
-                            @endif
-                        </ul>
                     </li>
-
                 </ul>
-                <!-- Menu links -->
             </div>
-            <!-- Collapsible wrapper -->
         </div>
-        <!-- Container wrapper -->
     </nav>
-    <!-- End Navbar -->
 </header>
-<!-- End header-->
+<!-- End Header -->

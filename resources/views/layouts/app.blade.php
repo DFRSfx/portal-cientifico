@@ -25,8 +25,6 @@
     <!-- Jquery -->
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 
-    <!-- Alpine.js -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 
 

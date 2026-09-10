@@ -10,6 +10,10 @@
     --color-brand-border: #cfe2d6;
 }
 
+[x-cloak] {
+    display: none !important;
+}
+
 /* ==========================================================================
    Fase 2, 3, 4 & 5: Tabelas Compartilhadas (outputs, publicações, info, autores)
    ========================================================================== */
@@ -645,6 +649,8 @@
 }
 .dropdown-menu {
     @apply absolute left-0 z-50 mt-1 min-w-[12rem] bg-white rounded-xl shadow-xl border border-slate-200/90 py-1.5 list-none;
+}
+.dropdown-menu:not([x-show]) {
     display: none;
 }
 .dropdown-menu.show {
