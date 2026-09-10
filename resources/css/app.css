@@ -11,11 +11,12 @@
 }
 
 /* ==========================================================================
-   Fase 2, 3 & 4: Tabelas Compartilhadas (outputs, publicações, info)
+   Fase 2, 3, 4 & 5: Tabelas Compartilhadas (outputs, publicações, info, autores)
    ========================================================================== */
 .outputs-table,
 .publications-table,
-.info-table {
+.info-table,
+.authors-table {
     border-collapse: separate;
     border-spacing: 0;
     @apply w-full text-left text-sm;
@@ -23,37 +24,43 @@
 
 .outputs-table thead th,
 .publications-table thead th,
-.info-table thead th {
+.info-table thead th,
+.authors-table thead th {
     @apply bg-emerald-50/90 text-emerald-950 font-bold border-b border-emerald-200/80 px-4 py-3 text-xs uppercase tracking-wider;
 }
 
 .outputs-table tbody td,
 .publications-table tbody td,
-.info-table tbody td {
+.info-table tbody td,
+.authors-table tbody td {
     @apply border-b border-slate-100 px-4 py-3.5 align-middle text-slate-700 transition-colors duration-150;
 }
 
 .outputs-table tbody tr:nth-child(even),
 .publications-table tbody tr:nth-child(even),
-.info-table tbody tr:nth-child(even) {
+.info-table tbody tr:nth-child(even),
+.authors-table tbody tr:nth-child(even) {
     @apply bg-emerald-50/25;
 }
 
 .outputs-table tbody tr:hover,
 .publications-table tbody tr:hover,
-.info-table tbody tr:hover {
+.info-table tbody tr:hover,
+.authors-table tbody tr:hover {
     @apply bg-emerald-50/70;
 }
 
 .outputs-table a,
 .publications-table a,
-.info-table a {
+.info-table a,
+.authors-table a {
     @apply text-emerald-700 hover:text-emerald-900 font-semibold hover:underline inline-flex items-center gap-1 transition-colors;
 }
 
 .outputs-table .badge,
 .publications-table .badge,
-.info-table .badge {
+.info-table .badge,
+.authors-table .badge {
     @apply px-2.5 py-1 rounded-full text-xs font-semibold inline-block;
 }
 

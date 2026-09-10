@@ -8,6 +8,9 @@
    - Fase 4 (Perfil de Autor - show, basicInfo, output):
      Regras locais de .info-table, .info-list, .info-box, métricas, tabs e
      modal .vc-modal migradas para Tailwind v4 em resources/css/app.css.
+   - Fase 5 (Listagem de Autores - authors.index):
+     Regras locais de .authors-table e filtros migradas para Tailwind v4
+     em resources/css/app.css.
    ========================================================================== */
 
 @media screen and (max-width: 600px) {
