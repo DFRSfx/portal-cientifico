@@ -292,5 +292,59 @@
     @apply text-sm text-slate-600 leading-relaxed;
 }
 
+/* ==========================================================================
+   Formulários e Inputs (Tailwind CSS v4)
+   Substituição de .form-control, .form-select e variantes Bootstrap
+   ========================================================================== */
+.form-control {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-2xs transition-all;
+}
+
+.form-select {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-2xs transition-all;
+}
+
+.form-label {
+    @apply block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5;
+}
+
+.form-group {
+    @apply mb-4;
+}
+
+.form-check {
+    @apply flex items-center gap-2 mb-2;
+}
+
+.form-check-input {
+    @apply h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer;
+}
+
+.form-check-label {
+    @apply text-sm text-slate-700 select-none cursor-pointer;
+}
+
+.input-group {
+    @apply relative flex items-stretch w-full;
+}
+
+.input-group-text {
+    @apply flex items-center px-3.5 text-sm text-slate-500 bg-slate-50 border border-slate-300 rounded-l-xl;
+}
+
+.col-form-label {
+    @apply text-sm font-semibold text-slate-700 py-2;
+}
+
+.is-invalid {
+    @apply border-rose-500! focus:border-rose-500! focus:ring-rose-500/20!;
+}
+
+.invalid-feedback {
+    @apply block text-xs text-rose-600 font-medium mt-1.5;
+}
+
+
+
 
 

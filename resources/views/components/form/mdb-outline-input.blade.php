@@ -4,16 +4,15 @@
     'divContainerExtraClass' => 'mb-4',
 ])
 
-<div class="form-outline {{ $divContainerExtraClass }}">
-    <input type="{{ $type }}" @if ($inputMask != '') data-mdb-input-mask="{{ $inputMask }}" @endif
-    id="{{ $name }}"
-    class="form-control  @if ($bag == '') @error($name) is-invalid @enderror @else @error($name, $bag) is-invalid @enderror @endif"
-    name="{{ $name }}" value="{{ $value }}" />
-
-    {{-- Checks  --}}
+<div class="{{ $divContainerExtraClass }}">
     @if ($label)
         <label class="form-label" for="{{ $name }}">{{ __($labelValue) }}</label>
     @endif
+
+    <input type="{{ $type }}" @if ($inputMask != '') data-input-mask="{{ $inputMask }}" @endif
+    id="{{ $name }}"
+    class="form-control @if ($bag == '') @error($name) is-invalid @enderror @else @error($name, $bag) is-invalid @enderror @endif"
+    name="{{ $name }}" value="{{ $value }}" />
 
     @if ($bag == '')
         @error($name)
