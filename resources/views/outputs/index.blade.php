@@ -4,39 +4,7 @@
         {{ __('Publicações') }}
     </x-slot>
 
-    <style>
-        .btn-jstabales {
-            background-color: transparent;
-            color: black;
-        }
-
-        .outputs-table {
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .outputs-table thead th {
-            background: #e6f1ea;
-            color: #1f4d2f;
-            font-weight: 700;
-            border-bottom: 1px solid #cfe2d6;
-            padding: 12px 14px;
-        }
-
-        .outputs-table tbody td {
-            padding: 12px 14px;
-            border-bottom: 1px solid #dfeae3;
-            vertical-align: middle;
-        }
-
-        .outputs-table tbody tr:nth-child(even) {
-            background: #f2f8f4;
-        }
-
-        .outputs-table tbody tr:hover {
-            background: #e3f2e8;
-        }
-    </style>
+    {{-- Estilos da outputs-table migrados para Tailwind CSS v4 em resources/css/app.css (.outputs-table) --}}
 
     @push('header-links')
         <!-- DataTables Bootstrap -->
@@ -53,22 +21,24 @@
         </script>
     @endpush
 
-    <section class="saas-list-compact">
+    <section class="saas-list-compact py-2">
         <div class="container saas-wide mt-3">
             <div class="row">
                 <div class="col-xl-3">
-                    <div class="card saas-sticky">
+                    <div class="card saas-sticky rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm backdrop-blur-md">
 
                         <form id="form-filter" name="form-filter" method="POST">
                             @csrf
                             <div class="card-body">
 
-                                <h5 class="card-title">{{ __('Filter') }}</h5>
-                                <button class="btn btn-primary btn-sm " type="button"
-                                    onclick="clearSelectedElements()">
-                                    {{ __('Limpar') }}</button>
-
-                                <hr>
+                                <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-100">
+                                    <h5 class="text-sm font-bold uppercase tracking-wider text-slate-800 m-0">{{ __('Filtros') }}</h5>
+                                    <button class="px-2.5 py-1 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-full border border-emerald-200/60 transition-colors cursor-pointer inline-flex items-center gap-1" type="button"
+                                        onclick="clearSelectedElements()">
+                                        <i class="fas fa-rotate-left text-[10px]"></i>
+                                        {{ __('Limpar') }}
+                                    </button>
+                                </div>
                                 <div>
                                     <div class="input-group">
                                         <div class="form-outline">
@@ -164,22 +134,22 @@
             </div>
 
             <div class="col-xl-9">
-                <div class="card mb-2">
-                    <div class="card-body">
+                <div class="card mb-3 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
+                    <div class="card-body p-3 sm:p-5">
                         <div class="card-title">
                             <div class="container">
-                                <div class="d-inline-flex align-content-start flex-wrap" id="filtred-filds">
+                                <div class="d-inline-flex align-content-start flex-wrap gap-1.5" id="filtred-filds">
                                 </div>
                             </div>
                         </div>
-                        <div class="table-responsive p-1 ">
-                            <table class="table align-middle mb-0 bg-white outputs-table" style="width:100% "
+                        <div class="table-responsive p-1">
+                            <table class="table align-middle mb-0 bg-white outputs-table w-full"
                                 id="outputs_table">
-                                <thead class="bg-light">
+                                <thead>
                                     <tr>
-                                        <th>{{ __('Nome da publicação') }}</th>
+                                        <th class="rounded-tl-lg">{{ __('Nome da publicação') }}</th>
                                         <th>{{ __('Estado') }}</th>
-                                        <th>{{ __('Tipo') }}</th>
+                                        <th class="rounded-tr-lg">{{ __('Tipo') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -405,21 +375,14 @@
 
                         table.row.add([
                             `
-                            <div class="">
-                                <div class="">
-                                    <div class="w-100">
-                                        <span class="text-muted">
-                                            <cite>${element.citation_string}</cite>
-                                        </span>
-                                        <br>
-                                        <span class="fw-bolder mt-1">
-                                            ${title}
-                                        </span>
-                                        <br>
-                                        ${publisherSpan}
-                                        <br>
-                                        ${link}
-                                    </div>
+                            <div class="w-full space-y-1">
+                                ${element.citation_string ? `<cite class="not-italic text-xs font-normal text-slate-500 block leading-relaxed line-clamp-2">${element.citation_string}</cite>` : ''}
+                                <h4 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-snug m-0">
+                                    ${title}
+                                </h4>
+                                <div class="flex flex-wrap items-center gap-2 pt-0.5 text-xs text-slate-500">
+                                    ${publisherSpan}
+                                    ${link}
                                 </div>
                             </div>`,
                             `<span class="badge badge-${statusBadgeClass(element.polymorphic?.status)} rounded-pill d-inline">${(element.polymorphic?.status) ?? "{{ __('Sem Estado') }}"}</span>`,
@@ -470,7 +433,7 @@
                 }
 
                 if (returnLinkAsString) {
-                    link = `<a href ="${url}">Aceder à Publicação</a>`
+                    link = `<a href="${url}" target="_blank" rel="nofollow noopener noreferrer" class="inline-flex items-center gap-1 font-semibold text-emerald-700 hover:text-emerald-900 hover:underline transition-colors ml-auto sm:ml-0"><span>Aceder à Publicação</span> <i class="fas fa-arrow-up-right-from-square text-[10px]"></i></a>`
                 } else {
                     link = document.createElement("a")
 

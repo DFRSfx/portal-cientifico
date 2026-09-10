@@ -1,3 +1,10 @@
+/* ==========================================================================
+   Portal Científico - Migração Tailwind CSS v4
+   - Fase 2 (outputs.index & x-publication-title):
+     As regras locais de .outputs-table e .btn-jstabales foram migradas para
+     Tailwind v4 (@apply) em resources/css/app.css.
+   ========================================================================== */
+
 @media screen and (max-width: 600px) {
     #author-options {
         display: none;

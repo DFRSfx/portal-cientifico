@@ -8,39 +8,44 @@
 
 <div class="{{ $firstDivClass }}">
     <div class="{{ $secondDivClass }}">
-        <div class="w-100">
-            <span class="text-muted">
-                <cite>{{ $publication->citation_string }}</cite>
-            </span>
-            <br>
-            <span class="fw-bolder mt-1">
+        <div class="w-full space-y-1">
+            @if (!empty($publication->citation_string))
+                <cite class="not-italic text-xs font-normal text-slate-500 block leading-relaxed line-clamp-2">
+                    {{ $publication->citation_string }}
+                </cite>
+            @endif
+
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-snug m-0">
                 @if (isset($publication->year))
                     {{ $publication->title . ', ' . $publication->year }}
                 @else
                     {{ $publication->title }}
                 @endif
-            </span>
-            <br>
-            @if ($displayType)
-                <span class="text-muted ">
-                    {{ $publication->type->name }}
-                </span>
-            @endif
+            </h3>
 
-            @if ($dispayPublisher)
-                <span class="text-muted ">
-                    {{ $publication->polymorphic->publisher ?? "Sem Publicador" }}
-                </span>
-            @endif
+            <div class="flex flex-wrap items-center gap-2 pt-0.5 text-xs text-slate-500">
+                @if ($displayType && !empty($publication->type->name))
+                    <span class="inline-flex items-center font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+                        {{ $publication->type->name }}
+                    </span>
+                @endif
 
-            @if ($displayAccessPubButton && $publication->doi)
-                @php($pubUrl = filter_var($publication->doi, FILTER_VALIDATE_URL) ? $publication->doi : 'https://www.doi.org/' . $publication->doi)
+                @if ($dispayPublisher)
+                    <span class="inline-flex items-center text-slate-600">
+                        <i class="fas fa-building-columns me-1 text-[10px] opacity-70"></i>
+                        {{ $publication->polymorphic->publisher ?? "Sem Publicador" }}
+                    </span>
+                @endif
 
-                <span>
-                    <a href="{{ $pubUrl }}" target="__blank" ref="nofollow noopener noreferrer"> Aceder à Publicação
+                @if ($displayAccessPubButton && $publication->doi)
+                    @php($pubUrl = filter_var($publication->doi, FILTER_VALIDATE_URL) ? $publication->doi : 'https://www.doi.org/' . $publication->doi)
+                    <a href="{{ $pubUrl }}" target="_blank" rel="nofollow noopener noreferrer"
+                       class="inline-flex items-center gap-1 font-semibold text-emerald-700 hover:text-emerald-900 hover:underline transition-colors ml-auto sm:ml-0">
+                        <span>{{ __('Aceder à Publicação') }}</span>
+                        <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
                     </a>
-                </span>
-            @endif
+                @endif
+            </div>
         </div>
     </div>
 </div>
