@@ -47,13 +47,12 @@
 
 
 
-    <meta name="csrf-token" content="{{ csrf_token() }}" />
-
     @stack('header-scripts')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
 
-<body class="saas">
+<body class="saas min-h-screen flex flex-col justify-between antialiased">
 
     <x-layouts.nav-bar />
     <x-vanilla-modal />

@@ -54,70 +54,46 @@
 
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="p-3 badge-primary rounded-4 " style="background-color:#2A6B20">
-                                        <i class="fas fa-newspaper fa-lg fa-fw" style="color:white;"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-4">
-                                        <p class="text-muted mb-1">{{ __('Publicações') }}</p>
-                                        <h2 class="mb-0">
-                                            {{ $numberOfPublications }}
-                                        </h2>
-                                    </div>
-                                </div>
+                        <div class="saas-stat">
+                            <div class="saas-stat-icon">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                            <div>
+                                <div class="saas-stat-label">{{ __('Publicações') }}</div>
+                                <div class="saas-stat-value">{{ $numberOfPublications }}</div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="p-3 badge-primary rounded-4 " style="background-color:#2A6B20">
-                                        <i class="fas fa-user fa-lg fa-fw" style="color:white;"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-4">
-                                        <p class="text-muted mb-1">{{ __('Média de Publicações') }}</p>
-                                        <h2 class="mb-0">
-                                            {{ $average }}
-                                        </h2>
-                                    </div>
-                                </div>
+                        <div class="saas-stat">
+                            <div class="saas-stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <div class="saas-stat-label">{{ __('Média de Publicações') }}</div>
+                                <div class="saas-stat-value">{{ $average }}</div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="p-3 badge-primary rounded-4 " style="background-color:#2A6B20">
-                                        <i class="fas fa-user-check fa-lg fa-fw" style="color:white;"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-4">
-                                        <p class="text-muted mb-1">{{ __('Utilizadores Ativos') }}</p>
-                                        <h2 class="mb-0">
-                                            {{ $activeUsersCount ?? 0 }}
-                                        </h2>
-                                    </div>
-                                </div>
+                        <div class="saas-stat">
+                            <div class="saas-stat-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div>
+                                <div class="saas-stat-label">{{ __('Utilizadores Ativos') }}</div>
+                                <div class="saas-stat-value">{{ $activeUsersCount ?? 0 }}</div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="p-3 badge-primary rounded-4 " style="background-color:#2A6B20">
-                                        <i class="fas fa-user-clock fa-lg fa-fw" style="color:white;"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-4">
-                                        <p class="text-muted mb-1">{{ __('Por Aprovar / Verificar') }}</p>
-                                        <h2 class="mb-0">
-                                            {{ ($pendingUsersCount ?? 0) + ($pendingVerificationCount ?? 0) }}
-                                        </h2>
-                                    </div>
-                                </div>
+                        <div class="saas-stat">
+                            <div class="saas-stat-icon">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <div>
+                                <div class="saas-stat-label">{{ __('Por Aprovar / Verificar') }}</div>
+                                <div class="saas-stat-value">{{ ($pendingUsersCount ?? 0) + ($pendingVerificationCount ?? 0) }}</div>
                             </div>
                         </div>
                     </div>

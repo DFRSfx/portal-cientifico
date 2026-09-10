@@ -14,6 +14,10 @@
    - Fase 6 (Páginas Institucionais - home e about):
      Regras locais de .saas-stat, carrossel de destaques e layout editorial de
      Sobre Nós migradas para Tailwind CSS v4 em resources/css/app.css.
+   - Fase 7 (Shell Global, Navbar, Footer e Áreas de Utilizadores):
+     Migração da barra de navegação (nav-bar), rodapé (footer), layouts base
+     (app, admin), tabelas de utilizadores (.users-table) e estatísticas para
+     Tailwind CSS v4.
    ========================================================================== */
 
 @media screen and (max-width: 600px) {
@@ -349,39 +353,9 @@ body.saas .saas-dashboard .list-group-item {
     padding-bottom: .5rem;
 }
 
-body.saas .saas-stat {
-    display: flex;
-    align-items: center;
-    gap: .9rem;
-    padding: .9rem 1rem;
-    border-radius: 16px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    background: rgba(255, 255, 255, 0.75);
-    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
-}
-
-body.saas .saas-stat-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    background: linear-gradient(135deg, rgba(42, 107, 32, 0.95), rgba(42, 107, 32, 0.75));
-    color: #fff;
-}
-
-body.saas .saas-stat-label {
-    font-size: .875rem;
-    color: rgba(15, 23, 42, 0.65);
-    margin-bottom: .15rem;
-}
-
-body.saas .saas-stat-value {
-    font-size: 1.75rem;
-    font-weight: 800;
-    line-height: 1;
-    color: #0f172a;
-}
+/* [Migrado para Tailwind CSS v4 em resources/css/app.css]:
+   As regras de .saas-stat, .saas-stat-icon, .saas-stat-label e .saas-stat-value
+   foram unificadas via @apply em app.css e eliminadas daqui para evitar sobreposição. */
 
 body.saas .saas-page {
     background: transparent;

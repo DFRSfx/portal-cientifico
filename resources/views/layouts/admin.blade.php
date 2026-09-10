@@ -28,8 +28,9 @@
     @stack('header-scripts')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
 
-<body>
+<body class="saas min-h-screen flex flex-col justify-between antialiased">
 
     <x-layouts.nav-bar />
 

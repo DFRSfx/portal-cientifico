@@ -14,16 +14,16 @@
         </script>
     @endpush
 
-    <div class="container-fluid pt-5 px-4">
+    <div class="container-fluid pt-5 px-4 max-w-7xl mx-auto">
         <div class="row justify-content-center">
             <div class="col-12">
-                <div class="card">
+                <div class="card rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
 
-                    <div class="card-body">
+                    <div class="card-body p-4 sm:p-6">
                         <div id="admin-update-message-container" class="mb-3 position-relative"></div>
 
-                        <div class="table-responsive p-2">
-                            <table class="table align-middle mb-0 bg-white" id="users_table">
+                        <div class="table-responsive p-1">
+                            <table class="table users-table align-middle mb-0 bg-white" id="users_table">
                                 <thead class="bg-light">
                                     <tr>
                                         <th>{{ __('Nome') }}</th>
@@ -38,43 +38,49 @@
                                 <tbody>
                                     @foreach ($users as $user)
                                         <tr>
-                                            <td><p class="fw-normal mb-0">{{ $user->name }}</p></td>
-                                            <td><p class="fw-normal mb-0">{{ $user->email }}</p></td>
-                                            <td><p class="fw-normal mb-0">{{ $user->ciencia_vitae ?? '-' }}</p></td>
+                                            <td><p class="font-semibold text-slate-800 mb-0">{{ $user->name }}</p></td>
+                                            <td><p class="text-slate-600 mb-0">{{ $user->email }}</p></td>
+                                            <td><p class="text-slate-600 mb-0 font-mono text-xs">{{ $user->ciencia_vitae ?? '-' }}</p></td>
                                             <td>
-                                                <span class="badge {{ $user->email_verified_at ? 'badge-success' : 'badge-warning' }} rounded-pill">
-                                                    {{ $user->email_verified_at ? __('Verificado') : __('Pendente') }}
-                                                </span>
+                                                @if ($user->email_verified_at)
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                        <i class="fas fa-check-circle me-1 text-[10px]"></i>{{ __('Verificado') }}
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                                                        <i class="fas fa-clock me-1 text-[10px]"></i>{{ __('Pendente') }}
+                                                    </span>
+                                                @endif
                                             </td>
-                                            <td><p class="fw-normal mb-0">{{ $user->created_at?->format('Y-m-d') ?? '-' }}</p></td>
-                                            <td><p class="fw-normal mb-0 text-uppercase">{{ $user->type }}</p></td>
-                                            <td class="d-flex flex-wrap gap-2">
+                                            <td><p class="text-slate-600 mb-0 text-xs">{{ $user->created_at?->format('Y-m-d') ?? '-' }}</p></td>
+                                            <td><p class="font-medium text-slate-700 mb-0 uppercase text-xs">{{ $user->type }}</p></td>
+                                            <td class="d-flex flex-wrap gap-1.5">
                                                 @if ($user->type !== 'administrative' && !empty($user->ciencia_vitae) && $user->authorInformation)
                                                     <button type="button"
-                                                        class="btn btn-sm btn-outline-success update-author-cv"
+                                                        class="btn btn-sm text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg transition-all update-author-cv"
                                                         data-author-id="{{ $user->authorInformation->id }}">
                                                         {{ __('Atualizar CV') }}
                                                     </button>
                                                 @endif
-                                                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">
+                                                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-all">
                                                     {{ __('Editar') }}
                                                 </a>
                                                 <form method="POST" action="{{ route('user.deactivate', $user->id) }}">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <button type="submit" class="btn btn-sm text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-all">
                                                         {{ __('Desativar') }}
                                                     </button>
                                                 </form>
                                                 <form method="POST" action="{{ route('user.resend-verification', $user->id) }}">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                    <button type="submit" class="btn btn-sm text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg transition-all">
                                                         {{ __('Reenviar email') }}
                                                     </button>
                                                 </form>
                                                 <form method="POST" action="{{ route('user.destroy', $user->id) }}" onsubmit="return confirm('{{ __('Tem a certeza que deseja remover?') }}');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <button type="submit" class="btn btn-sm text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-all">
                                                         {{ __('Remover') }}
                                                     </button>
                                                 </form>
