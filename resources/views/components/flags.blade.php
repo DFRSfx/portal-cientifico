@@ -18,20 +18,22 @@
     </button>
 
     {{-- Dropdown Menu --}}
-    <ul class="dropdown-menu shadow-xl border border-slate-200/90 rounded-xl py-1.5 bg-white/98 backdrop-blur-md absolute right-0 mt-2 min-w-[150px] z-50 list-none"
+    <ul class="dropdown-menu shadow-xl border border-slate-200/90 rounded-xl py-1.5 bg-white absolute right-0 mt-2 min-w-[160px] z-50 list-none"
         x-show="open" x-cloak x-transition.opacity.duration.150ms>
         @foreach ($flags as $language => $langInfo)
             <li>
-                <a class="dropdown-item px-3 py-2 text-xs font-medium {{ $appLanguage == $language ? 'text-emerald-800 bg-emerald-50/80 font-semibold' : 'text-slate-700 hover:bg-slate-50 hover:text-emerald-800' }} rounded-lg mx-1 flex items-center justify-between transition-colors"
+                <a class="w-full !flex items-center justify-between gap-3 px-3 py-2 text-xs font-medium {{ $appLanguage == $language ? 'text-emerald-800 bg-emerald-50/80 font-semibold' : 'text-slate-700 hover:bg-slate-50 hover:text-emerald-800' }} rounded-lg mx-1 transition-colors"
                    href="{{ route('language', ['locale' => $language]) }}">
-                    <span class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-2 shrink-0">
                         @if (file_exists(public_path('logo/flags/' . $language . '.svg')))
                             <img src="{{ asset('logo/flags/' . $language . '.svg') }}" alt="{{ $language }}" class="w-4 h-3 rounded-xs object-cover shadow-2xs shrink-0" />
                         @endif
-                        <span>{{ __($langInfo['lang']) }}</span>
+                        <span class="whitespace-nowrap">{{ __($langInfo['lang']) }}</span>
                     </span>
                     @if ($appLanguage == $language)
-                        <i class="fa fa-check text-emerald-600 text-[10px]"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600 shrink-0 ml-auto" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
                     @endif
                 </a>
             </li>
