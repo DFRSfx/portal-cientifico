@@ -1,39 +1,8 @@
 @extends('authors.show')
 
 @section('author-information')
+    {{-- Regras de .publications-table e .btn-jstabales migradas para Tailwind CSS v4 em resources/css/app.css --}}
     <style>
-        .btn-jstabales {
-            background-color: transparent;
-            color: black;
-        }
-
-        .publications-table {
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .publications-table thead th {
-            background: #e6f1ea;
-            color: #1f4d2f;
-            font-weight: 700;
-            border-bottom: 1px solid #cfe2d6;
-            padding: 12px 14px;
-        }
-
-        .publications-table tbody td {
-            padding: 12px 14px;
-            border-bottom: 1px solid #dfeae3;
-            vertical-align: middle;
-        }
-
-        .publications-table tbody tr:nth-child(even) {
-            background: #f2f8f4;
-        }
-
-        .publications-table tbody tr:hover {
-            background: #e3f2e8;
-        }
-
         .quartile-select {
             min-width: 86px;
         }

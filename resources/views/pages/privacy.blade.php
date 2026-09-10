@@ -3,16 +3,16 @@
     <x-slot:title>
         {{ __('Política de Privacidade') }} </x-slot>
 
-    <div class="container " style="margin-top: 50px;">
+    <div class="container max-w-5xl mx-auto py-8 sm:py-12 px-4">
         <div class="row">
-         
-
-            <div class="col">
-                <div class="card mb-3">
+            <div class="col-12">
+                <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm p-4 sm:p-10">
                     <div class="card-body">
-                        <h2 class="card-title pt-3 ps-2 pe-2 pb-5 text-center">Política de Privacidade e Proteção de
-                            Dados Pessoais | Instituições Ensino Lusófona em Portugal</h2>
-                        <div class="card-text ps-2 pe-2">
+                        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 text-center tracking-tight mb-8 pb-4 border-b border-emerald-100">
+                            {{ __('Política de Privacidade e Proteção de Dados Pessoais') }}
+                            <span class="block text-base font-normal text-emerald-800 mt-2">Instituições Ensino Lusófona em Portugal</span>
+                        </h1>
+                        <div class="prose prose-slate prose-emerald max-w-none text-slate-700 leading-relaxed prose-ol:my-3 prose-li:my-1.5">
 
                             <ol>
                                 <li>A recolha e armazenamento dos dados pessoais da Universidade Lusófona, ISDOM-
