@@ -20,9 +20,9 @@
                                 <div class="col-12">
                                     <!--Section: Block Content-->
                                     <section class="my-5 text-center">
-                                        <h1 class="display-1">403</h1>
+                                        <h1 class="text-6xl sm:text-7xl font-extrabold text-emerald-800 mb-2">404</h1>
 
-                                        <h4 class="mb-4">Page not found</h4>
+                                        <h4 class="text-xl font-bold text-slate-800 mb-4">{{ __('Página não encontrada') }}</h4>
 
                                         <p class="mb-0">
                                             The Page you are looking for doesn't exist or an other error
