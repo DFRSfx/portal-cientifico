@@ -2,68 +2,7 @@
 
 @section('author-information')
 
-<style>
-    .info-body {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    @media (min-width: 1200px) {
-        .info-body {
-            padding-left: 6px;
-            padding-right: 6px;
-        }
-    }
-
-    .info-table {
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .info-table thead th {
-        background: #e6f1ea;
-        color: #1f4d2f;
-        font-weight: 700;
-        border-bottom: 1px solid #cfe2d6;
-        padding: 12px 14px;
-    }
-
-    .info-table tbody td {
-        padding: 12px 14px;
-        border-bottom: 1px solid #dfeae3;
-        vertical-align: middle;
-    }
-
-    .info-table tbody tr:nth-child(even) {
-        background: #f2f8f4;
-    }
-
-    .info-table tbody tr:hover {
-        background: #e3f2e8;
-    }
-
-    .info-list {
-        list-style: none;
-        padding-left: 0;
-        margin: 0;
-    }
-
-    .info-list li {
-        padding: 8px 12px;
-        border-bottom: 1px solid #dfeae3;
-    }
-
-    .info-list li:nth-child(even) {
-        background: #f2f8f4;
-    }
-
-    .info-box {
-        background: #ffffff;
-        border: 1px solid #dfeae3;
-        border-radius: 10px;
-        padding: 12px;
-    }
-</style>
+{{-- Estilos de .info-table, .info-list e .info-box migrados para Tailwind CSS v4 em resources/css/app.css --}}
 
 <div class="accordion-item">
     <div class="accordion-header" id="headingOne">

@@ -187,19 +187,19 @@
         <div class="container saas-profile saas-profile-wide py-3 ">
             <div class="row g-3">
                 <div class="col-xl-3">
-                    <div class="card testimonial-card mb-3 saas-sticky">
-                        <div class="card-up"></div>
-                        <div class="avatar mx-auto white">
+                    <div class="card testimonial-card mb-3 saas-sticky rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm backdrop-blur-md overflow-hidden">
+                        <div class="card-up bg-gradient-to-r from-emerald-800 to-emerald-700 h-24"></div>
+                        <div class="avatar mx-auto white relative -mt-12 w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-white">
                             <x-user-image showLogedUserImage="0"
                                 cienciaVitae="{{ $author->userInformation->ciencia_vitae }}"
                                 cienciaVitaeImageIsPublic="{{ $author->profile_is_public && $author->profile_image_is_public }}"
-                                class="rounded-circle img-fluid" />
+                                class="rounded-circle img-fluid w-full h-full object-cover" />
                         </div>
 
-                        <div class="card-body">
-                            <h5 class="font-weight-bolder mb-0">
+                        <div class="card-body p-4 text-center">
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight mb-1">
                                 {{ $author->userInformation->name ?? __('Sem Valor') }}
-                            </h5>
+                            </h2>
                             @php
                                 $rawEntities = [];
                                 $entityName = $author->userInformation->entidade ?? null;
@@ -583,39 +583,33 @@
                 </div>
 
                 <div class="col-xl-9">
-                    <div class="card mb-2">
-                        <div class="card-body">
+                    <div class="card mb-3 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
+                        <div class="card-body p-3 sm:p-5">
 
                             <!-- Tabs navs -->
-                            <ul class="nav nav-tabs nav-justified mb-2" id="ex1" role="tablist">
+                            <ul class="nav nav-tabs nav-justified mb-3 border-b border-slate-200 gap-1" id="ex1" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.show') ? 'nav-link active' : 'nav-link' }}"
-                                        style="color:#2A6B20 ;"
+                                    <a class="{{ request()->routeIs('authors.show') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
                                         href="{{ route('authors.show', $author->id) }}">{{ __('Informação pessoal') }}</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.employments') ? 'nav-link active' : 'nav-link' }}"
-                                        style="color:#2A6B20 ;"
+                                    <a class="{{ request()->routeIs('authors.employments') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
                                         href="{{ route('authors.employments', ['id' => $author->id]) }}">{{ __('Percurso profissional') }}</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.outputs') ? 'nav-link active' : 'nav-link' }}"
-                                    style="color:#2A6B20 ;"
+                                    <a class="{{ request()->routeIs('authors.outputs') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
                                     href="{{ route('authors.outputs', ['authorsId' => $author->id]) }}">{{ __('Publicações') }}</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.projects') ? 'nav-link active' : 'nav-link' }}"
-                                    style="color:#2A6B20 ;"
+                                    <a class="{{ request()->routeIs('authors.projects') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
                                     href="{{ route('authors.projects', ['authorsId' => $author->id]) }}">{{ __('Projetos') }}</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.activities') ? 'nav-link active' : 'nav-link' }}"
-                                    style="color:#2A6B20 ;"
+                                    <a class="{{ request()->routeIs('authors.activities') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
                                     href="{{ route('authors.activities', ['authorsId' => $author->id]) }}">{{ __('Atividades') }}</a>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.statistics') ? 'nav-link active' : 'nav-link' }}"
-                                        style="color:#2A6B20 ;"
+                                    <a class="{{ request()->routeIs('authors.statistics') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
                                         href="{{ route('authors.statistics', ['id' => $author->id]) }}">{{ __('Estatísticas') }}</a>
                                 </li>
                             </ul>
@@ -623,8 +617,8 @@
 
                             <!-- Tabs content -->
                             <div class="tab-content" id="ex2-content">
-                                <div class="card-body">
-                                    <div class="accordion accordion-borderless" id="accordion">
+                                <div class="card-body p-0 sm:p-2">
+                                    <div class="accordion accordion-borderless space-y-3" id="accordion">
                                         @yield('author-information')
                                     </div>
                                 </div>

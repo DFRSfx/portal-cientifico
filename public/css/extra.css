@@ -3,6 +3,11 @@
    - Fase 2 (outputs.index & x-publication-title):
      As regras locais de .outputs-table e .btn-jstabales foram migradas para
      Tailwind v4 (@apply) em resources/css/app.css.
+   - Fase 3 (Tipografia Científica & findPub):
+     Migração para @tailwindcss/typography (.prose-scientific) e search card.
+   - Fase 4 (Perfil de Autor - show, basicInfo, output):
+     Regras locais de .info-table, .info-list, .info-box, métricas, tabs e
+     modal .vc-modal migradas para Tailwind v4 em resources/css/app.css.
    ========================================================================== */
 
 @media screen and (max-width: 600px) {
