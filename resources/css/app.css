@@ -696,6 +696,129 @@
 .rounded-circle { @apply rounded-full; }
 .rounded-0 { @apply rounded-none; }
 
+/* ==========================================================================
+   Camada de Tema Visual SaaS (Fundo, Variáveis e Integração DataTables)
+   Migrada de extra.css para resources/css/app.css
+   ========================================================================== */
+.saas {
+    --saas-bg: #f6f8fb;
+    --saas-surface: rgba(255, 255, 255, 0.92);
+    --saas-surface-strong: #ffffff;
+    --saas-text: #0f172a;
+    --saas-muted: rgba(15, 23, 42, 0.6);
+    --saas-border: rgba(15, 23, 42, 0.08);
+    --saas-border-strong: rgba(15, 23, 42, 0.14);
+    --saas-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 1px rgba(15, 23, 42, 0.03);
+    --saas-shadow-md: 0 10px 25px rgba(15, 23, 42, 0.08);
+    --saas-radius: 16px;
+    --saas-radius-sm: 12px;
+    --saas-brand: #2a6b20;
+    --saas-brand-2: #2ac41c;
+}
+
+body.saas {
+    background: radial-gradient(1200px 800px at 10% 0%, rgba(42, 196, 28, 0.10), transparent 55%),
+        radial-gradient(1200px 800px at 90% 10%, rgba(42, 107, 32, 0.10), transparent 55%),
+        var(--saas-bg);
+    color: var(--saas-text);
+}
+
+body.saas .saas-list-compact .card-body { padding: 1rem; }
+body.saas .saas-list-compact .card-title { margin-bottom: .5rem; }
+body.saas .saas-list-compact .card-body h5 { margin-bottom: .35rem; }
+body.saas .saas-list-compact .card-body h6 { margin-top: .65rem; margin-bottom: .35rem; }
+body.saas .saas-list-compact hr { margin-top: .75rem; margin-bottom: .75rem; }
+body.saas .saas-list-compact .table td,
+body.saas .saas-list-compact .table th { padding-top: .55rem; padding-bottom: .55rem; }
+body.saas .saas-list-compact .dataTables_wrapper .dataTables_length,
+body.saas .saas-list-compact .dataTables_wrapper .dataTables_filter { margin-bottom: .5rem; }
+body.saas .saas-list-compact .dataTables_wrapper .dataTables_filter input { padding-top: .25rem; padding-bottom: .25rem; }
+body.saas .saas-list-compact .dataTables_wrapper .dataTables_length select { padding-top: .15rem; padding-bottom: .15rem; }
+body.saas .saas-list-compact #datatables-buttons { margin-top: .5rem; }
+body.saas .saas-list-compact .chip.filtred-filds { padding: .2rem .5rem; font-size: .78rem; line-height: 1.1; margin: .15rem .35rem .15rem 0; }
+body.saas .saas-list-compact .chip.filtred-filds i { font-size: .8rem; }
+body.saas .saas-list-compact .form-check { margin-bottom: .35rem; }
+body.saas .saas-list-compact .btn.btn-primary.btn-sm { padding: .25rem .6rem; }
+body.saas .saas-list-compact .table .text-muted cite { display: inline; }
+body.saas .saas-list-compact .table .fw-bolder { line-height: 1.25; }
+
+body.saas .saas-dashboard { padding-bottom: 1.25rem; }
+body.saas .saas-dashboard .card { border-radius: 16px; }
+body.saas .saas-dashboard .card-body { padding: 1rem; }
+body.saas .saas-dashboard .list-group-item { padding-top: .5rem; padding-bottom: .5rem; }
+
+body.saas .saas-page { background: transparent; }
+body.saas .saas-profile .card-body { padding: 1rem; }
+body.saas .saas-profile .nav-tabs .nav-link { padding: 0.6rem 0.9rem; }
+body.saas .saas-profile .accordion .accordion-button { padding: 0.85rem 1rem; }
+body.saas .saas-profile .accordion .accordion-body { padding: 1rem; }
+
+body.saas .saas-sticky { position: sticky; top: 88px; }
+@media (max-width: 1199.98px) {
+    body.saas .saas-sticky { position: static; top: auto; }
+}
+
+@media (min-width: 1200px) {
+    body.saas .container.saas-wide {
+        max-width: 1440px;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+    body.saas .container.saas-profile-wide {
+        max-width: 1360px;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}
+@media (min-width: 1600px) {
+    body.saas .container.saas-wide { max-width: 1560px; }
+    body.saas .container.saas-profile-wide { max-width: 1480px; }
+}
+
+body.saas .saas-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--saas-border);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+body.saas .saas-navbar .navbar-brand img { filter: saturate(1.05); }
+body.saas .saas-navbar .nav-link {
+    color: rgba(15, 23, 42, 0.72) !important;
+    font-weight: 500;
+}
+body.saas .saas-navbar .nav-link:hover {
+    color: rgba(15, 23, 42, 0.92) !important;
+}
+body.saas .saas-navbar .dropdown-menu { margin-top: 10px; }
+
+/* Auxiliares e Testemunhos */
+@media screen and (max-width: 600px) {
+    #author-options { display: none; }
+}
+.read-more-hide { cursor: pointer; }
+.hide_content { display: none; }
+.read-more-show { cursor: pointer; }
+
+.testimonial-card .card-up {
+    height: 90px;
+    overflow: hidden;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    background-color: #33642b;
+}
+.testimonial-card .avatar {
+    width: 90px;
+    margin-top: -60px;
+    overflow: hidden;
+    border: 3px solid #fff;
+    border-radius: 50%;
+}
+.testimonial-card .card-body { text-align: center; }
+
+
 
 
 

@@ -1,5 +1,4 @@
 <x-app-layout>
-    <link href="{{ asset('css/extra.css') }}" rel="stylesheet">
 
     <x-slot:title>
         {{ __('Perfil') }}

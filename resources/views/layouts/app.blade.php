@@ -20,9 +20,6 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
 
-    <!-- Custom theme overrides -->
-    <link href="{{ asset('css/extra.css') }}" rel="stylesheet">
-
     @stack('header-links')
 
     <!-- Jquery -->

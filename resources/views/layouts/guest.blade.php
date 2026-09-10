@@ -15,9 +15,6 @@
         {{ __(':title', ['title' => $AppTitle]) }}
     </title>
 
-    <!-- Custom theme overrides -->
-    <link href="{{ asset('css/extra.css') }}" rel="stylesheet">
-
     @stack('header-links')
 
     <!-- JQuery-->
