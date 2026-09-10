@@ -8,36 +8,39 @@
 
         <div class="container-xxl saas-dashboard pt-4 pb-4 home-layout">
             <div class="row g-4">
+                {{-- Coluna 1: Perfil de Visitante / Utilizador e Eventos --}}
                 <div class="col-xl-3">
-                    <div class="card testimonial-card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden backdrop-blur-md">
-                        <div class="card-up bg-gradient-to-r from-emerald-800 to-emerald-700 h-20"></div>
-                        <div class="avatar mx-auto white relative -mt-10 w-20 h-20 rounded-full border-4 border-white shadow-md overflow-hidden bg-white">
+                    <div class="card testimonial-card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-up h-20" style="background-color: #2A6B20;"></div>
+                        <div class="avatar mx-auto white relative -mt-10 w-20 h-20 rounded-full border-4 border-white shadow-sm overflow-hidden bg-white flex items-center justify-center">
                             <x-user-image
                                 showLogedUserImage="{{ Auth::check() && auth()->user()->type != 'administrative' }}"
-                                class="rounded-circle img-fluid w-full h-full object-cover" height="36" />
+                                class="rounded-circle img-fluid w-full h-full object-cover" height="72" />
                         </div>
                         <div class="card-body p-4 text-center">
                             @if (Auth::check())
-                                <h5 class="font-bold text-slate-900 mb-2">
+                                <h5 class="font-bold text-slate-900 mb-2 text-base">
                                     {{ auth()->user()->name }}
                                 </h5>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="px-5 py-2 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-full shadow-sm hover:shadow transition-all border-0 cursor-pointer">
+                                        class="px-6 py-2 text-xs font-bold text-white uppercase tracking-wider rounded-full shadow-sm hover:shadow transition-all border-0 cursor-pointer"
+                                        style="background-color: #2A6B20;">
                                         {{ __('Logout') }} </button>
                                 </form>
                             @else
-                                <h5 class="font-bold text-slate-900 mb-1">{{ __('Convidado') }}</h5>
+                                <h5 class="font-bold text-slate-900 mb-1 text-base">{{ __('Convidado') }}</h5>
                                 <p class="text-xs text-slate-500 mb-3">{{ __('Faça login para aceder a todas as funcionalidades!') }}</p>
                                 <a href="{{ route('login') }}">
                                     <button type="button"
-                                        class="px-5 py-2 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-full shadow-sm hover:shadow transition-all border-0 cursor-pointer">
-                                        {{ __('Iniciar Sessão') }} </button></a>
+                                        class="px-6 py-2 text-xs font-bold text-white uppercase tracking-wider rounded-full shadow-sm hover:shadow transition-all border-0 cursor-pointer"
+                                        style="background-color: #2A6B20;">
+                                        {{ __('LOGIN') }} </button></a>
                             @endif
 
                             <div class="small pt-3 text-slate-500">{{ __('Aceda a página') }}
-                                <a href="{{ route('about.index') }}" class="font-semibold text-emerald-700 hover:underline"> {{ __('Sobre Nós') }}
+                                <a href="{{ route('about.index') }}" class="font-semibold text-emerald-800 hover:underline"> {{ __('Sobre Nós') }}
                                 </a> {{ __('para obter mais informações') }}
                             </div>
 
@@ -45,10 +48,11 @@
 
                         </div>
                     </div>
-                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
-                        <div class="card-body">
-                            <p class="mb-2 fw-semibold" style="color:#2A6B20">{{ __('Eventos') }}</p>
-                            <div class="list-group list-group-flush">
+
+                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-body p-4">
+                            <p class="mb-3 font-semibold text-sm" style="color:#2A6B20">{{ __('Eventos') }}</p>
+                            <div class="list-group list-group-flush space-y-1">
 
                                 @if(!empty($eventsFinal) && count($eventsFinal))
                                     @foreach ($eventsFinal as $event)
@@ -59,196 +63,155 @@
                                         @endphp
 
                                         <a href="{{ $link }}"
-                                        class="list-group-item list-group-item-action border-0 py-1 text-truncate"
+                                        class="list-group-item list-group-item-action border-0 py-1 text-truncate block text-xs text-slate-700 hover:text-emerald-800"
                                         rel="noopener noreferrer" target="_blank">
-                                            <i class="fas fa-calendar pe-2"></i>{{ $title }}
+                                            <i class="fas fa-calendar pe-2 text-slate-400"></i>{{ $title }}
                                         </a>
                                     @endforeach
                                 @else
-                                    <div class="list-group-item border-0 py-1 text-muted">{{ __('Sem eventos recentes') }}</div>
+                                    <div class="list-group-item border-0 py-1 text-slate-400 text-xs">{{ __('Sem eventos recentes') }}</div>
                                 @endif
 
                             </div>
-                                                        <a href="https://investigacao.islagaia.pt/events/" target="_blank" rel="noopner noreferrer">
-                                <button type="button" class="btn btn-link text-slate-700 hover:text-emerald-800"> {{ __('Mostrar todos os Eventos') }} <i
-                                        class="fas fa-arrow-right ps-2"></i></button>
+                            <hr class="my-3 border-slate-100">
+                            <a href="https://investigacao.islagaia.pt/events/" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors">
+                                {{ __('Mostrar todos os Eventos') }}
+                                <i class="fas fa-arrow-right ps-2 text-[10px]"></i>
                             </a>
                         </div>
                     </div>
                 </div>
 
+                {{-- Coluna 2: Banner Central e Lista de Últimos Artigos --}}
                 <div class="col-xl-5">
-                    @php
-                        $featuredItems = !empty($lastOutputs) ? collect($lastOutputs)->values() : collect();
-                        if ($featuredItems->count()) {
-                            $targetCount = 5;
-                            $cursor = 0;
-                            while ($featuredItems->count() < $targetCount) {
-                                $featuredItems->push($featuredItems[$cursor % $featuredItems->count()]);
-                                $cursor++;
-                            }
-                            $featuredItems = $featuredItems->take($targetCount);
-                        }
-                    @endphp
-                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
-                        <div class="card-body">
+                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-body p-3">
                             <div class="overflow-hidden rounded-xl">
-                                <img src="{{ asset('logo/bg-portal.avif') }}" alt="Logo POCH" class="img-fluid"
-                                    width="auto" height="2.2rem">
+                                <img src="{{ asset('logo/bg-portal.avif') }}" alt="Portal Científico" class="img-fluid rounded-xl w-full h-auto block"
+                                    loading="eager">
                             </div>
                         </div>
                     </div>
 
-                    @if ($featuredItems->count())
-                        <div class="card mb-4 featured-carousel-card rounded-2xl border border-emerald-100 shadow-sm overflow-hidden"
-                             x-data="{
-                                 active: 0,
-                                 total: {{ $featuredItems->count() }},
-                                 timer: null,
-                                 init() {
-                                     if (this.total > 1) {
-                                         this.timer = setInterval(() => this.next(), 4000);
-                                     }
-                                 },
-                                 next() {
-                                     this.active = (this.active + 1) % this.total;
-                                 },
-                                 prev() {
-                                     this.active = (this.active - 1 + this.total) % this.total;
-                                 },
-                                 goTo(index) {
-                                     this.active = index;
-                                 }
-                             }"
-                             @mouseenter="if (timer) clearInterval(timer)"
-                             @mouseleave="if (total > 1) timer = setInterval(() => next(), 4000)">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <p class="mb-0 fw-semibold text-emerald-800">{{ __('Últimos artigos') }}</p>
+                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-body p-5">
+                            <p class="mb-4 font-semibold text-sm" style="color:#2A6B20">{{ __('Últimos artigos') }}</p>
+
+                            @if(!empty($lastOutputs) && count($lastOutputs))
+                                @foreach ($lastOutputs as $publication)
+                                    <div class="py-1">
+                                        <x-publication-title :publication=$publication displayType="0"
+                                            displayAccessPubButton="1" />
                                     </div>
-                                    @if ($featuredItems->count() > 1)
-                                        <div class="flex items-center gap-1">
-                                            <button type="button" @click="prev()" aria-label="{{ __('Anterior') }}"
-                                                class="w-7 h-7 rounded-full flex items-center justify-center text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition border-0 bg-transparent cursor-pointer">
-                                                <i class="fas fa-chevron-left text-xs"></i>
-                                            </button>
-                                            <button type="button" @click="next()" aria-label="{{ __('Seguinte') }}"
-                                                class="w-7 h-7 rounded-full flex items-center justify-center text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition border-0 bg-transparent cursor-pointer">
-                                                <i class="fas fa-chevron-right text-xs"></i>
-                                            </button>
-                                        </div>
+                                    @if (!$loop->last)
+                                        <hr class="my-3 border-slate-100">
                                     @endif
-                                </div>
+                                @endforeach
+                            @else
+                                <p class="text-xs text-slate-400">{{ __('Sem publicações recentes') }}</p>
+                            @endif
 
-                                <div class="relative min-h-[110px]">
-                                    @foreach ($featuredItems as $index => $publication)
-                                        <div x-show="active === {{ $index }}"
-                                             x-transition:enter="transition ease-out duration-300"
-                                             x-transition:enter-start="opacity-0 translate-y-1"
-                                             x-transition:enter-end="opacity-100 translate-y-0"
-                                             x-transition:leave="transition ease-in duration-200 absolute inset-0 pointer-events-none"
-                                             x-transition:leave-start="opacity-100"
-                                             x-transition:leave-end="opacity-0"
-                                             class="p-3 rounded-xl featured-carousel-item"
-                                             style="{{ $index !== 0 ? 'display: none;' : '' }}">
-                                            <x-publication-title :publication=$publication displayType="0" displayAccessPubButton="1" />
-                                        </div>
-                                    @endforeach
+                            @if (Auth::check())
+                                <div class="mt-4 pt-2">
+                                    <a href="{{ route('outputs.index') }}"
+                                       class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors">
+                                        {{ __('Mostrar todas as Publicações') }}
+                                        <i class="fas fa-arrow-right ps-2 text-[10px]"></i>
+                                    </a>
                                 </div>
-
-                                @if ($featuredItems->count() > 1)
-                                    <div class="flex justify-center items-center gap-1.5 pt-3">
-                                        @foreach ($featuredItems as $index => $publication)
-                                            <button type="button"
-                                                @click="goTo({{ $index }})"
-                                                :class="active === {{ $index }} ? 'w-6 bg-emerald-600' : 'w-2 bg-slate-300 hover:bg-slate-400'"
-                                                class="h-1.5 rounded-full transition-all duration-300 cursor-pointer border-0 p-0 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                                                aria-label="{{ __('Slide') }} {{ $index + 1 }}"></button>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
+                            @endif
                         </div>
-                    @endif
+                    </div>
                 </div>
-                <!-- Start Section 3-->
+
+                {{-- Coluna 3: Estatísticas e Links Úteis --}}
                 <div class="col-xl-4">
-                    <!-- Start Search-->
-                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <div class="saas-stat">
-                                        <div class="saas-stat-icon"><i class="fas fa-user"></i></div>
-                                        <div class="saas-stat-body">
-                                            <div class="saas-stat-label">{{ __('Autores') }}</div>
-                                            <div class="saas-stat-value counter" id="number-of-authors" data-count="{{ $numberOfAuthors }}">{{ $numberOfAuthors }}</div>
-                                        </div>
+                    {{-- Estatística Autores --}}
+                    <div class="card mb-3 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="p-4">
+                            <div class="flex items-center">
+                                <div class="shrink-0">
+                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg shadow-sm"
+                                        style="background-color:#2A6B20">
+                                        <i class="fas fa-user"></i>
                                     </div>
                                 </div>
-
-                                <div class="col-12">
-                                    <div class="saas-stat">
-                                        <div class="saas-stat-icon"><i class="fas fa-newspaper"></i></div>
-                                        <div class="saas-stat-body">
-                                            <div class="saas-stat-label">{{ __('Artigos') }}</div>
-                                            <div class="saas-stat-value counter" id="number-of-outputs" data-count="{{ $numberOfOutputs }}">{{ $numberOfOutputs }}</div>
-                                        </div>
+                                <div class="grow ms-4">
+                                    <p class="text-xs text-slate-500 mb-0 font-medium">{{ __('Autores') }}</p>
+                                    <div>
+                                        <h2 class="mb-0 text-2xl font-bold text-slate-800 counter" id="number-of-authors"
+                                            data-count="{{ $numberOfAuthors }}">
+                                            {{ $numberOfAuthors }}
+                                        </h2>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Section: Design Block -->
                     </div>
 
+                    {{-- Estatística Artigos --}}
+                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="p-4">
+                            <div class="flex items-center">
+                                <div class="shrink-0">
+                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg shadow-sm"
+                                        style="background-color:#2A6B20">
+                                        <i class="fas fa-newspaper"></i>
+                                    </div>
+                                </div>
+                                <div class="grow ms-4">
+                                    <p class="text-xs text-slate-500 mb-0 font-medium">{{ __('Artigos') }}</p>
+                                    <div title="{{ __('Artigos') }}">
+                                        <h2 class="mb-0 text-2xl font-bold text-slate-800 counter" id="number-of-outputs"
+                                            data-count="{{ $numberOfOutputs }}">
+                                            {{ $numberOfOutputs }}
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- Start Ads-->
-                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
-                        <div class="card-body">
-                            <p class="mb-2 fw-semibold" style="color:#2A6B20">{{ __('Links Úteis') }}</p>
-                           <div class="d-flex align-items-center w-100 ps-3">
-                            <div class="w-100">
-
-                                <p class="text-uppercase small text-muted mb-2">{{ __('Recursos') }}</p>
-
+                    {{-- Links Úteis --}}
+                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-body p-4">
+                            <p class="mb-3 font-semibold text-sm" style="color:#2A6B20">{{ __('Links Úteis') }}</p>
+                            <div class="space-y-1">
                                 @if(!empty($coursesFinal) && count($coursesFinal))
                                     @foreach ($coursesFinal as $course)
                                         @php
-                                            // data_get funciona quer $course seja array ou object
                                             $name = data_get($course, 'name', data_get($course, 'title.rendered', ''));
                                             $name = is_string($name) ? html_entity_decode($name) : '';
                                             $permalink = data_get($course, 'permalink', data_get($course, 'link', '#'));
                                         @endphp
 
                                         <a href="{{ $permalink }}"
-                                            class="list-group-item list-group-item-action border-0 py-1 text-truncate"
+                                            class="flex items-center py-1.5 text-xs text-slate-700 hover:text-emerald-800 truncate transition-colors"
                                             target="_blank" rel="noopener noreferrer">
-                                            <i class="fa-solid fa-chalkboard-user pe-2"></i>{{ $name }}
+                                            <i class="fa-solid fa-chalkboard-user pe-2 text-slate-400 shrink-0"></i>
+                                            <span class="truncate">{{ $name }}</span>
                                         </a>
                                     @endforeach
                                 @else
-                                    <div class="list-group-item border-0 py-1 text-muted">{{ __('Sem cursos recentes') }}</div>
+                                    <div class="py-1 text-slate-400 text-xs">{{ __('Sem cursos recentes') }}</div>
                                 @endif
 
-                                <p class="text-uppercase small text-muted mt-3 mb-2">{{ __('Pesquisa') }}</p>
                                 <a href="https://www.webofscience.com/wos/woscc/basic-search"
-                                    class="list-group-item list-group-item-action border-0 py-1 text-truncate"
+                                    class="flex items-center py-1.5 text-xs text-slate-700 hover:text-emerald-800 truncate transition-colors"
                                     target="_blank" rel="noopener noreferrer">
-                                    <i class="fa-solid fa-chalkboard-user pe-2"></i>Web of Science
+                                    <i class="fa-solid fa-chalkboard-user pe-2 text-slate-400 shrink-0"></i>
+                                    <span class="truncate">Web of Science</span>
                                 </a>
-
                             </div>
-                        </div>
+
+                            <hr class="my-3 border-slate-100">
+
+                            <a href="https://ci-islagaia.pt/formacao-online/" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors">
+                                {{ __('Mostrar todos os links úteis') }}
+                                <i class="fas fa-arrow-right ps-2 text-[10px]"></i>
                             </a>
-
-                            <hr>
-
-                            <a href="https://ci-islagaia.pt/formacao-online/" target="_blank" rel="noopner noreferrer">
-                                <button type="button" class="btn btn-link text-slate-700 hover:text-emerald-800"> {{ __('Mostrar todos os links úteis') }} <i
-                                        class="fas fa-arrow-right ps-2"></i></button>
-                            </a>
-
                         </div>
                     </div>
                 </div>

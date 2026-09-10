@@ -10,7 +10,7 @@
     <div class="{{ $secondDivClass }}">
         <div class="w-full space-y-1">
             @if (!empty($publication->citation_string))
-                <cite class="not-italic text-xs font-normal text-slate-500 block leading-relaxed line-clamp-2">
+                <cite class="italic text-xs font-normal text-slate-500 block leading-relaxed line-clamp-2">
                     {{ $publication->citation_string }}
                 </cite>
             @endif

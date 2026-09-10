@@ -135,10 +135,12 @@
                     ]" />
 
                     <li class="relative nav-item px-1 w-full lg:w-auto" x-data="{ open: false }">
-                        <a class="nav-link py-1 cursor-pointer flex items-center" href="#"
+                        <a class="nav-link py-1 cursor-pointer flex items-center gap-1.5" href="#"
                             @click.prevent="open = !open">
                             <x-user-image
-                                showLogedUserImage="{{ Auth::check() && auth()->user()->type != 'administrative' }}" />
+                                showLogedUserImage="{{ Auth::check() && auth()->user()->type != 'administrative' }}"
+                                height="34" />
+                            <i class="fas fa-caret-down text-slate-500 text-xs transition-transform duration-150" :class="{ 'rotate-180': open }"></i>
                         </a>
 
                         <ul class="dropdown-menu shadow-lg border border-slate-200/80 rounded-xl py-1.5 bg-white/98 backdrop-blur-md absolute right-0 mt-1 min-w-[180px] z-50 list-none"
