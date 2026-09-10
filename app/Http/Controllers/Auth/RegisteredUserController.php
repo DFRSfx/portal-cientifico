@@ -109,7 +109,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('verification.notice')
+        return redirect()->route('home')
+            ->with('open_verify_email', true)
             ->with('status', __('Registo efetuado. Confirme o email e aguarde aprovacao do administrador.'));
     }
 }

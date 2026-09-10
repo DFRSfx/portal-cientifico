@@ -27,7 +27,7 @@ class AuthApprovalFlowTest extends TestCase
             'entidade' => 'Dept A',
         ]);
 
-        $response->assertRedirect(route('verification.notice'));
+        $response->assertRedirect(route('home'));
 
         $user = User::where('email', 'test@example.com')->first();
         $this->assertNotNull($user);

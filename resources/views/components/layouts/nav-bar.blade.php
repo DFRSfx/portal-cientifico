@@ -24,8 +24,12 @@
 
                     @if (Auth::check())
                         <li class="nav-item dropdown px-2">
-                            <a class="nav-link active  link-post " aria-current="pagestatistics"
-                                href="{{ route('dashboard') }}">{{ __('Painel') }}</a>
+                            @if (!auth()->user()->hasVerifiedEmail())
+                                <a class="nav-link active link-post" href="javascript:void(0)" onclick="openVerifyEmailModal()" title="{{ __('Verificação de email necessária') }}">{{ __('Painel') }}</a>
+                            @else
+                                <a class="nav-link active link-post" aria-current="pagestatistics"
+                                    href="{{ route('dashboard') }}">{{ __('Painel') }}</a>
+                            @endif
                         </li>
 
                     @if (auth()->user()->type == 'administrative')
@@ -146,6 +150,14 @@
                                             href="{{ route('login') }}">{{ __('Iniciar Sessão') }}</a>
                                     </li>
                                 @else
+                                    @if (!auth()->user()->hasVerifiedEmail())
+                                        <li>
+                                            <a class="dropdown-item text-success fw-semibold" href="javascript:void(0)" onclick="openVerifyEmailModal()">
+                                                <i class="fas fa-envelope-open-text me-2"></i>{{ __('Verificar Email') }}
+                                            </a>
+                                        </li>
+                                    @endif
+
                                     <li>
                                         <a class="dropdown-item"
                                             href="  {{ route('profile.edit') }}">{{ __('Perfil') }}</a>

@@ -58,6 +58,9 @@
     <x-layouts.nav-bar />
     <x-vanilla-modal />
 
+    @if (auth()->check() && !auth()->user()->hasVerifiedEmail() && !request()->routeIs('verification.notice'))
+        <x-verify-email-modal />
+    @endif
 
     {{ $slot }}
 
