@@ -11,6 +11,9 @@
    - Fase 5 (Listagem de Autores - authors.index):
      Regras locais de .authors-table e filtros migradas para Tailwind v4
      em resources/css/app.css.
+   - Fase 6 (Páginas Institucionais - home e about):
+     Regras locais de .saas-stat, carrossel de destaques e layout editorial de
+     Sobre Nós migradas para Tailwind CSS v4 em resources/css/app.css.
    ========================================================================== */
 
 @media screen and (max-width: 600px) {

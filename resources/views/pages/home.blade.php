@@ -9,47 +9,43 @@
         <div class="container-xxl saas-dashboard pt-4 pb-4 home-layout">
             <div class="row g-4">
                 <div class="col-xl-3">
-                    <div class="card testimonial-card mb-4">
-                        <div class="card-up">
-
-                        </div>
-                        <div class="avatar mx-auto white">
+                    <div class="card testimonial-card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden backdrop-blur-md">
+                        <div class="card-up bg-gradient-to-r from-emerald-800 to-emerald-700 h-20"></div>
+                        <div class="avatar mx-auto white relative -mt-10 w-20 h-20 rounded-full border-4 border-white shadow-md overflow-hidden bg-white">
                             <x-user-image
                                 showLogedUserImage="{{ Auth::check() && auth()->user()->type != 'administrative' }}"
-                                class="rounded-circle img-fluid" height="36" />
+                                class="rounded-circle img-fluid w-full h-full object-cover" height="36" />
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-4 text-center">
                             @if (Auth::check())
-                                <h5 class="font-weight-bolder mb-1">
+                                <h5 class="font-bold text-slate-900 mb-2">
                                     {{ auth()->user()->name }}
                                 </h5>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="btn btn-rounded gain-bg ripple-surface-dark text-white"
-                                        data-mdb-ripple-color="dark" style="background-color:#33642b">
+                                        class="px-5 py-2 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-full shadow-sm hover:shadow transition-all border-0 cursor-pointer">
                                         {{ __('Logout') }} </button>
                                 </form>
                             @else
-                                <h5 class="font-weight-bolder mb-1">{{ __('Convidado') }}</h5>
-                                <p>{{ __('Faça login para aceder a todas as funcionalidades!') }}</p>
+                                <h5 class="font-bold text-slate-900 mb-1">{{ __('Convidado') }}</h5>
+                                <p class="text-xs text-slate-500 mb-3">{{ __('Faça login para aceder a todas as funcionalidades!') }}</p>
                                 <a href="{{ route('login') }}">
                                     <button type="button"
-                                        class="btn btn-rounded gain-bg ripple-surface-dark text-white"
-                                        data-mdb-ripple-color="dark" style="background-color:#33642b">
+                                        class="px-5 py-2 text-xs font-semibold text-white bg-emerald-700 hover:bg-emerald-800 rounded-full shadow-sm hover:shadow transition-all border-0 cursor-pointer">
                                         {{ __('Iniciar Sessão') }} </button></a>
                             @endif
 
-                            <div class="small pt-3">{{ __('Aceda a página') }}
-                                <a href="{{ route('about.index') }}" style="color:#2A6B20"> {{ __('Sobre Nós') }}
-                                </a>{{ __('para obter mais informações') }}
+                            <div class="small pt-3 text-slate-500">{{ __('Aceda a página') }}
+                                <a href="{{ route('about.index') }}" class="font-semibold text-emerald-700 hover:underline"> {{ __('Sobre Nós') }}
+                                </a> {{ __('para obter mais informações') }}
                             </div>
 
-                            <hr class="mt-2 mb-0">
+                            <hr class="my-3 border-slate-100">
 
                         </div>
                     </div>
-                    <div class="card mb-4">
+                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
                         <div class="card-body">
                             <p class="mb-2 fw-semibold" style="color:#2A6B20">{{ __('Eventos') }}</p>
                             <div class="list-group list-group-flush">
@@ -97,7 +93,7 @@
                             $featuredItems = $featuredItems->take($targetCount);
                         }
                     @endphp
-                    <div class="card mb-4">
+                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
                         <div class="card-body">
                             <div class="bg-image hover-overlay ripple rounded-0 ripple-surface-light"
                                 data-mdb-ripple-color="light">
@@ -108,7 +104,7 @@
                     </div>
 
                     @if ($featuredItems->count())
-                        <div class="card mb-4 featured-carousel-card">
+                        <div class="card mb-4 featured-carousel-card rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
@@ -146,7 +142,7 @@
                 <!-- Start Section 3-->
                 <div class="col-xl-4">
                     <!-- Start Search-->
-                    <div class="card mb-4">
+                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-12">
@@ -175,7 +171,7 @@
 
 
                     <!-- Start Ads-->
-                    <div class="card mb-4">
+                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm overflow-hidden">
                         <div class="card-body">
                             <p class="mb-2 fw-semibold" style="color:#2A6B20">{{ __('Links Úteis') }}</p>
                            <div class="d-flex align-items-center w-100 ps-3">
@@ -229,65 +225,7 @@
         </div>
     </main>
 
-    <style>
-        .home-layout {
-            max-width: 1440px;
-        }
-
-        .home-layout .card {
-            border: 1px solid #e4efe7;
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-        }
-        .featured-carousel-card {
-            background: linear-gradient(135deg, #f3fbf7 0%, #ffffff 60%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .featured-carousel-card::before {
-            content: "";
-            position: absolute;
-            inset: -40% auto auto -30%;
-            width: 260px;
-            height: 260px;
-            background: radial-gradient(circle, rgba(46, 125, 50, 0.12), rgba(46, 125, 50, 0));
-        }
-
-        .featured-carousel-card .card-body {
-            position: relative;
-        }
-
-        .featured-carousel-item {
-            background: #f7fbf8;
-            border: 1px solid #e4efe7;
-            padding-bottom: 22px;
-        }
-
-        .featured-carousel-card .carousel-indicators {
-            position: static;
-            margin-top: 12px;
-        }
-
-        .featured-carousel-card .carousel-indicators [data-mdb-target] {
-            background-color: #2a6b20;
-            opacity: 0.25;
-        }
-
-        .featured-carousel-card .carousel-indicators .active {
-            opacity: 0.85;
-        }
-
-        .featured-carousel-card .carousel-control-prev-icon,
-        .featured-carousel-card .carousel-control-next-icon {
-            filter: invert(30%) sepia(12%) saturate(350%) hue-rotate(85deg);
-        }
-
-        @media (max-width: 1199.98px) {
-            .home-layout {
-                max-width: 100%;
-            }
-        }
-    </style>
+    {{-- Estilos da Home e carrossel migrados para Tailwind CSS v4 em resources/css/app.css --}}
 
     <script>
         function animateValue(obj, start, end, duration) {
