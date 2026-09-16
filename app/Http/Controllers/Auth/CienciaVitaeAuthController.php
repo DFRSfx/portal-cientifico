@@ -279,6 +279,15 @@ class CienciaVitaeAuthController extends Controller
             $request->session()->regenerate();
         }
 
+        // Automatic metrics sync for the author on login
+        if ($user && $user->authorInformation) {
+            try {
+                app(\App\Services\MetricScraperService::class)->syncAuthorMetrics($user->authorInformation);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Automatic metrics sync on CV login failed: ' . $e->getMessage());
+            }
+        }
+
         // Redirect back to intended page
         $redirectTo = $request->input('redirect_to') ?: ($request->hasSession() ? session()->pull('ciencia_vitae_redirect_to') : null);
         if ($redirectTo && !str_contains($redirectTo, '/login') && !str_contains($redirectTo, '/register')) {

@@ -1547,6 +1547,12 @@ public function updateAuthorInformation($responseArray, $authorObject)
             \Log::warning('Funding-output groups sync skipped: ' . $e->getMessage());
         }
 
+        try {
+            app(\App\Services\MetricScraperService::class)->syncAuthorMetrics($authorObject);
+        } catch (\Throwable $e) {
+            \Log::warning('Automatic metrics sync after CV profile sync failed: ' . $e->getMessage());
+        }
+
         $response["message"] = "Profile updated successfully";
         
     } catch (\Exception $e) {

@@ -34,6 +34,15 @@ class AuthenticatedSessionController extends Controller
             return redirect()->to($redirectTo);
         }
 
+        $user = Auth::user();
+        if ($user && $user->authorInformation) {
+            try {
+                app(\App\Services\MetricScraperService::class)->syncAuthorMetrics($user->authorInformation);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Automatic metrics sync on login failed: ' . $e->getMessage());
+            }
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
