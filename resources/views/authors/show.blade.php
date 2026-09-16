@@ -10,7 +10,7 @@
 
         ];
 
-        $routeText = $routes[request()->route()->getName()] ?? '';
+        $routeText = $routes[request()->route()?->getName()] ?? '';
     @endphp
 
     <x-slot:title>
@@ -32,154 +32,6 @@
         </script>
     @endpush
 
-    <style>
-        .scientific-production-menu {
-            max-height: calc(100vh - 220px);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: contain;
-            touch-action: pan-y;
-            z-index: 1060;
-        }
-
-        .author-identifiers-menu {
-            display: none;
-        }
-
-        .author-identifiers-menu.show {
-            display: block;
-        }
-
-        .sp-panel,
-        .sp-backdrop,
-        .ai-panel,
-        .ai-backdrop {
-            display: none;
-        }
-
-        .sp-panel,
-        .sp-backdrop {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .scientific-production-menu {
-                display: none !important;
-            }
-
-            .scientific-production-menu {
-                display: none !important;
-            }
-
-            .scientific-production-menu.show {
-                display: none !important;
-            }
-
-            .sp-panel {
-                position: fixed;
-                left: 12px;
-                right: 12px;
-                top: 12px;
-                bottom: 12px;
-                background: #fff;
-                border-radius: 14px;
-                box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
-                z-index: 1070;
-                display: none;
-                flex-direction: column;
-                overflow: hidden;
-            }
-
-            .sp-panel.open {
-                display: flex;
-            }
-
-            .sp-panel-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 12px 14px;
-                border-bottom: 1px solid #e6efe6;
-                font-weight: 600;
-            }
-
-            .sp-panel-body {
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .sp-backdrop {
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.35);
-                z-index: 1065;
-                display: none;
-            }
-
-            .sp-backdrop.open {
-                display: block;
-            }
-
-            .author-identifiers-menu {
-                display: none !important;
-            }
-
-            .ai-panel {
-                position: fixed;
-                left: 12px;
-                right: 12px;
-                top: 12px;
-                bottom: 12px;
-                background: #fff;
-                border-radius: 14px;
-                box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
-                z-index: 1070;
-                display: none;
-                flex-direction: column;
-                overflow: hidden;
-            }
-
-            .ai-panel.open {
-                display: flex;
-            }
-
-            .ai-panel-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 12px 14px;
-                border-bottom: 1px solid #e6efe6;
-                font-weight: 600;
-            }
-
-            .ai-panel-body {
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .ai-backdrop {
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.35);
-                z-index: 1065;
-                display: none;
-            }
-
-            .ai-backdrop.open {
-                display: block;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .sp-panel,
-            .sp-backdrop,
-            .ai-panel,
-            .ai-backdrop {
-                display: none !important;
-            }
-        }
-    </style>
-
     {{-- Bootstrap Bundle removido: o projeto já carrega `mdb.min.js` no layout global --}}
 
 
@@ -187,13 +39,13 @@
         <div class="container saas-profile saas-profile-wide py-3 ">
             <div class="row g-3">
                 <div class="col-xl-3">
-                    <div class="card testimonial-card mb-3 saas-sticky rounded-2xl border border-slate-200/80 bg-white/95 shadow-sm backdrop-blur-md overflow-hidden">
+                    <div class="card testimonial-card mb-3 saas-sticky rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
                         <div class="card-up bg-gradient-to-r from-emerald-800 to-emerald-700 h-24"></div>
-                        <div class="avatar mx-auto white relative -mt-12 w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-white">
+                        <div class="avatar mx-auto white relative -mt-12 w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-white flex items-center justify-center">
                             <x-user-image showLogedUserImage="0"
-                                cienciaVitae="{{ $author->userInformation->ciencia_vitae }}"
+                                cienciaVitae="{{ $author->userInformation?->ciencia_vitae }}"
                                 cienciaVitaeImageIsPublic="{{ $author->profile_is_public && $author->profile_image_is_public }}"
-                                class="rounded-circle img-fluid w-full h-full object-cover" />
+                                class="rounded-full w-full h-full object-cover block" height="88" width="88" />
                         </div>
 
                         <div class="card-body p-4 text-center">
@@ -231,23 +83,23 @@
                                 $entityCount = count($expandedEntities);
                                 $entityName = $entityCount > 1 ? 'All institutions' : ($expandedEntities[0] ?? null);
                             @endphp
-                            @if (!isset($author->profile_updated_date))
-                                <div>
-                                    <span class="badge rounded-pill badge-success">{{ $author->userInformation->type }}</span>
-                                    <span class="badge rounded-pill badge-success">{{ __('No Profile Status') }}</span>
-                                </div>
-                            @else
-                                <div>
-                                    <span class="badge rounded-pill badge-success">{{ $author->userInformation->type }}</span>
-                                </div>
-                            @endif
+                            <div class="flex flex-wrap items-center justify-center gap-1.5 mt-2">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 uppercase tracking-wider">
+                                    {{ $author->userInformation->type ?? 'researcher' }}
+                                </span>
+                                @if (!isset($author->profile_updated_date))
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                        {{ __('Perfil Não Sincronizado') }}
+                                    </span>
+                                @endif
+                            </div>
                             @if ($entityName)
                                 @if ($entityCount > 1)
-                                    <div class="dropdown d-inline-block mt-1" x-data="{ open: false }" @click.outside="open = false">
-                                        <button class="btn btn-sm btn-light dropdown-toggle" type="button"
-                                            id="authorEntitiesDropdown" @click="open = !open" :aria-expanded="open"
-                                            style="padding: 6px 12px; border: 1px solid #2ac41cff; border-radius: 6px;">
-                                            {{ $entityName }}
+                                    <div class="dropdown inline-block mt-1" x-data="{ open: false }" @click.outside="open = false">
+                                        <button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-900 bg-emerald-50 border border-emerald-200/90 rounded-lg hover:bg-emerald-100 transition-colors cursor-pointer shadow-2xs" type="button"
+                                            id="authorEntitiesDropdown" @click="open = !open" :aria-expanded="open">
+                                            <span>{{ $entityName }}</span>
+                                            <i class="fas fa-chevron-down text-[10px] text-emerald-600"></i>
                                         </button>
                                         <ul class="dropdown-menu" :class="{ 'show': open }" x-show="open" style="display: none;" aria-labelledby="authorEntitiesDropdown">
                                             @foreach($expandedEntities as $entityLabel)
@@ -256,10 +108,9 @@
                                         </ul>
                                     </div>
                                 @else
-                                    <small class="badge text-muted d-inline-block mt-1"
-                                        style="padding: 6px 12px; border: 1px solid #2ac41cff; border-radius: 6px;">
+                                    <span class="inline-block px-3 py-1 text-xs font-semibold text-emerald-900 bg-emerald-50 border border-emerald-200/90 rounded-lg shadow-2xs mt-1">
                                         {{ $entityName }}
-                                    </small>
+                                    </span>
                                 @endif
                             @endif
 
@@ -396,23 +247,14 @@
 
                                 @if ($identifiersCount > 0)
                                     <div class="dropdown mt-3">
-                                        <button class="btn w-100 d-flex justify-content-between align-items-center"
+                                        <button class="w-full flex items-center justify-between px-3.5 py-2.5 bg-white hover:bg-emerald-50/40 text-slate-800 font-bold text-xs sm:text-sm rounded-xl border border-emerald-200/80 shadow-2xs transition-all cursor-pointer"
                                                 type="button"
                                                 id="dropdownIdentifiers"
-                                                aria-expanded="false"
-                                                style="
-                                                    background-color: rgba(255, 255, 255, 0.9);
-                                                    border: 1px solid #2ac41cff;
-                                                    border-radius: 8px;
-                                                    font-weight: bold;
-                                                    padding: 10px 14px;
-                                                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                                                    transition: all 0.2s ease-in-out;
-                                                ">
+                                                aria-expanded="false">
                                             <span>{{ __('Identificadores de Autor') }}</span>
-                                            <span class="d-inline-flex align-items-center gap-3">
-                                                <span class="text-primary">{{ $identifiersCount }}</span>
-                                                <i class="fas fa-caret-down"></i>
+                                            <span class="inline-flex items-center gap-2">
+                                                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">{{ $identifiersCount }}</span>
+                                                <i class="fas fa-chevron-down text-[10px] text-slate-400"></i>
                                             </span>
                                         </button>
 
@@ -498,25 +340,16 @@
                                             $uniqueOutputs = $author->output->unique('id')->values();
                                             $groupedOutputs = $uniqueOutputs->groupBy('type.name');
                                         @endphp
-                                        <button class="btn w-100 d-flex justify-content-between align-items-center"
+                                        <button class="w-full flex items-center justify-between px-3.5 py-2.5 bg-white hover:bg-emerald-50/40 text-slate-800 font-bold text-xs sm:text-sm rounded-xl border border-emerald-200/80 shadow-2xs transition-all cursor-pointer"
                                                 type="button"
                                                 id="dropdownScientificProduction"
-                                                aria-expanded="false"
-                                                style="
-                                                    background-color: rgba(255, 255, 255, 0.9);
-                                                    border: 1px solid #2ac41cff;
-                                                    border-radius: 8px;
-                                                    font-weight: bold;
-                                                    padding: 10px 14px;
-                                                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                                                    transition: all 0.2s ease-in-out;
-                                                ">
-                                                <span>{{ __('Produção científica') }}</span>
-                                                <span class="d-inline-flex align-items-center gap-3">
-                                                    <span class="text-primary">{{ $uniqueOutputs->count() }}</span>
-                                                    <i class="fas fa-caret-down"></i>
-                                                </span>
-                                            </button>
+                                                aria-expanded="false">
+                                            <span>{{ __('Produção científica') }}</span>
+                                            <span class="inline-flex items-center gap-2">
+                                                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">{{ $uniqueOutputs->count() }}</span>
+                                                <i class="fas fa-chevron-down text-[10px] text-slate-400"></i>
+                                            </span>
+                                        </button>
 
                                         <ul class="dropdown-menu w-100 shadow-sm scientific-production-menu"
                                             aria-labelledby="dropdownScientificProduction">
@@ -576,6 +409,16 @@
                             <hr class="mt-2 mb-0">
                             <x-ciencia-vitae-update-profile-button authorId="{{ $author->id }}" />
 
+                            @if (!empty($author->userInformation?->ciencia_vitae))
+                                <div class="pt-2 w-full">
+                                    <a href="{{ route('authors.pdf', ['id' => $author->id]) }}" target="_blank" rel="noopener noreferrer"
+                                       class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-700 hover:text-emerald-800 text-xs font-semibold rounded-xl shadow-2xs transition-colors cursor-pointer border border-slate-200 hover:border-emerald-300">
+                                        <i class="fas fa-file-pdf text-red-500 text-xs"></i>
+                                        <span>{{ __('Descarregar CV Oficial (PDF)') }}</span>
+                                    </a>
+                                </div>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -585,32 +428,45 @@
                         <div class="card-body p-3 sm:p-5">
 
                             <!-- Tabs navs -->
-                            <ul class="nav nav-tabs nav-justified mb-3 border-b border-slate-200 gap-1" id="ex1" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.show') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
-                                        href="{{ route('authors.show', $author->id) }}">{{ __('Informação pessoal') }}</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.employments') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
-                                        href="{{ route('authors.employments', ['id' => $author->id]) }}">{{ __('Percurso profissional') }}</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.outputs') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
-                                    href="{{ route('authors.outputs', ['authorsId' => $author->id]) }}">{{ __('Publicações') }}</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.projects') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
-                                    href="{{ route('authors.projects', ['authorsId' => $author->id]) }}">{{ __('Projetos') }}</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.activities') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
-                                    href="{{ route('authors.activities', ['authorsId' => $author->id]) }}">{{ __('Atividades') }}</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="{{ request()->routeIs('authors.statistics') ? 'nav-link active font-bold text-emerald-800 border-b-2 border-emerald-600 bg-emerald-50/70' : 'nav-link font-medium text-slate-600 hover:text-emerald-800 hover:bg-slate-50' }} rounded-t-xl transition-all"
-                                        href="{{ route('authors.statistics', ['id' => $author->id]) }}">{{ __('Estatísticas') }}</a>
-                                </li>
-                            </ul>
+                            <div class="border-b border-slate-200/90 mb-6 overflow-x-auto scrollbar-thin">
+                                <nav class="flex items-center gap-1 sm:gap-2 -mb-px min-w-max pb-px" aria-label="Tabs do Perfil">
+                                    <a href="{{ route('authors.show', $author->id) }}"
+                                       class="group inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-xl transition-all duration-150 border-b-2 {{ request()->routeIs('authors.show') ? 'border-emerald-700 text-emerald-800 bg-emerald-50/70' : 'border-transparent text-slate-600 hover:text-emerald-800 hover:border-slate-300 hover:bg-slate-50/80' }}">
+                                        <i class="fas fa-user-circle text-sm {{ request()->routeIs('authors.show') ? 'text-emerald-700' : 'text-slate-400 group-hover:text-emerald-700' }} transition-colors"></i>
+                                        <span>{{ __('Informação pessoal') }}</span>
+                                    </a>
+
+                                    <a href="{{ route('authors.employments', ['id' => $author->id]) }}"
+                                       class="group inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-xl transition-all duration-150 border-b-2 {{ request()->routeIs('authors.employments') ? 'border-emerald-700 text-emerald-800 bg-emerald-50/70' : 'border-transparent text-slate-600 hover:text-emerald-800 hover:border-slate-300 hover:bg-slate-50/80' }}">
+                                        <i class="fas fa-briefcase text-sm {{ request()->routeIs('authors.employments') ? 'text-emerald-700' : 'text-slate-400 group-hover:text-emerald-700' }} transition-colors"></i>
+                                        <span>{{ __('Percurso profissional') }}</span>
+                                    </a>
+
+                                    <a href="{{ route('authors.outputs', ['authorsId' => $author->id]) }}"
+                                       class="group inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-xl transition-all duration-150 border-b-2 {{ request()->routeIs('authors.outputs') ? 'border-emerald-700 text-emerald-800 bg-emerald-50/70' : 'border-transparent text-slate-600 hover:text-emerald-800 hover:border-slate-300 hover:bg-slate-50/80' }}">
+                                        <i class="fas fa-newspaper text-sm {{ request()->routeIs('authors.outputs') ? 'text-emerald-700' : 'text-slate-400 group-hover:text-emerald-700' }} transition-colors"></i>
+                                        <span>{{ __('Publicações') }}</span>
+                                    </a>
+
+                                    <a href="{{ route('authors.projects', ['authorsId' => $author->id]) }}"
+                                       class="group inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-xl transition-all duration-150 border-b-2 {{ request()->routeIs('authors.projects') ? 'border-emerald-700 text-emerald-800 bg-emerald-50/70' : 'border-transparent text-slate-600 hover:text-emerald-800 hover:border-slate-300 hover:bg-slate-50/80' }}">
+                                        <i class="fas fa-diagram-project text-sm {{ request()->routeIs('authors.projects') ? 'text-emerald-700' : 'text-slate-400 group-hover:text-emerald-700' }} transition-colors"></i>
+                                        <span>{{ __('Projetos') }}</span>
+                                    </a>
+
+                                    <a href="{{ route('authors.activities', ['authorsId' => $author->id]) }}"
+                                       class="group inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-xl transition-all duration-150 border-b-2 {{ request()->routeIs('authors.activities') ? 'border-emerald-700 text-emerald-800 bg-emerald-50/70' : 'border-transparent text-slate-600 hover:text-emerald-800 hover:border-slate-300 hover:bg-slate-50/80' }}">
+                                        <i class="fas fa-list-check text-sm {{ request()->routeIs('authors.activities') ? 'text-emerald-700' : 'text-slate-400 group-hover:text-emerald-700' }} transition-colors"></i>
+                                        <span>{{ __('Atividades') }}</span>
+                                    </a>
+
+                                    <a href="{{ route('authors.statistics', ['id' => $author->id]) }}"
+                                       class="group inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-xl transition-all duration-150 border-b-2 {{ request()->routeIs('authors.statistics') ? 'border-emerald-700 text-emerald-800 bg-emerald-50/70' : 'border-transparent text-slate-600 hover:text-emerald-800 hover:border-slate-300 hover:bg-slate-50/80' }}">
+                                        <i class="fas fa-chart-pie text-sm {{ request()->routeIs('authors.statistics') ? 'text-emerald-700' : 'text-slate-400 group-hover:text-emerald-700' }} transition-colors"></i>
+                                        <span>{{ __('Estatísticas') }}</span>
+                                    </a>
+                                </nav>
+                            </div>
                             <!-- Tabs navs -->
 
                             <!-- Tabs content -->
@@ -659,6 +515,8 @@
                         document.body.style.overflow = 'hidden';
                     } else {
                         event.preventDefault();
+                        event.stopPropagation();
+                        menu?.classList.remove('show');
                         identifiersMenu.classList.toggle('show');
                     }
                 });
@@ -724,6 +582,8 @@
                     return;
                 }
                 event.preventDefault();
+                event.stopPropagation();
+                identifiersMenu?.classList.remove('show');
                 menu.classList.toggle('show');
                 positionMenu();
                 requestAnimationFrame(positionMenu);

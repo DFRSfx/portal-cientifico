@@ -16,15 +16,49 @@ class Output extends Model
 
     protected $fillable = [
         "title",
+        "abstract",
         "doi",
+        "isbn",
+        "issn",
+        "handle",
+        "pmid",
         "quartile",
         "type_id",
         "model_id",
         "citation_string",
+        "cover_image_url",
+        "views_count",
         "output_type_class",
         "year",
         "ciencia_vitae_pub_id"
     ];
+
+    /**
+     * Get real or external cover image URL if available
+     */
+    public function getCoverImageAttribute(): ?string
+    {
+        if (!empty($this->cover_image_url)) {
+            return $this->cover_image_url;
+        }
+
+        if (!empty($this->isbn)) {
+            $cleanIsbn = preg_replace('/[^0-9X]/i', '', $this->isbn);
+            if (!empty($cleanIsbn)) {
+                return 'https://covers.openlibrary.org/b/isbn/' . $cleanIsbn . '-M.jpg';
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Safely increment view count for publication
+     */
+    public function incrementViews(): void
+    {
+        $this->increment('views_count');
+    }
 
     public function polymorphic(): MorphTo
     {
@@ -53,6 +87,11 @@ class Output extends Model
         return $this->belongsToMany(AuthorCitationName::class, "author_outputs", "output_id", "citation_id")->withPivot(
             "author_id"
         )->withTimestamps();
+    }
+
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_outputs', 'output_id', 'project_id')->withTimestamps();
     }
 
     /**

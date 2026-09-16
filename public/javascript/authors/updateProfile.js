@@ -26,9 +26,15 @@ $(document).ready(function() {
             setTimeout(() => toast.remove(), 4600);
         }
 
+        const authorId = authorsUpdateButton.getAttribute('data-author-id');
+        let updateUrl = '/authors/update';
+        if (authorId) {
+            updateUrl = '/authors/update/' + encodeURIComponent(authorId);
+        }
+
         $.ajax({
             type: 'GET',
-            url: 'https://portalcientifico.islagaia.pt/authors/update/',
+            url: updateUrl,
             beforeSend: function () {
                 authorsUpdateButton.innerHTML +=
                     '<span id="spinner-container" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>';

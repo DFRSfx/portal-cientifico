@@ -1,38 +1,6 @@
 @extends('authors.show')
 
 @section('author-information')
-    <style>
-        .affiliation-table {
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .affiliation-table thead th {
-            background: #e6f1ea;
-            color: #1f4d2f;
-            font-weight: 700;
-            border-bottom: 1px solid #cfe2d6;
-            padding: 12px 14px;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .affiliation-table tbody td {
-            padding: 12px 14px;
-            border-bottom: 1px solid #dfeae3;
-            vertical-align: middle;
-        }
-
-        .affiliation-table tbody tr:nth-child(even) {
-            background: #f2f8f4;
-        }
-
-        .affiliation-table tbody tr:hover {
-            background: #e3f2e8;
-        }
-
-    </style>
-
     <div class="accordion-item">
         <div class="accordion-header" id="headingSeven">
             <h5 class="mb-0">

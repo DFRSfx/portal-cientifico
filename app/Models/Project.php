@@ -33,12 +33,18 @@ class Project extends Model
         "total_amount",
         "program_name",
         "year_awarded",
-        "author_id"
+        "author_id",
+        "ciencia_vitae_funding_id"
     ];
 
     public function author()
     {
-        $this->belongsTo(Author::class);
+        return $this->belongsTo(Author::class);
+    }
+
+    public function outputs()
+    {
+        return $this->belongsToMany(Output::class, 'project_outputs', 'project_id', 'output_id')->withTimestamps();
     }
     
 }

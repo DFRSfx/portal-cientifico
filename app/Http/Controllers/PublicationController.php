@@ -45,6 +45,50 @@ class PublicationController extends Controller
         return view("outputs.index", compact("outputsInformation", "outputsType", "outputsKeyWords", "citationNames", "oldestYear", "newestYear"));
     }
 
+    public function show($id)
+    {
+        $output = Output::with([
+            'polymorphic',
+            'authors.userInformation',
+            'type',
+            'keywords',
+            'citations',
+            'projects'
+        ])->findOrFail($id);
+
+        // Track view count per session
+        $viewedKey = 'viewed_output_' . $output->id;
+        if (!session()->has($viewedKey)) {
+            $output->incrementViews();
+            session()->put($viewedKey, true);
+        }
+
+        // Find all ISLA authors associated with this work (including co-authors who synced the same output)
+        $institutionAuthors = Author::whereHas('output', function ($q) use ($output) {
+            $q->where('outputs.id', $output->id)
+              ->orWhere('title', $output->title);
+            if (!empty($output->doi)) {
+                $q->orWhere('doi', $output->doi);
+            }
+        })
+        ->with('userInformation')
+        ->distinct()
+        ->get();
+
+        $relatedOutputs = Output::with(['type', 'authors'])
+            ->where('id', '!=', $output->id)
+            ->where(function ($q) use ($output) {
+                if ($output->type_id) {
+                    $q->where('type_id', $output->type_id);
+                }
+            })
+            ->orderBy('year', 'DESC')
+            ->limit(3)
+            ->get();
+
+        return view('outputs.show', compact('output', 'institutionAuthors', 'relatedOutputs'));
+    }
+
     public function showAuthorOutputs(Request $request, $authorsId)
     {
         $typeName = trim((string) $request->query('type', ''));
@@ -120,5 +164,33 @@ class PublicationController extends Controller
         }
 
         return response()->json([compact("filteredResults")], 200);
+    }
+
+    /**
+     * Fetch native Ciência Vitae coauthors for an output
+     *
+     * @param Output $output
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function coauthors(Output $output): \Illuminate\Http\JsonResponse
+    {
+        $author = $output->authors()->with('userInformation')->first();
+        $cienciaId = $author?->userInformation?->ciencia_vitae;
+        $cvPubId = $output->ciencia_vitae_pub_id;
+
+        if (!$cienciaId || !$cvPubId) {
+            return response()->json([
+                'error' => true,
+                'message' => __('Identificador Ciência Vitae não disponível para esta publicação.')
+            ], 404);
+        }
+
+        $cvController = new CienciaVitaeController();
+        $coauthors = $cvController->getOutputCoauthors($cienciaId, $cvPubId);
+
+        return response()->json([
+            'error' => false,
+            'coauthors' => $coauthors
+        ]);
     }
 }

@@ -90,9 +90,7 @@
         .fp-modal-backdrop {
             position: absolute;
             inset: 0;
-            background: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            background: rgba(15, 23, 42, 0.55);
             animation: fp-fade-in 0.2s ease-out forwards;
         }
 

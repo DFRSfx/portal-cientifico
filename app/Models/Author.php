@@ -19,6 +19,10 @@ class Author extends Model
         'researchgate_profile',
         'id_lattes',
         'h_index',
+        'h_index_scholar',
+        'citations_scholar',
+        'h_index_scopus',
+        'citations_scopus',
         'h_index_source',
         'h_index_reported_at',
         'h_index_is_self_declared',
@@ -112,6 +116,11 @@ class Author extends Model
     public function degrees()
     {
         return $this->hasMany(AuthorDegree::class);
+    }
+
+    public function distinctions()
+    {
+        return $this->hasMany(AuthorDistinction::class);
     }
 
 }

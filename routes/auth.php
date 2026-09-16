@@ -66,4 +66,15 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->name('logout');
+
+    Route::post('profile/unlink-ciencia-vitae', [\App\Http\Controllers\Auth\CienciaVitaeAuthController::class, 'unlink'])
+                ->name('auth.ciencia-vitae.unlink');
 });
+
+// Ciência Vitae OAuth SSO Routes (Accessible by guests for login/registration and by auth users for account linking)
+Route::get('auth/ciencia-vitae', [\App\Http\Controllers\Auth\CienciaVitaeAuthController::class, 'redirect'])
+    ->name('auth.ciencia-vitae.redirect');
+
+Route::match(['get', 'post'], 'auth/ciencia-vitae/callback', [\App\Http\Controllers\Auth\CienciaVitaeAuthController::class, 'callback'])
+    ->name('auth.ciencia-vitae.callback');
+

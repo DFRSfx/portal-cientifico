@@ -328,13 +328,155 @@ class CienciaVitaeController extends Controller
 
         $apiResponse = $this->cienciaVitaeRequest("api-user/" . urlencode($cienciaVitaeId) . "/access-privileges");
 
-        if (gettype($apiResponse) != "array") {
-            $response = -1;
-        } else if ($apiResponse["api-user"]["privacy-level"]["value"] == "Public") {
+        if (!is_array($apiResponse)) {
+            return -1;
+        }
+
+        $effectivePrivacy = strtolower(data_get($apiResponse, 'privilege.effective-privacy-level.value', ''));
+        $effectiveCode = strtolower(data_get($apiResponse, 'privilege.effective-privacy-level.code', ''));
+        $roleCode = strtoupper(data_get($apiResponse, 'privilege.effective-role.code', ''));
+        $roleValue = strtolower(data_get($apiResponse, 'privilege.effective-role.value', ''));
+        $apiUserPrivacy = strtolower(data_get($apiResponse, 'api-user.privacy-level.value', ''));
+
+        if (
+            in_array($roleCode, ['R', 'W']) ||
+            in_array($roleValue, ['read', 'write']) ||
+            in_array($effectivePrivacy, ['public', 'semi public', 'semi-public']) ||
+            in_array($effectiveCode, ['publico', 'semi-publico']) ||
+            in_array($apiUserPrivacy, ['public', 'semi public', 'semi-public'])
+        ) {
             $response = 1;
         }
 
         return $response;
+    }
+
+    /**
+     * Download official PDF of the curriculum from Ciência Vitae
+     * @param string $cienciaVitaeId
+     * @return \Psr\Http\Message\ResponseInterface|null
+     */
+    public function getCurriculumPdfResponse($cienciaVitaeId)
+    {
+        try {
+            $url = "curriculum/" . urlencode($cienciaVitaeId) . "/pdf";
+            $response = $this->client->request('GET', $url, [
+                'headers' => [
+                    'accept' => 'application/pdf',
+                    'authorization' => $this->authorization,
+                ],
+                'http_errors' => true,
+            ]);
+
+            return $response;
+        } catch (\Exception $e) {
+            \Log::error("Error downloading CV PDF from CienciaVitae: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Fetch co-authors for a specific output from Ciência Vitae
+     * @param string $cienciaVitaeId
+     * @param string|int $outputId
+     * @return array|null
+     */
+    public function getOutputCoauthors($cienciaVitaeId, $outputId)
+    {
+        try {
+            $url = "curriculum/" . urlencode($cienciaVitaeId) . "/output/" . urlencode($outputId) . "/coauthors";
+            $response = $this->client->request('GET', $url, [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'authorization' => $this->authorization,
+                ],
+                'http_errors' => true,
+            ]);
+
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            \Log::warning("Error fetching output coauthors from CienciaVitae: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Fetch distinctions/awards from Ciência Vitae
+     * @param string $cienciaVitaeId
+     * @return array|null
+     */
+    public function getDistinctions($cienciaVitaeId)
+    {
+        try {
+            $url = "curriculum/" . urlencode($cienciaVitaeId) . "/distinction";
+            $response = $this->client->request('GET', $url, [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'authorization' => $this->authorization,
+                ],
+                'http_errors' => true,
+            ]);
+
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            \Log::warning("Error fetching distinctions from CienciaVitae: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Fetch curriculum groups (e.g. fundingsOutputs links) from Ciência Vitae
+     * @param string $cienciaVitaeId
+     * @return array|null
+     */
+    public function getCurriculumGroups($cienciaVitaeId)
+    {
+        try {
+            $url = "curriculum/" . urlencode($cienciaVitaeId) . "/groups";
+            $response = $this->client->request('GET', $url, [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'authorization' => $this->authorization,
+                ],
+                'http_errors' => true,
+            ]);
+
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            \Log::warning("Error fetching curriculum groups from CienciaVitae: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Search researchers across institutions via Ciência Vitae API
+     * @param string $institutionName
+     * @param int $page
+     * @param int $pageSize
+     * @return array|null
+     */
+    public function searchPersonsByInstitution($institutionName, $page = 1, $pageSize = 20)
+    {
+        try {
+            $url = "searches/persons/institution";
+            $response = $this->client->request('GET', $url, [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'authorization' => $this->authorization,
+                ],
+                'query' => [
+                    'institutionName' => $institutionName,
+                    'page' => $page,
+                    'pageSize' => $pageSize,
+                ],
+                'http_errors' => true,
+            ]);
+
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            \Log::warning("Error searching persons by institution: " . $e->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -813,7 +955,8 @@ public function updateAuthorInformation($responseArray, $authorObject)
                     "year_awarded" => $this->returnValueIfNotNull($funding, "year-awarded"),
                     "competitive" => $this->returnValueIfNotNull($funding, "competitive"),
                     "funding_renewable" => $this->returnValueIfNotNull($funding, "funding-renewable"),
-                    "author_id" => $authorObject->id
+                    "author_id" => $authorObject->id,
+                    "ciencia_vitae_funding_id" => $funding["id"] ?? null
                 ]);
             }
 
@@ -941,6 +1084,85 @@ public function updateAuthorInformation($responseArray, $authorObject)
             }
         }
 
+        // Distinctions & Awards (Prémios e Distinções)
+        try {
+            $distinctionsBlock = $responseArray["distinctions"] ?? null;
+            if (!$distinctionsBlock && !empty($authorObject->userInformation?->ciencia_vitae)) {
+                $distinctionsBlock = $this->getDistinctions($authorObject->userInformation->ciencia_vitae);
+            }
+            if (!empty($distinctionsBlock)) {
+                $authorObject->distinctions()->delete();
+                $rawDistinctions = $distinctionsBlock["distinction"] ?? $distinctionsBlock["distinctions"] ?? $distinctionsBlock;
+                if (isset($rawDistinctions["distinction-name"]) || isset($rawDistinctions["distinctionName"]) || isset($rawDistinctions["distinction-type"])) {
+                    $rawDistinctions = [$rawDistinctions];
+                }
+                if (is_array($rawDistinctions)) {
+                    $distinctionsToInsert = [];
+                    foreach ($rawDistinctions as $dist) {
+                        if (!is_array($dist)) continue;
+                        $distName = $this->sanitizeCvText(
+                            $dist["distinction-name"] ??
+                            $dist["distinctionName"] ??
+                            $dist["name"] ??
+                            $dist["value"] ??
+                            ""
+                        );
+                        if (empty($distName)) continue;
+
+                        $distType = $this->sanitizeCvText(
+                            $dist["distinction-type"]["value"] ??
+                            $dist["distinction-type"]["label"] ??
+                            $dist["distinctionType"]["value"] ??
+                            $dist["distinctionType"]["label"] ??
+                            $dist["distinction-type"] ??
+                            ""
+                        );
+
+                        $effectiveDate = $dist["effective-date"] ?? $dist["effectiveDate"] ?? $dist["date"] ?? [];
+                        $effYear = is_array($effectiveDate) ? ($effectiveDate["year"] ?? null) : null;
+                        $effMonth = is_array($effectiveDate) ? ($effectiveDate["month"] ?? null) : null;
+                        $effDay = is_array($effectiveDate) ? ($effectiveDate["day"] ?? null) : null;
+                        if (!$effYear && is_string($effectiveDate) && preg_match('/^(\d{4})/', $effectiveDate, $m)) {
+                            $effYear = $m[1];
+                        }
+
+                        $instName = null;
+                        if (isset($dist["institutions"]["institution"])) {
+                            $instList = $dist["institutions"]["institution"];
+                            $instFirst = is_array($instList) && isset($instList[0]) ? $instList[0] : $instList;
+                            $instName = $this->sanitizeCvText($instFirst["institution-name"] ?? $instFirst["institutionName"] ?? $instFirst["name"] ?? null);
+                        } elseif (isset($dist["institution"])) {
+                            $instName = $this->sanitizeCvText($dist["institution"]["institution-name"] ?? $dist["institution"]["name"] ?? null);
+                        }
+
+                        $countryVal = $this->sanitizeCvText(
+                            $dist["country"]["value"] ??
+                            $dist["country"]["label"] ??
+                            $dist["country"] ??
+                            null
+                        );
+
+                        $distinctionsToInsert[] = [
+                            'distinction_type' => $this->truncateCvString($distType, 255),
+                            'distinction_name' => $this->truncateCvString($distName, 255),
+                            'effective_year' => $effYear ? substr((string)$effYear, 0, 4) : null,
+                            'effective_month' => $effMonth ? substr((string)$effMonth, 0, 2) : null,
+                            'effective_day' => $effDay ? substr((string)$effDay, 0, 2) : null,
+                            'institution_name' => $this->truncateCvString($instName, 255),
+                            'country' => $this->truncateCvString($countryVal, 255),
+                            'description' => $this->sanitizeCvText($dist["description"] ?? null),
+                        ];
+                    }
+
+                    if (!empty($distinctionsToInsert)) {
+                        $authorObject->distinctions()->createMany($distinctionsToInsert);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Distinctions processing skipped: ' . $e->getMessage());
+        }
+
         if (isset($responseArray["outputs"])) {
             $publicationsAdded = [];
             $cvOutputIdsSeen = [];
@@ -975,13 +1197,44 @@ public function updateAuthorInformation($responseArray, $authorObject)
                         $publicationTypeAttribute = $publicationsAttributes["attribute"];
                         $publicationTitleAttribute = $publicationsAttributes["title-atribute-name"];
                         $publicationInformation = $output[$publicationTypeAttribute];
-                        $doi = "";
+                        $doi = null;
+                        $isbn = null;
+                        $issn = null;
+                        $handle = null;
+                        $pmid = null;
 
                         if (isset($publicationInformation["identifiers"])) {
-                            foreach ($publicationInformation["identifiers"]["identifier"] as $identifier) {
-                                if ($identifier["identifier-type"]["code"] == "doi") {
-                                    $doi = $identifier["identifier"];
-                                    break;
+                            $rawIdentifiers = $publicationInformation["identifiers"]["identifier"] ?? $publicationInformation["identifiers"] ?? [];
+                            if (isset($rawIdentifiers["identifier-type"]) || isset($rawIdentifiers["identifierType"]) || isset($rawIdentifiers["identifier"])) {
+                                $rawIdentifiers = [$rawIdentifiers];
+                            }
+                            if (is_array($rawIdentifiers)) {
+                                foreach ($rawIdentifiers as $identifier) {
+                                    if (!is_array($identifier)) {
+                                        continue;
+                                    }
+                                    $idTypeCode = strtoupper(trim((string) (
+                                        $identifier["identifier-type"]["code"] ??
+                                        $identifier["identifierType"]["code"] ??
+                                        $identifier["identifier-type"]["value"] ??
+                                        $identifier["identifierType"]["value"] ??
+                                        ""
+                                    )));
+                                    $idVal = trim((string) ($identifier["identifier"] ?? $identifier["value"] ?? ""));
+                                    if ($idVal === "") {
+                                        continue;
+                                    }
+                                    if ($idTypeCode === 'DOI' && empty($doi)) {
+                                        $doi = $idVal;
+                                    } elseif ($idTypeCode === 'ISBN' && empty($isbn)) {
+                                        $isbn = $idVal;
+                                    } elseif ($idTypeCode === 'ISSN' && empty($issn)) {
+                                        $issn = $idVal;
+                                    } elseif (($idTypeCode === 'HANDLE' || $idTypeCode === 'URI' || $idTypeCode === 'URL' || $idTypeCode === 'REPOSITORY') && empty($handle)) {
+                                        $handle = $idVal;
+                                    } elseif ($idTypeCode === 'PMID' && empty($pmid)) {
+                                        $pmid = $idVal;
+                                    }
                                 }
                             }
                         }
@@ -1119,6 +1372,10 @@ public function updateAuthorInformation($responseArray, $authorObject)
                                 $publication->update([
                                     "title" => $title,
                                     "doi" => ($doi) ?? null,
+                                    "isbn" => ($isbn) ?? null,
+                                    "issn" => ($issn) ?? null,
+                                    "handle" => ($handle) ?? null,
+                                    "pmid" => ($pmid) ?? null,
                                     "citation_string" => $citationString,
                                     "year" => $this->returnValueIfNotNull($publicationInformation, $publicationsAttributes["year-column"], "year")
                                 ]);
@@ -1181,6 +1438,10 @@ public function updateAuthorInformation($responseArray, $authorObject)
                                 $publication = $newPolymorphicPublication->output()->create([
                                     "title" => $title,
                                     "doi" => ($doi) ?? null,
+                                    "isbn" => ($isbn) ?? null,
+                                    "issn" => ($issn) ?? null,
+                                    "handle" => ($handle) ?? null,
+                                    "pmid" => ($pmid) ?? null,
                                     "type_id" => $publicationType->id,
                                     "citation_string" => $citationString,
                                     "year" => $this->returnValueIfNotNull($publicationInformation, $publicationsAttributes["year-column"], "year"),
@@ -1251,6 +1512,39 @@ public function updateAuthorInformation($responseArray, $authorObject)
 
                 $this->removePolymorphicRelations($this->outputs, "output");
             }
+        }
+
+        // Groups (Funding <-> Output links)
+        try {
+            $groups = $responseArray["groups"] ?? null;
+            if (!$groups && !empty($authorObject->userInformation?->ciencia_vitae)) {
+                $groups = $this->getCurriculumGroups($authorObject->userInformation->ciencia_vitae);
+            }
+            if ($groups) {
+                $rawGroups = $groups["fundings-outputs"]["funding-output"]
+                    ?? $groups["fundingsOutputs"]
+                    ?? $groups["groups"]["fundingsOutputs"]
+                    ?? [];
+                if (isset($rawGroups["funding"]) || isset($rawGroups["output"])) {
+                    $rawGroups = [$rawGroups];
+                }
+                if (is_array($rawGroups)) {
+                    foreach ($rawGroups as $grp) {
+                        if (!is_array($grp)) continue;
+                        $fId = (string) ($grp["funding"] ?? $grp["funding-id"] ?? "");
+                        $oId = (string) ($grp["output"] ?? $grp["output-id"] ?? "");
+                        if ($fId !== "" && $oId !== "") {
+                            $proj = $authorObject->project()->where('ciencia_vitae_funding_id', $fId)->first();
+                            $pub = $authorObject->output()->where('ciencia_vitae_pub_id', $oId)->first();
+                            if ($proj && $pub) {
+                                $proj->outputs()->syncWithoutDetaching([$pub->id]);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Funding-output groups sync skipped: ' . $e->getMessage());
         }
 
         $response["message"] = "Profile updated successfully";

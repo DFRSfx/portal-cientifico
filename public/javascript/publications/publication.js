@@ -116,7 +116,7 @@ $("#buttonUpdate").on("click", function(event){
         d.innerHTML += '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
         $.ajax({
-            url: "https://portalcientifico.islagaia.pt",
+            url: "/",
             type: 'GET',
             dataType: 'json', // added data type
             success: function(res) {

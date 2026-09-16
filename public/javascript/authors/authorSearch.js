@@ -166,17 +166,17 @@ function formHandler () {
             // Create the rows of the table using the data that cames from the request
             data.authors.forEach(element => {
                 const perfileLink =
-                    'https://portalcientifico.islagaia.pt/authors/' + element['id']
+                    '/authors/' + element['id']
 
                 const imageSrc =
                     element.profile_image_is_public && element.profile_is_public
                         ? `https://www.cienciavitae.pt/fotos/publico/${element['user_information'].ciencia_vitae}.jpg`
-                        : 'https://portalcientifico.islagaia.pt/logo/user.jpg'
+                        : '/logo/user.jpg'
 
                 table.row.add([
                     `
                  <div class="d-flex align-items-center">
-                    <img src="${imageSrc}" onerror="this.onerror=null;this.src='https://portalcientifico.islagaia.pt/logo/user.jpg';" style="width: 45px; height: 45px" class="rounded-circle" alt="gfvg">
+                    <img src="${imageSrc}" onerror="this.onerror=null;this.src='/logo/user.jpg';" style="width: 45px; height: 45px" class="rounded-circle" alt="gfvg">
                                         
                                             <div class="ms-3">
                                             <p class="fw-bold mb-1">${element['user_information']['name']}</p>

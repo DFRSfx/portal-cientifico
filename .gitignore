@@ -22,3 +22,6 @@ yarn-error.log
 /public/backup.sql
 /create_admin_temp.php
 /reset_login_local.php
+/POCH_8_Portal_Cientifico_RelatorioFinal*
+test_*.php
+

@@ -53,7 +53,7 @@ $("#form").submit(function(event) {
             data:{
                 doi: document.getElementById("text-to-search").value
             },
-            url: 'https://portalcientifico.islagaia.pt',
+            url: '/test-search',
             success: function(data, status) {
 
                 document.getElementById("scopus-spinner").style.display = "none";
@@ -282,7 +282,7 @@ function formHandler() {
 
     $.ajax({
         type: 'POST',
-        url: 'https://portalcientifico.islagaia.pt',
+        url: '/test-search',
         data,
         beforeSend: function() {
 

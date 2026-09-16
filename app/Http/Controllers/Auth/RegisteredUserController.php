@@ -34,7 +34,7 @@ class RegisteredUserController extends Controller
     /**
      * Handle an incoming registration request.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
@@ -100,6 +100,18 @@ class RegisteredUserController extends Controller
             'is_admin' => 0,
             'set_password_token' => Str::random(30),
         ]);
+
+        if ($type !== 'administrative') {
+            $user->authorInformation()->create([
+                'orcid' => '',
+                'id_google_scholar' => '',
+                'id_researcher' => '',
+                'id_scopus_author' => '',
+                'resume' => '',
+                'profile_image_is_public' => 0,
+                'profile_is_public' => 0,
+            ]);
+        }
 
         \Log::info('User created:', ['id' => $user->id, 'email' => $user->email]);
 

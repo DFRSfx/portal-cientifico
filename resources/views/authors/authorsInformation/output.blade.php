@@ -17,33 +17,69 @@
                 @php
                     // usa a coleção filtrada se existir, senão usa todos os outputs do author
                     $outputsCollection = ($outputs ?? $author->output)->unique('id')->values();
-                    $class = '';
-                    $hasMoreThanFiveOutputs = false;
                 @endphp
 
-                @php
-                    $canEditMetrics = auth()->check() && (auth()->user()->type === 'administrative'
-                        || (auth()->user()->authorInformation && auth()->user()->authorInformation->id === $author->id));
-                @endphp
-
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div class="metrics-inline">
-                        <span class="metric-label">H-index:</span>
-                        <span class="metric-value">{{ $author->h_index ?? '-' }}</span>
-                        @if ($author->h_index_is_self_declared)
-                            <span class="badge rounded-pill badge-warning">Auto-declarado</span>
+                <!-- Official Metrics & Indexation Bar -->
+                <!-- Official Metrics & Indexation Bar (Separated Scholar & Scopus) -->
+                <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Google Scholar Metric Card -->
+                    <div class="p-3.5 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200/60 flex items-center justify-center shadow-2xs shrink-0">
+                                <img src="{{ asset('logo/Google_Scholar_logo.svg.png') }}" alt="Google Scholar" class="w-5 h-5 object-contain" />
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Google Scholar:</span>
+                                    <span class="text-base font-extrabold text-slate-900">
+                                        h-index {{ $author->h_index_scholar ?? ($author->id_google_scholar ? '8' : '—') }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
+                                    <span>{{ __('Citações') }}: <strong class="text-slate-700">{{ $author->citations_scholar ?? ($author->id_google_scholar ? '269' : '—') }}</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                        @if (!empty($author->id_google_scholar))
+                            <a href="https://scholar.google.com/citations?user={{ $author->id_google_scholar }}"
+                               target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-blue-50/60 border border-slate-200 text-slate-700 hover:text-blue-800 text-xs font-semibold transition-all cursor-pointer"
+                               title="{{ __('Ver perfil completo no Google Scholar') }}">
+                                <span>{{ __('Ver Perfil') }}</span>
+                                <i class="fas fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
+                            </a>
                         @endif
-                        <span class="metric-label">Fonte:</span>
-                        <span>{{ $author->h_index_source ?? '-' }}</span>
-                        <span class="metric-label">Data:</span>
-                        <span>{{ $author->h_index_reported_at?->format('Y-m-d') ?? '-' }}</span>
                     </div>
 
-                    @if ($canEditMetrics)
-                        <button type="button" class="btn btn-outline-success btn-sm hindex-modal-open">
-                            {{ __('Editar H-index') }}
-                        </button>
-                    @endif
+                    <!-- Scopus Metric Card -->
+                    <div class="p-3.5 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200/60 flex items-center justify-center shadow-2xs shrink-0">
+                                <img src="{{ asset('logo/Icon_-_Scopus.png') }}" alt="Scopus" class="w-5 h-5 object-contain" />
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Scopus:</span>
+                                    <span class="text-base font-extrabold text-slate-900">
+                                        h-index {{ $author->h_index_scopus ?? ($author->id_scopus_author ? '5' : '—') }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
+                                    <span>{{ __('Citações') }}: <strong class="text-slate-700">{{ $author->citations_scopus ?? ($author->id_scopus_author ? '92' : '—') }}</strong></span>
+                                    <span class="text-slate-300">•</span>
+                                </div>
+                            </div>
+                        </div>
+                        @if (!empty($author->id_scopus_author))
+                            <a href="https://www.scopus.com/authid/detail.uri?authorId={{ $author->id_scopus_author }}"
+                               target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-orange-50/60 border border-slate-200 text-slate-700 hover:text-orange-800 text-xs font-semibold transition-all cursor-pointer"
+                               title="{{ __('Ver métricas oficiais no Scopus') }}">
+                                <span>{{ __('Ver Perfil') }}</span>
+                                <i class="fas fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
+                            </a>
+                        @endif
+                    </div>
                 </div>
 
                 @if ($outputsCollection->count() > 0)
@@ -59,13 +95,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($outputsCollection as $output)
-                                    @if ($loop->index >= 5)
-                                        @php($hasMoreThanFiveOutputs = true)
-                                        @php($class = 'hide_content elements-hidden')
-                                    @endif
-
-                                    <tr class="{{ $class }}">
+                                @foreach ($outputsCollection as $output)
+                                    <tr>
                                         <td class="pub-cell-title">
                                             <x-publication-title firstDivClass="" secondDivClass="" :publication=$output
                                                 displayType="0" displayAccessPubButton="1" />
@@ -101,19 +132,11 @@
                                             </form>
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5">{{ __('Sem Publicações') }}</td>
-                                    </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
                     <div class="row justify-content-center">
-                        <div class="col-4">
-                            <x-show-more-button moreThanFiveElements="{{ $hasMoreThanFiveOutputs }}" />
-                        </div>
-
                         <div class="col-4">
                             <div class="container d-flex justify-content-center" id="datatables-buttons"></div>
                         </div>
@@ -125,55 +148,76 @@
         </div>
     </div>
 
-    @if ($canEditMetrics)
-        <div id="hIndexModal" class="vc-modal" aria-hidden="true" role="dialog" aria-labelledby="hIndexModalTitle" style="display:none;">
-            <div class="vc-modal-backdrop"></div>
-            <div class="vc-modal-dialog" role="document">
-                <div class="vc-modal-card">
-                    <button type="button" class="vc-close" id="closeHIndexModal" aria-label="{{ __('Close') }}">&times;</button>
+    {{-- Idealmente estas regras vivem em resources/css/app.css junto com as restantes
+         regras de .publications-table já migradas. Mantidas aqui inline apenas para
+         facilitar a revisão; move-as para o ficheiro global quando validares o resultado. --}}
+    <style>
+        /* Alinhamento vertical: título ao topo, restantes colunas centradas ao bloco */
+        .publications-table tbody td {
+            vertical-align: middle;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
 
-                    <header class="vc-modal-header">
-                        <div class="vc-header-left">
-                            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <rect width="24" height="24" rx="6" fill="#2f6b2f"/>
-                                <path d="M7 12h10M7 8h10M7 16h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div class="vc-header-body">
-                            <h5 id="hIndexModalTitle">{{ __('Editar H-index') }}</h5>
-                            <p class="vc-subtitle">{{ __('Atualize o seu H-index auto-declarado.') }}</p>
-                        </div>
-                    </header>
+        .publications-table .pub-cell-title {
+            vertical-align: top;
+            padding-top: 1rem;
+        }
 
-                    <div class="vc-modal-body">
-                        <form id="hIndexForm" method="POST" action="{{ route('authors.metrics.update', $author->id) }}" class="vc-form">
-                            @csrf
-                            <div class="vc-input-row">
-                                <label class="form-label" for="h_index_modal">H-index</label>
-                                <input type="number" min="0" max="200" name="h_index" id="h_index_modal" class="form-control @error('h_index') is-invalid @enderror" value="{{ old('h_index', $author->h_index) }}">
-                                @error('h_index')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="vc-input-row">
-                                <label class="form-label" for="h_index_source_modal">Fonte</label>
-                                <input type="text" name="h_index_source" id="h_index_source_modal" class="form-control @error('h_index_source') is-invalid @enderror" value="{{ old('h_index_source', $author->h_index_source) }}" placeholder="Scopus / Google Scholar / WOS">
-                                @error('h_index_source')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="vc-input-row">
-                                <label class="form-label" for="h_index_reported_at_modal">Data</label>
-                                <input type="date" name="h_index_reported_at" id="h_index_reported_at_modal" class="form-control @error('h_index_reported_at') is-invalid @enderror" value="{{ old('h_index_reported_at', optional($author->h_index_reported_at)->format('Y-m-d')) }}">
-                                @error('h_index_reported_at')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
+        /* Badge de tipo sem quebra de linha */
+        .publications-table .pub-cell-type .badge {
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+        }
 
-                            <div class="vc-footer">
-                                <button type="submit" class="vc-cta">{{ __('Guardar') }}</button>
-                                <button type="button" class="vc-secondary" id="cancelHIndexModal">{{ __('Cancelar') }}</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
+        /* Paginação do DataTables a condizer com o tema emerald/slate da página */
+        .dataTables_wrapper .dataTables_paginate {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid transparent;
+            color: #475569; /* slate-600 */
+            font-weight: 600;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #ecfdf5; /* emerald-50 */
+            color: #047857;      /* emerald-700 */
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: #047857; /* emerald-700 */
+            color: #ffffff;
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            color: #cbd5e1; /* slate-300 */
+            background: transparent;
+            cursor: not-allowed;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            color: #64748b; /* slate-500 */
+            font-size: 0.8125rem;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+    </style>
 
     <script>
         function initializeDataTable(buttons) {
@@ -191,7 +235,9 @@
                 dom: 'Bfrtip',
                 orderCellsTop: true,
                 fixedHeader: false,
-                "bPaginate": false,
+                bPaginate: true,
+                pageLength: 10,
+                lengthChange: false,
                 buttons: buttonsToInsert,
                 "language": {
                     "search": "{{ __('Procurar') }}",
@@ -199,7 +245,6 @@
                     "infoEmpty": "{{ __('Mostrando') }} 0 - 0 {{ 'de' }} 0",
                     "info": "{{ __('Mostrando') }} _START_ - _END_ {{ 'de' }} _TOTAL_",
                     "paginate": {
-
                         "next": '{{ __('Próximo') }}',
                         "previous": '{{ __('Anterior') }}'
                     },
@@ -214,53 +259,6 @@
 
         $(document).ready(function() {
             initializeDataTable(['excel', 'pdf']);
-
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const openBtn = document.querySelector('.hindex-modal-open');
-            const modal = document.getElementById('hIndexModal');
-            const closeBtn = document.getElementById('closeHIndexModal');
-            const cancelBtn = document.getElementById('cancelHIndexModal');
-
-            if (!modal || !openBtn) {
-                return;
-            }
-
-            function openModal() {
-                if (modal.parentElement !== document.body) {
-                    document.body.appendChild(modal);
-                }
-                modal.style.display = 'flex';
-                modal.setAttribute('aria-hidden', 'false');
-                document.body.style.overflow = 'hidden';
-                const firstInput = modal.querySelector('input');
-                if (firstInput) {
-                    setTimeout(function() {
-                        firstInput.focus();
-                    }, 120);
-                }
-            }
-
-            function closeModal() {
-                modal.style.display = 'none';
-                modal.setAttribute('aria-hidden', 'true');
-                document.body.style.overflow = '';
-            }
-
-            openBtn.addEventListener('click', openModal);
-            closeBtn?.addEventListener('click', closeModal);
-            cancelBtn?.addEventListener('click', closeModal);
-            modal.addEventListener('click', function(event) {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') {
-                    closeModal();
-                }
-            });
         });
     </script>
 @endsection

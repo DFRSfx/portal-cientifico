@@ -3,37 +3,19 @@
 </button>
 
 @pushOnce('scripts')
-    <script>
-        $(function() {
-            var intervalID = setInterval(function() {
-                //  Do whatever in here that happens every 3 seconds
-            }, 3000);
-
-            setTimeout(function() {
-                clearInterval(intervalID);
-            }, 30000);
+    <script data-navigate-once>
+        window.addEventListener('scroll', function() {
+            const btn = document.getElementById("btn-back-to-top");
+            if (!btn) return;
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "flex";
+            } else {
+                btn.style.display = "none";
+            }
         });
 
-        //Get the button
-        let mybutton = document.getElementById("btn-back-to-top");
-
-        // When the user scrolls down 20px from the top of the document, show the button
-        window.onscroll = function() {
-            scrollFunction();
+        window.backToTop = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
-
-        function scrollFunction() 
-        {
-            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-                mybutton.style.display = "block";
-            } else {
-                mybutton.style.display = "none";
-            }
-        }
-
-        function backToTop() {
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
-        }
     </script>
 @endPushOnce

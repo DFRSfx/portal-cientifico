@@ -10,22 +10,30 @@ class DashboardController extends Controller
     
     public function index()
     {
-        
-        if(auth()->user()->type == "administrative")
-        {
+        $user = auth()->user();
+
+        if ($user->type === "administrative") {
             return redirect()->route("statistics");
         }
-        else
-        {
-            $author = Author::where("user_id", "=", auth()->user()->id)->with(["userInformation:id,name,ciencia_vitae,email,type"])->first();
 
-            if (!$author) {
-                return redirect()->route('home')->with('open_verify_email', true);
-            }
-    
-            return redirect()->route("authors.show", $author->id);
+        if (!$user->hasVerifiedEmail()) {
+            return redirect()->route('home')->with('open_verify_email', true);
         }
 
+        $author = Author::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'orcid' => '',
+                'id_google_scholar' => '',
+                'id_researcher' => '',
+                'id_scopus_author' => '',
+                'resume' => '',
+                'profile_image_is_public' => 0,
+                'profile_is_public' => 0
+            ]
+        );
+
+        return redirect()->route("authors.show", $author->id);
     }
 
 }

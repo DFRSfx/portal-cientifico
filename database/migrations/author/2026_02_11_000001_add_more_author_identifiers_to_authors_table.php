@@ -9,8 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('authors', function (Blueprint $table) {
-            $table->string('id_authenticus')->nullable()->after('id_scopus_author');
-            $table->string('researchgate_profile')->nullable()->after('id_authenticus');
+            if (!Schema::hasColumn('authors', 'id_authenticus')) {
+                $table->string('id_authenticus')->nullable()->after('id_scopus_author');
+            }
+            if (!Schema::hasColumn('authors', 'researchgate_profile')) {
+                $table->string('researchgate_profile')->nullable()->after('id_scopus_author');
+            }
         });
     }
 

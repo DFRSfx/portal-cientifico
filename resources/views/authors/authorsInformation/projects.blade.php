@@ -1,46 +1,6 @@
 @extends('authors.show')
 
 @section('author-information')
-<style>
-    .projects-body {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    @media (min-width: 1200px) {
-        .projects-body {
-            padding-left: 6px;
-            padding-right: 6px;
-        }
-    }
-
-    .projects-table {
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .projects-table thead th {
-        background: #e6f1ea;
-        color: #1f4d2f;
-        font-weight: 700;
-        border-bottom: 1px solid #cfe2d6;
-        padding: 12px 14px;
-    }
-
-    .projects-table tbody td {
-        padding: 12px 14px;
-        border-bottom: 1px solid #dfeae3;
-        vertical-align: middle;
-    }
-
-    .projects-table tbody tr:nth-child(even) {
-        background: #f2f8f4;
-    }
-
-    .projects-table tbody tr:hover {
-        background: #e3f2e8;
-    }
-</style>
 <div class="accordion-item">
     <div class="accordion-header" id="headingProjects">
         <h5 class="mb-0">
@@ -68,9 +28,21 @@
                                 <x-date-component :model=$project initialDateAttribute="start_date" finalDateAttribute="end_date"/>
                             </td>
                             <td>
-                                {{ $project->project_title }}
-                                <br>
-                                {{ $project->investigation_role }}
+                                <div class="font-semibold text-slate-800">{{ $project->project_title }}</div>
+                                @if(!empty($project->investigation_role))
+                                    <div class="text-xs text-slate-500 mt-0.5">{{ $project->investigation_role }}</div>
+                                @endif
+                                @if($project->outputs && $project->outputs->count() > 0)
+                                    <div class="mt-2 flex flex-wrap gap-1.5">
+                                        <span class="text-[11px] text-slate-400 font-medium block w-full">{{ __('Publicações Associadas:') }}</span>
+                                        @foreach($project->outputs as $linkedOut)
+                                            <a href="{{ route('outputs.show', $linkedOut->id) }}" class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+                                                <i class="fas fa-book-open text-[10px] text-emerald-600"></i>
+                                                <span class="truncate max-w-xs">{{ $linkedOut->title }}</span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </td>
                             <td>
                                 <span class="badge rounded-pill  d-inline @if ($project->status == 'Ongoing') badge-primary @elseif($project->status == 'Cancelled') badge-danger @else badge-success @endif">{{ $project->status }}</span>

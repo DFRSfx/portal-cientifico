@@ -41,11 +41,11 @@ class AuthorController extends Controller
     {
         // Professores
         if (auth()->user()->type == "administrative") {
-            $authors = Author::with(["userInformation:id,name,ciencia_vitae,email,type"])->whereHas("userInformation", function ($query) {
+            $authors = Author::with(["userInformation:id,name,ciencia_vitae,email,type,entidade"])->whereHas("userInformation", function ($query) {
                 $query->where("is_active", "=", "1")->where("type", "!=", "administrative");
             })->cursor();
         } else {
-            $authors = Author::with(["userInformation:id,name,ciencia_vitae,email,type"])->whereHas("userInformation", function ($query) {
+            $authors = Author::with(["userInformation:id,name,ciencia_vitae,email,type,entidade"])->whereHas("userInformation", function ($query) {
                 $query->where("is_active", "=", "1")->where("type", "!=", "administrative")->where("is_isla", '=', Auth::user()->is_isla);
             })->cursor();
         }
@@ -288,6 +288,7 @@ public function updateAllAuthors(Request $request)
         $author = Author::with(
             [
                 "citations",
+                "citationName",
                 "languages",
                 "activity",
                 "project",
@@ -295,6 +296,9 @@ public function updateAllAuthors(Request $request)
                 "phones",
                 "addresses",
                 "websites",
+                "distinctions" => function ($query) {
+                    $query->orderBy("effective_year", "desc");
+                },
                 "degrees" => function ($query) {
                     $query->orderBy("end_date_year", "desc");
                 },
@@ -444,11 +448,11 @@ public function updateAllAuthors(Request $request)
      */
     public function updateAuthorById(int $authorId): \Illuminate\Http\JsonResponse
     {
-        abort_if(auth()->user()->type != "administrative", 403);
+        $author = Author::with("userInformation")->findOrFail($authorId);
+        $user = auth()->user();
+        abort_if($user->type != "administrative" && $user->id != $author->user_id, 403);
 
-        $author = Author::with("userInformation")->find($authorId);
-
-        if (!$author || !$author->userInformation || !$author->userInformation->ciencia_vitae) {
+        if (!$author->userInformation || !$author->userInformation->ciencia_vitae) {
             return response()->json(["message" => "Autor sem Ciencia Vitae associado."], 400);
         }
 
@@ -552,7 +556,7 @@ public function updateAllAuthors(Request $request)
 
     public function projects($authorsId)
     {
-        $author = Author::with(['project'])->findOrFail($authorsId);
+        $author = Author::with(['project.outputs'])->findOrFail($authorsId);
         return view('authors.authorsInformation.projects', compact('author'));
     }
 
@@ -565,7 +569,7 @@ public function updateAllAuthors(Request $request)
     {
         $dataValidated = $request->validated();
 
-        $authors = Author::query()->with("userInformation:id,name,ciencia_vitae,email,type");
+        $authors = Author::query()->with("userInformation:id,name,ciencia_vitae,email,type,entidade");
 
         $authors = $authors->when($request->filled("name"), function ($query) use ($dataValidated) {
 
@@ -603,6 +607,9 @@ public function updateAllAuthors(Request $request)
                 });
             })->whereHas("userInformation", function ($query) {
                 $query->where("is_active", "=", "1")->where("type", "!=", "administrative");
+                if (auth()->check() && auth()->user()->type !== 'administrative') {
+                    $query->where("is_isla", "=", auth()->user()->is_isla);
+                }
             });
 
         $authors = $authors->get();
@@ -655,8 +662,66 @@ public function updateAllAuthors(Request $request)
             ->groupBy("year", "type_id")
             ->orderBy("year", "asc")->get();
 
-        $average = round($outputsByYear->avg('count'));
+        $yearlyTotals = $outputsByYear->groupBy('year')->map(fn ($items) => $items->sum('count'));
+        $average = $yearlyTotals->count() > 0 ? round($yearlyTotals->avg(), 1) : 0;
+        $totalOutputs = $author->output_count ?? $author->output()->count();
+        $firstYear = $outputsByYear->min('year');
+        $lastYear = $outputsByYear->max('year');
+        $peakYear = null;
+        $peakCount = 0;
+        if ($yearlyTotals->isNotEmpty()) {
+            $peakYear = $yearlyTotals->sortDesc()->keys()->first();
+            $peakCount = (int) $yearlyTotals->get($peakYear);
+        }
 
-        return view("authors.authorsInformation.analytics", compact("outputsByYear", "author", "average"));
+        return view("authors.authorsInformation.analytics", compact(
+            "outputsByYear",
+            "author",
+            "average",
+            "totalOutputs",
+            "firstYear",
+            "lastYear",
+            "peakYear",
+            "peakCount"
+        ));
+    }
+
+    /**
+     * Download official PDF of author curriculum from Ciência Vitae
+     *
+     * @param int $id
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function downloadCvPdf($id)
+    {
+        $author = Author::with('userInformation')->findOrFail($id);
+
+        if (!$author->profile_is_public && !auth()->check()) {
+            abort(403, __('Perfil não acessível publicamente.'));
+        }
+
+        $cienciaId = $author->userInformation?->ciencia_vitae;
+
+        if (empty($cienciaId)) {
+            return redirect()->back()->with('error', __('Ciência ID não configurado para este autor.'));
+        }
+
+        $pdfResponse = $this->cienciaVitaeApi->getCurriculumPdfResponse($cienciaId);
+
+        if (!$pdfResponse || $pdfResponse->getStatusCode() !== 200) {
+            return redirect()->back()->with('error', __('Não foi possível descarregar o PDF do CiênciaVitae no momento.'));
+        }
+
+        $safeName = \Illuminate\Support\Str::slug($author->userInformation->name ?? 'curriculo') . '_cienciavitae.pdf';
+
+        return response()->stream(function () use ($pdfResponse) {
+            $body = $pdfResponse->getBody();
+            while (!$body->eof()) {
+                echo $body->read(8192);
+            }
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $safeName . '"',
+        ]);
     }
 }

@@ -9,7 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('authors', function (Blueprint $table) {
-            $table->string('id_lattes')->nullable()->after('researchgate_profile');
+            if (!Schema::hasColumn('authors', 'id_lattes')) {
+                $table->string('id_lattes')->nullable();
+            }
         });
     }
 

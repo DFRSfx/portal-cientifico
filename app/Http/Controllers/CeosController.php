@@ -222,10 +222,13 @@ public function authorSupervision() //para o N4 todas as atividades feito
 
         $dateOriginal = new DateTime();
         $dateOriginal->modify('-1 year');
-        $previousMonthYear = $dateOriginal->format('M-Y');
-        $previousMonthYear = strtolower($previousMonthYear);
+        $templatePath = storage_path('app/public/FirminoSilva_RelatorioIndividual_2023.xlsx');
+        if (!file_exists($templatePath)) {
+            return redirect()->back()->with('error', __('O modelo de relatório individual CEOS (:file) não foi encontrado no servidor. Por favor contacte a administração.', ['file' => 'FirminoSilva_RelatorioIndividual_2023.xlsx']));
+        }
+
         $reader = IOFactory::createReader('Xlsx');
-        $spreadsheet = $reader->load(storage_path('app/public/FirminoSilva_RelatorioIndividual_2023.xlsx'));
+        $spreadsheet = $reader->load($templatePath);
 
         $rawName = (string) Auth::user()->name;
         $safeName = preg_replace('/[^A-Za-z0-9 _-]/', '', $rawName);
@@ -305,10 +308,13 @@ public function authorSupervision() //para o N4 todas as atividades feito
     
     $userIds = $authors->pluck('user_id')->filter()->toArray();
     
-    $users = \App\Models\User::whereIn('id', $userIds)->get()->keyBy('id');
+    $templatePath = storage_path('app/public/FirminoSilva_RelatorioIndividual_2023.xlsx');
+    if (!file_exists($templatePath)) {
+        return redirect()->back()->with('error', __('O modelo de relatório individual CEOS (:file) não foi encontrado no servidor. Por favor contacte a administração.', ['file' => 'FirminoSilva_RelatorioIndividual_2023.xlsx']));
+    }
 
     $reader = IOFactory::createReader('Xlsx');
-    $spreadsheet = $reader->load(storage_path('app/public/FirminoSilva_RelatorioIndividual_2023.xlsx'));
+    $spreadsheet = $reader->load($templatePath);
 
     $sheetN1 = $spreadsheet->getSheetByName('DadosN1');
     $sheetN2 = $spreadsheet->getSheetByName('DadosN2');

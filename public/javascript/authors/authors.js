@@ -9,7 +9,7 @@ $('#update-author-information').on('click', function (event) {
 
     $.ajax({
         type: 'GET',
-        url: 'https://portalcientifico.islagaia.pt/authors/update/',
+        url: '/authors/update/',
         beforeSend: function () {
             authorsUpdateButton.innerHTML +=
                 '<span id="spinner-container" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'
@@ -45,16 +45,16 @@ window.onload = event => {
         delay: 5000,
         added: true
     })
-    
+
 }
 
-function updateOrAddPropsOfOneObject (object, proprieties) {
+function updateOrAddPropsOfOneObject(object, proprieties) {
     for (var proprietyName in proprieties) {
         object.proprietyName = proprieties.proprietyName
     }
 }
 
-function showMessage (message) {
+function showMessage(message) {
     const alertInstance = Alert.getInstance(responseContainerElement)
 
     console.log(alertInstance)
@@ -101,8 +101,7 @@ function showMessage (message) {
     alertInstance.show()
 }
 
-function showMessage (message) 
-{
+function showMessage(message) {
     const messageElement = document.getElementById(
         'sync-with-cienciavitae-response'
     )
@@ -129,6 +128,6 @@ $('.read-more-show').on('click', function (e) {
 $('.read-more-hide').on('click', function (e) {
     var p = $(this).parent('.read-more-content')
     p.addClass('hide_content') // adiciona o "esconder" ao css
-    p.prev('.read-more-show').removeClass('hide_content') 
+    p.prev('.read-more-show').removeClass('hide_content')
     // Hide only the preceding "Read More" esconde a class anterior
 })

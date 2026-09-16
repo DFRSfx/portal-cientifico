@@ -66,7 +66,7 @@ class StatisticsController extends Controller
     {
         $dataValidated = $request->validated();
 
-        if (!isset($dataValidated["authorId"]) && $request->user()->type != "administrative") {
+        if (!isset($dataValidated["authorId"]) && (!auth()->check() || $request->user()?->type != "administrative")) {
             return response()->json(["message" => "Access not Authorized"], 403);
         }
 
@@ -104,7 +104,7 @@ class StatisticsController extends Controller
     {
         $dataValidated = $request->validated();
 
-        if (!isset($dataValidated["authorId"]) && $request->user()->type != "administrative") {
+        if (!isset($dataValidated["authorId"]) && (!auth()->check() || $request->user()?->type != "administrative")) {
             return response()->json(["message" => "Access not Authorized"], 403);
         }
 

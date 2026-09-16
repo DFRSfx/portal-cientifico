@@ -13,7 +13,7 @@ function setUserLocation(languageToSet) {
 
     if(languageToSet === null)
     {
-        location.href = 'https://portalcientifico.islagaia.pt/lang/' + defaultLanguage;
+        location.href = '/lang/' + defaultLanguage;
     }
 
     //alert("oi");
@@ -23,7 +23,7 @@ function getUserLocation() {
 
     $.ajax({
         type: 'GET',
-        url: "https://portalcientifico.islagaia.pt/sessionlocation",
+        url: "/sessionlocation",
         success: function (data, status) {
 
             LanguageInSession = data["userLocation"];

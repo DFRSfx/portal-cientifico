@@ -178,11 +178,15 @@ class ExcelController extends Controller
         $previousMonthYear = strtolower($previousMonthYear);
 
 
-        // $option now holds the appropriate range based on the count
+        $templatePath = storage_path('app/public/Avaliação Pessoal Docente.xlsx');
+        if (!file_exists($templatePath)) {
+            return redirect()->back()->with('error', __('O modelo de avaliação docente (:file) não foi encontrado no servidor. Por favor contacte a administração.', ['file' => 'Avaliação Pessoal Docente.xlsx']));
+        }
+
         $columnArray = array_chunk($authorResearchLeader, 1);
         $columnArray2 = array_chunk($authorProjectsParticipations, 1);
         $reader = IOFactory::createReader('Xlsx');
-        $spreadsheet = $reader->load(storage_path('/app/public/Avaliação Pessoal Docente.xlsx'));
+        $spreadsheet = $reader->load($templatePath);
         $spreadsheet->getActiveSheet()->setCellValue('L51', Auth::user()->ciencia_vitae);
         $spreadsheet->getActiveSheet()->setCellValue('L54', "Nenhum(a)");
         $spreadsheet->getActiveSheet()->setCellValue('L61', $option4);

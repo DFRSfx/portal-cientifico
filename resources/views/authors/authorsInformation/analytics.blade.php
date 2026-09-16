@@ -1,8 +1,6 @@
 @extends('authors.show')
 
 @section('author-information')
-    <!-- Hero -->
-
     @pushOnce('header-scripts')
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"
@@ -10,184 +8,302 @@
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     @endPushOnce
 
+    <!-- Top KPI Highlights Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5">
+        <!-- Total Outputs -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-slate-200/80 shadow-2xs hover:shadow-xs transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">{{ __('Publicações') }}</span>
+                <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs">
+                    <i class="fas fa-newspaper"></i>
+                </span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">{{ $totalOutputs ?? $author->output()->count() }}</div>
+            <p class="text-[11px] text-slate-400 font-medium mt-1 mb-0 flex items-center gap-1">
+                <i class="fas fa-check-circle text-emerald-600 text-[10px]"></i>
+                <span>{{ __('Histórico consolidado') }}</span>
+            </p>
+        </div>
 
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="card-title">
-                    <h6 class="my-3" style="color:#2A6B20">{{ __('Filtros') }}</h6>
+        <!-- Annual Average -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-slate-200/80 shadow-2xs hover:shadow-xs transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">{{ __('Média Anual') }}</span>
+                <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs">
+                    <i class="fas fa-calculator"></i>
+                </span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-emerald-800 tracking-tight">{{ $average }}</div>
+            <p class="text-[11px] text-slate-400 font-medium mt-1 mb-0">
+                {{ __('Publicações / ano ativo') }}
+            </p>
+        </div>
+
+        <!-- Peak Year -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-slate-200/80 shadow-2xs hover:shadow-xs transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">{{ __('Ano de Pico') }}</span>
+                <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs">
+                    <i class="fas fa-arrow-trend-up"></i>
+                </span>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">{{ $peakYear ?? '-' }}</span>
+                @if(!empty($peakCount))
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80">
+                        {{ $peakCount }} pub.
+                    </span>
+                @endif
+            </div>
+            <p class="text-[11px] text-slate-400 font-medium mt-1 mb-0">
+                {{ __('Maior produção anual') }}
+            </p>
+        </div>
+
+        <!-- Timeline Span -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-slate-200/80 shadow-2xs hover:shadow-xs transition-all">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">{{ __('Período Ativo') }}</span>
+                <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs shadow-2xs">
+                    <i class="fas fa-timeline"></i>
+                </span>
+            </div>
+            <div class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">
+                {{ $firstYear ? ($firstYear . ' – ' . $lastYear) : '-' }}
+            </div>
+            <p class="text-[11px] text-slate-400 font-medium mt-1 mb-0">
+                @if(!empty($firstYear) && !empty($lastYear))
+                    {{ (int)$lastYear - (int)$firstYear + 1 }} {{ __('anos de atividade') }}
+                @else
+                    {{ __('Sem registo de anos') }}
+                @endif
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Chart Section -->
+    <div class="card rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden mb-5">
+        <!-- Section Header with Title & Export Actions -->
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/40">
+            <div class="flex items-center gap-2.5">
+                <span class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-sm shadow-2xs">
+                    <i class="fas fa-chart-line"></i>
+                </span>
+                <div>
+                    <h6 class="font-bold text-slate-900 text-sm sm:text-base mb-0">{{ __('Evolução da Produção Científica') }}</h6>
+                    <p class="text-xs text-slate-400 font-medium mb-0">{{ __('Análise temporal da produtividade e atividades do autor') }}</p>
                 </div>
-                <h6 class="my-3" style="color:#2A6B20">{{ __('Tipos de gráficos') }}</h6>
-                <select name="chartType" id="chartType" class="select " onchange="updateChartType()">
-                    <option value="line">{{ __('Linha') }}</option>
-                    <option value="bar">{{ __('Barras') }}</option>
-                </select>
+            </div>
 
-                <h6 class="my-3" style="color:#2A6B20">{{ __('Informações') }}</h6> <select name="chartType"
-                    id="chartInformation" class="select" onchange="requestInformation()">
-                    <option value="publications">{{ __('Publicações') }}</option>
-                    <option value="events">{{ __('Events') }}</option>
-                </select>
-                <h6 class="my-3" style="color:#2A6B20">{{ __('Tipo de Estatisticas') }}</h6>
-                <select name="statsType" id="statsType" class="select" onchange="requestInformation()">
-                    <option value="global">{{ __('Global') }}</option>
-                    <option value="type">{{ __('Tipo') }}</option>
-                </select>
+            <!-- Export Buttons -->
+            <div class="flex items-center gap-2 self-end sm:self-auto">
+                <button type="button" id="downloadPdf" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-emerald-50/60 active:bg-emerald-100 text-slate-700 hover:text-emerald-800 text-xs font-semibold rounded-xl border border-slate-200 transition-all shadow-2xs cursor-pointer">
+                    <i class="fas fa-file-pdf text-red-500 text-xs"></i>
+                    <span>{{ __('Exportar PDF') }}</span>
+                </button>
+                <button type="button" id="downloadImg" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-emerald-50/60 active:bg-emerald-100 text-slate-700 hover:text-emerald-800 text-xs font-semibold rounded-xl border border-slate-200 transition-all shadow-2xs cursor-pointer">
+                    <i class="fas fa-file-image text-emerald-600 text-xs"></i>
+                    <span>{{ __('Exportar PNG') }}</span>
+                </button>
             </div>
         </div>
-        <!-- Pills navs -->
-        <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
-            <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="ex3-tab-1" data-mdb-toggle="pill" href="#ex3-pills-1" role="tab"
-                    aria-controls="ex3-pills-1" aria-selected="true"> {{ __('Estatística') }} </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" id="ex3-tab-2" data-mdb-toggle="pill" href="#ex3-pills-2" role="tab"
-                    aria-controls="ex3-pills-2" aria-selected="false">{{ __('Média') }}</a>
-            </li>
-        </ul>
-        <div class="tab-content" id="reportPage">
-            <div class="tab-pane fade show active" id="ex3-pills-1" role="tabpanel" aria-labelledby="ex3-tab-1">
-                <div class="card text-center">
-                    <div class="card-header"><span style="color:#33642b">{{ __('Estatísticas do Autor') }}</span></div>
-                    <div class="card-body">
-                        <div class="container">
-                            <canvas id="myChart"></canvas>
-                        </div>
-                        <div class="card-footer">
-                            <div class="container d-flex justify-content-around  align-items-center"> <a
-                                    href="javascript:void(0)" id="downloadPdf"><i class="fa-solid fa-file-arrow-down"></i>
-                                    {{ __('Download do gráfico em PDF') }}</a>
 
-                                <a id="downloadImg" download="Gráfico.png" href="javascript:void(0)"
-                                    title="Descargar Gráfico">
+        <!-- Filter Control Bar -->
+        <div class="p-4 sm:p-5 bg-white border-b border-slate-100">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <!-- Chart Type Segmented Button -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <i class="fas fa-shapes text-emerald-700 me-1"></i>{{ __('Tipo de Visualização') }}
+                    </label>
+                    <input type="hidden" id="chartType" value="line" />
+                    <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100/90 rounded-xl border border-slate-200/70">
+                        <button type="button" id="btnChartLine" onclick="setChartType('line')"
+                                class="chart-type-btn flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all duration-150 active-type bg-white text-emerald-800 shadow-2xs cursor-pointer">
+                            <i class="fas fa-chart-line text-xs"></i>
+                            <span>{{ __('Linha') }}</span>
+                        </button>
+                        <button type="button" id="btnChartBar" onclick="setChartType('bar')"
+                                class="chart-type-btn flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-semibold rounded-lg transition-all duration-150 text-slate-600 hover:text-slate-900 cursor-pointer">
+                            <i class="fas fa-chart-column text-xs"></i>
+                            <span>{{ __('Barras') }}</span>
+                        </button>
+                    </div>
+                </div>
 
-                                    <!-- Download Icon -->
-                                    <i class="fa-solid  fa-download"></i>
-                                    {{ __('Download do gráfico em PNG') }}
-                                </a>
-                            </div>
+                <!-- Information Source -->
+                <div>
+                    <label for="chartInformation" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <i class="fas fa-database text-emerald-700 me-1"></i>{{ __('Dados de Análise') }}
+                    </label>
+                    <div class="relative">
+                        <select name="chartInformation" id="chartInformation" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 shadow-2xs focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition-all cursor-pointer" onchange="requestInformation()">
+                            <option value="publications">{{ __('Publicações Científicas') }}</option>
+                            <option value="events">{{ __('Eventos e Atividades') }}</option>
+                        </select>
+                    </div>
+                </div>
 
-                        </div>
+                <!-- Grouping Mode -->
+                <div>
+                    <label for="statsType" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <i class="fas fa-layer-group text-emerald-700 me-1"></i>{{ __('Modo de Agrupamento') }}
+                    </label>
+                    <div class="relative">
+                        <select name="statsType" id="statsType" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 shadow-2xs focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition-all cursor-pointer" onchange="requestInformation()">
+                            <option value="global">{{ __('Total Global Anual') }}</option>
+                            <option value="type">{{ __('Desdobrar por Categoria') }}</option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Pills navs -->
 
-
-        <div class="tab-pane fade" id="ex3-pills-2" role="tabpanel" aria-labelledby="ex3-tab-2">
-            <div class="card text-center">
-                <div class="card-header"><span style="color:#33642b">{{ __('Média') }}</span></div>
-                <div class="card-body">
-                    <div class="row">
-
-                        <div class="col-xl-6 mx-auto">
-                            <h2 class="card-title" style="color:#33642b"> {{ $average }}</h2>
-                            <p class="card-text"><span class="text-muted">A sua média de publicações por ano </span></p>
-                        </div>
-                    </div>
-                </div>
+        <!-- Chart Canvas Container -->
+        <div id="reportPage" class="p-4 sm:p-6 bg-slate-50/20">
+            <div class="w-full relative min-h-[380px] max-h-[520px] flex items-center justify-center">
+                <canvas id="myChart"></canvas>
             </div>
         </div>
 
+        <!-- Annual Breakdown Quick-Chips -->
+        @if($outputsByYear->isNotEmpty())
+            <div class="p-4 bg-white border-t border-slate-100">
+                <div class="flex items-center justify-between gap-2 mb-2.5">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        <i class="fas fa-calendar-days text-emerald-700 me-1.5"></i>{{ __('Histórico Anual de Produção') }}
+                    </span>
+                    <span class="text-[11px] text-slate-400">{{ __('N.º de registos por ano') }}</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+                    @foreach($outputsByYear->groupBy('year') as $yr => $items)
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200/80 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all text-xs">
+                            <span class="font-mono text-slate-600 font-medium">{{ $yr }}</span>
+                            <span class="font-bold text-emerald-800 bg-emerald-100/70 px-1.5 py-0.2 rounded text-[11px]">
+                                {{ $items->sum('count') }}
+                            </span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </div>
 
-    <!-- Hero -->
+    <!-- Hidden Anchor for PNG Download -->
+    <a id="hiddenDownloadImg" download="Grafico_Producao_{{ $author->id }}.png" style="display: none;"></a>
+
     <script>
-        const dataSetInformation = []
+        const dataSetInformation = [];
+
+        // Curated Editorial Palette for Chart Categories
+        const PALETTE = [
+            { border: '#059669', bg: 'rgba(5, 150, 105, 0.12)' },
+            { border: '#2563eb', bg: 'rgba(37, 99, 235, 0.12)' },
+            { border: '#d97706', bg: 'rgba(217, 119, 6, 0.12)' },
+            { border: '#7c3aed', bg: 'rgba(124, 58, 237, 0.12)' },
+            { border: '#db2777', bg: 'rgba(219, 39, 119, 0.12)' },
+            { border: '#0891b2', bg: 'rgba(8, 145, 178, 0.12)' },
+            { border: '#ea580c', bg: 'rgba(234, 88, 12, 0.12)' },
+        ];
+
+        function setChartType(type) {
+            document.getElementById('chartType').value = type;
+            const btnLine = document.getElementById('btnChartLine');
+            const btnBar = document.getElementById('btnChartBar');
+
+            if (type === 'line') {
+                btnLine.classList.add('bg-white', 'text-emerald-800', 'shadow-2xs');
+                btnLine.classList.remove('text-slate-600');
+                btnBar.classList.remove('bg-white', 'text-emerald-800', 'shadow-2xs');
+                btnBar.classList.add('text-slate-600');
+            } else {
+                btnBar.classList.add('bg-white', 'text-emerald-800', 'shadow-2xs');
+                btnBar.classList.remove('text-slate-600');
+                btnLine.classList.remove('bg-white', 'text-emerald-800', 'shadow-2xs');
+                btnLine.classList.add('text-slate-600');
+            }
+
+            updateChartType();
+        }
 
         async function requestInformation() {
             const type = document.getElementById("chartInformation").value;
-
             const statsType = document.getElementById("statsType").value;
-
-            let url = (type == "events") ? "https://portalcientifico.islagaia.pt/statistics/events" :
-                "https://portalcientifico.islagaia.pt/statistics/publications"
-
-            const authorId = {{ $author->id }}
+            const url = (type === "events") ? "/statistics/events" : "/statistics/publications";
+            const authorId = {{ $author->id }};
 
             try {
-                const response = await fetch(url + "?statsType=" + statsType + "&authorId=" + authorId);
+                const response = await fetch(`${url}?statsType=${encodeURIComponent(statsType)}&authorId=${encodeURIComponent(authorId)}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
 
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
 
                 const data = await response.json();
-
-                changeDataset(data.data)
+                changeDataset(data.data || []);
             } catch (error) {
-                console.log(error);
+                console.error("Erro ao carregar estatísticas:", error);
             }
-
         }
 
         function getYearsToShow(array) {
-            let arrayToReturn = [];
+            if (!array || array.length === 0) return [];
 
-            let initialYear, lastYear, numberOfInteractions;
+            let initialYear = parseInt(array[0]["year"]);
+            let lastYear = parseInt(array[array.length - 1]["year"]);
 
-            initialYear = parseInt(array[0]["year"]);
+            if (isNaN(initialYear) || isNaN(lastYear)) {
+                return array.map(item => String(item.year));
+            }
 
-            lastYear = parseInt(array[array.length - 1]["year"]);
-
-            numberOfInteractions = 0;
-
-            do {
-
-                if (numberOfInteractions > 0) {
-                    initialYear += 1;
-                }
-
-                arrayToReturn.push(initialYear.toString());
-
-                numberOfInteractions++;
-
-            } while (initialYear != lastYear)
-
-            return arrayToReturn;
+            const years = [];
+            for (let y = initialYear; y <= lastYear; y++) {
+                years.push(String(y));
+            }
+            return years;
         }
 
-        /*
-
-        Dataset Manipulation
-
-        */
         function changeDataset(array) {
-            let num, arraySize
+            dataSetInformation.length = 0;
 
-            const dataSetPosition = []
-
-            if (dataSetInformation.length > 0) dataSetInformation.length = 0
-
-            arraySize = array.length
-
-            if (arraySize == 0) {
-                updateChartData({
-                    abels: [],
-                    datasets: []
-                })
-
-                return
+            if (!array || array.length === 0) {
+                updateChartData({ labels: [], datasets: [] });
+                return;
             }
 
             const type = document.getElementById("chartInformation").value;
+            const baseType = (type === "events") ? "{{ __('Eventos') }}" : "{{ __('Publicações') }}";
+            const dataSetPosition = {};
 
-            const baseType = (type == "events") ? "{{ 'Eventos' }}" : "{{ 'Publicações' }}"
+            for (let i = 0; i < array.length; i++) {
+                const label = array[i]["type"] || baseType;
+                const year = String(array[i]["year"]);
+                const count = Number(array[i]["count"]);
 
-            for (var i = 0; i < arraySize; i++) {
-                const label = (array[i]["type"]) ?? baseType
-
-                let labelWasChecked = (dataSetPosition[label]) ?? -1
-
-                if (labelWasChecked == -1) {
-                    // Adiciono o dataSet
-                    dataSetInformation.push(CreateDataSet(label, array[i]["year"], array[i]["count"]))
-
-                    dataSetPosition[label] = dataSetInformation.length - 1
+                if (dataSetPosition[label] === undefined) {
+                    const datasetIdx = dataSetInformation.length;
+                    const colors = PALETTE[datasetIdx % PALETTE.length];
+                    const newDataset = {
+                        label: label,
+                        data: [{ x: year, y: count }],
+                        borderColor: colors.border,
+                        backgroundColor: colors.bg,
+                        tension: 0.35,
+                        pointBackgroundColor: colors.border,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4.5,
+                        pointHoverRadius: 7,
+                        borderRadius: 6,
+                        borderWidth: 2,
+                        fill: true
+                    };
+                    dataSetInformation.push(newDataset);
+                    dataSetPosition[label] = datasetIdx;
                 } else {
-                    // dataSet
-                    dataSetInformation[dataSetPosition[label]] = UpdateDatasetData(dataSetInformation[dataSetPosition[
-                        label]], array[i]["year"], array[i]["count"])
+                    dataSetInformation[dataSetPosition[label]].data.push({ x: year, y: count });
                 }
             }
 
@@ -196,210 +312,161 @@
                 datasets: dataSetInformation
             };
 
-            updateChartData(data)
+            updateChartData(data);
         }
 
-        function CreateDataSet(datasetLabelName, year, numberOfElements) {
-            let chartJsDataset, graphCoordinates;
-
-            // Builds the initial dataset only for each type
-            chartJsDataset = {
-                label: datasetLabelName,
-                data: []
+        function getCommonChartOptions() {
+            return {
+                animation: { duration: 400 },
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            boxWidth: 12,
+                            boxHeight: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            font: { family: 'inherit', size: 12, weight: 600 },
+                            color: '#334155',
+                            padding: 16
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleFont: { size: 13, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        padding: 12,
+                        cornerRadius: 10,
+                        boxPadding: 4,
+                        usePointStyle: true
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#64748b',
+                            font: { weight: 600, size: 11 }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(226, 232, 240, 0.7)',
+                            borderDash: [3, 3]
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            precision: 0,
+                            font: { size: 11 }
+                        }
+                    }
+                }
             };
-
-            graphCoordinates = {
-                x: year,
-                y: numberOfElements
-            }
-
-            chartJsDataset["data"].push(graphCoordinates);
-
-            return chartJsDataset
         }
 
         function updateChartType() {
-            const oldChartInstance = Chart.getChart(document.getElementById('myChart'))
+            const chartCanvas = document.getElementById('myChart');
+            const oldChartInstance = Chart.getChart(chartCanvas);
 
-            let oldChartData
+            if (!oldChartInstance) return;
 
-            oldChartData = oldChartInstance.data
+            const currentData = oldChartInstance.data;
+            const currentType = document.getElementById("chartType").value;
 
-            oldChartInstance.destroy()
+            oldChartInstance.destroy();
 
-            new Chart(document.getElementById('myChart'), {
-                type: document.getElementById("chartType").value,
-                data: oldChartData,
-                options: {
-                    animation: false,
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        x: {
-                            stacked: true,
-                        },
-                        y: {
-                            stacked: true,
-                        },
-                    },
-
-                },
+            new Chart(chartCanvas, {
+                type: currentType,
+                data: currentData,
+                options: getCommonChartOptions(),
                 plugins: [{
                     id: 'noData',
                     afterDraw: function(chart) {
                         if (chart.data.datasets.length === 0) {
-                            // No data is present
-                            var ctx = chart.ctx;
-                            var width = chart.width;
-                            var height = chart.height;
+                            const ctx = chart.ctx;
+                            const width = chart.width;
+                            const height = chart.height;
                             chart.clear();
-
                             ctx.save();
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
-                            ctx.font = "16px normal 'Helvetica Nueue'";
-                            ctx.fillText('{{ __("Sem dados para exibir") }}', width / 2, height / 2);
+                            ctx.fillStyle = '#94a3b8';
+                            ctx.font = "14px 'Roboto', sans-serif";
+                            ctx.fillText('{{ __("Sem dados registados para este filtro") }}', width / 2, height / 2);
                             ctx.restore();
                         }
-                    },
+                    }
                 }]
             });
         }
 
-        function UpdateDatasetData(chartJsDataset, year, numberElements) {
-            let graphCoordinates
-
-            graphCoordinates = {
-                x: year,
-                y: numberElements
-            }
-
-            chartJsDataset["data"].push(graphCoordinates);
-
-            return chartJsDataset
-        }
-
-        // Function runs on chart type select update
         function updateChartData(data) {
-            const chart = Chart.getChart(document.getElementById('myChart'))
+            const chartCanvas = document.getElementById('myChart');
+            const existingChart = Chart.getChart(chartCanvas);
 
-            if (chart) chart.destroy()
+            if (existingChart) existingChart.destroy();
 
-            new Chart(document.getElementById('myChart'), {
+            new Chart(chartCanvas, {
                 type: document.getElementById("chartType").value,
                 data: data,
-                options: {
-                    animation: false,
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        x: {
-                            stacked: true,
-                        },
-                        y: {
-                            stacked: true,
-                        },
-                    },
-
-                },
+                options: getCommonChartOptions(),
                 plugins: [{
                     id: 'noData',
                     afterDraw: function(chart) {
-
                         if (chart.data.datasets.length === 0) {
-                            // No data is present
-                            var ctx = chart.ctx;
-                            var width = chart.width;
-                            var height = chart.height;
+                            const ctx = chart.ctx;
+                            const width = chart.width;
+                            const height = chart.height;
                             chart.clear();
-
                             ctx.save();
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
-                            ctx.font = "16px normal 'Helvetica Nueue'";
-                            ctx.fillText('{{ __("Sem dados para exibir") }}', width / 2, height / 2);
+                            ctx.fillStyle = '#94a3b8';
+                            ctx.font = "14px 'Roboto', sans-serif";
+                            ctx.fillText('{{ __("Sem dados registados para este filtro") }}', width / 2, height / 2);
                             ctx.restore();
                         }
-                    },
+                    }
                 }]
             });
-
-
         }
 
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            requestInformation();
 
-            requestInformation()
+            // Export to PDF
+            const pdfBtn = document.getElementById('downloadPdf');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', function () {
+                    const canvas = document.getElementById('myChart');
+                    if (!canvas) return;
 
-            $('#downloadPdf').click(function(event) {
+                    const { jsPDF } = window.jspdf || {};
+                    if (!jsPDF) return;
 
-                // get size of report page
-                var reportPageHeight = $('#reportPage').innerHeight();
-
-                var reportPageWidth = $('#reportPage').innerWidth();
-
-                // create a new canvas object that we will populate with all other canvas objects
-                var pdfCanvas = $('<canvas />').attr({
-                    id: "canvaspdf",
-                    width: reportPageWidth,
-                    height: reportPageHeight
+                    const imgData = canvas.toDataURL('image/png', 1.0);
+                    const pdf = new jsPDF('landscape', 'px', [canvas.width, canvas.height]);
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                    pdf.save('Estatisticas_Producao_{{ $author->id }}.pdf');
                 });
+            }
 
-                // keep track canvas position
-                var pdfctx = $(pdfCanvas)[0].getContext('2d');
-                var pdfctxX = 0;
-                var pdfctxY = 0;
-                var buffer = 100;
-
-                // for each chart.js chart
-                $("canvas").each(function(index) {
-                    // get the chart height/width
-                    var canvasHeight = $(this).innerHeight();
-                    var canvasWidth = $(this).innerWidth();
-
-                    // draw the chart into the new canvas
-                    pdfctx.drawImage($(this)[0], pdfctxX, pdfctxY, canvasWidth, canvasHeight);
-                    pdfctxX += canvasWidth + buffer;
-
-                    // our report page is in a grid pattern so replicate that in the new canvas
-                    if (index % 2 === 1) {
-                        pdfctxX = 0;
-                        pdfctxY += canvasHeight + buffer;
-                    }
+            // Export to PNG
+            const imgBtn = document.getElementById('downloadImg');
+            if (imgBtn) {
+                imgBtn.addEventListener('click', function () {
+                    const canvas = document.getElementById('myChart');
+                    if (!canvas) return;
+                    const url = canvas.toDataURL('image/png');
+                    const link = document.getElementById('hiddenDownloadImg');
+                    link.href = url;
+                    link.click();
                 });
-
-                // create new pdf and add our new canvas as an image
-                var pdf = new jsPDF('l', 'pt', [reportPageWidth, reportPageHeight]);
-
-                pdf.addImage($(pdfCanvas)[0], 'PNG', 0, 0, pdf.internal.pageSize.width, pdf.internal
-                    .pageSize.height);
-
-                // download the pdf
-                pdf.save('gráfico.pdf');
-            });
-
-            //Download Chart Image
-            document.getElementById("downloadImg").addEventListener('click', function() {
-                /*Get image of canvas element*/
-                var url_base64jp = document.getElementById("myChart").toDataURL("image/jpg");
-                /*get download button (tag: <a></a>) */
-                var a = document.getElementById("downloadImg");
-                /*insert chart image url to download button (tag: <a></a>) */
-                a.href = url_base64jp;
-            });
-
-
-            window.jsPDF = window.jspdf.jsPDF
+            }
         });
     </script>
 @endsection

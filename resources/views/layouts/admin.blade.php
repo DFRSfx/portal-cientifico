@@ -23,6 +23,7 @@
 
     @stack('header-scripts')
 
+    @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -39,7 +40,7 @@
     <!-- MDB -->
     @stack('scripts')
 
-
+    @livewireScripts
 </body>
 
 </html>

@@ -6,53 +6,53 @@
 
     <main>
 
-        <div class="container-xxl saas-dashboard pt-4 pb-4 home-layout">
-            <div class="row g-4">
+        <div class="container-xxl saas-dashboard pt-6 sm:pt-8 pb-10 sm:pb-14 home-layout">
+            <div class="row g-4 lg:g-5">
                 {{-- Coluna 1: Perfil de Visitante / Utilizador e Eventos --}}
                 <div class="col-xl-3">
-                    <div class="card testimonial-card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
-                        <div class="card-up h-20" style="background-color: #2A6B20;"></div>
-                        <div class="avatar mx-auto white relative -mt-10 w-20 h-20 rounded-full border-4 border-white shadow-sm overflow-hidden bg-white flex items-center justify-center">
+                    <div class="card testimonial-card mb-4 sm:mb-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-up h-24 sm:h-28 bg-emerald-800"></div>
+                        <div class="avatar mx-auto white relative -mt-12 w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-white flex items-center justify-center">
                             <x-user-image
                                 showLogedUserImage="{{ Auth::check() && auth()->user()->type != 'administrative' }}"
-                                class="rounded-circle img-fluid w-full h-full object-cover" height="72" />
+                                class="rounded-circle img-fluid w-full h-full object-cover" height="88" width="88" />
                         </div>
-                        <div class="card-body p-4 text-center">
+                        <div class="card-body p-6 sm:p-7 text-center">
                             @if (Auth::check())
-                                <h5 class="font-bold text-slate-900 mb-2 text-base">
+                                <h4 class="font-bold text-slate-900 mb-2 text-lg sm:text-xl">
                                     {{ auth()->user()->name }}
-                                </h5>
+                                </h4>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="px-6 py-2 text-xs font-bold text-white uppercase tracking-wider rounded-full shadow-sm hover:shadow transition-all border-0 cursor-pointer"
-                                        style="background-color: #2A6B20;">
+                                        class="px-8 py-2.5 text-xs sm:text-sm font-bold text-white uppercase tracking-wider rounded-xl shadow-xs hover:shadow transition-all border-0 cursor-pointer bg-emerald-700 hover:bg-emerald-800">
                                         {{ __('Logout') }} </button>
                                 </form>
                             @else
-                                <h5 class="font-bold text-slate-900 mb-1 text-base">{{ __('Convidado') }}</h5>
-                                <p class="text-xs text-slate-500 mb-3">{{ __('Faça login para aceder a todas as funcionalidades!') }}</p>
-                                <a href="{{ route('login') }}">
-                                    <button type="button"
-                                        class="px-6 py-2 text-xs font-bold text-white uppercase tracking-wider rounded-full shadow-sm hover:shadow transition-all border-0 cursor-pointer"
-                                        style="background-color: #2A6B20;">
-                                        {{ __('LOGIN') }} </button></a>
+                                <h4 class="font-semibold text-slate-900 mb-1.5 text-lg sm:text-xl">{{ __('Convidado') }}</h4>
+                                <p class="text-xs sm:text-sm text-slate-500 mb-4">{{ __('Faça login para aceder a todas as funcionalidades!') }}</p>
+                                <button type="button"
+                                    onclick="if (typeof openAuthModal === 'function') { openAuthModal('login'); } else { window.location.href = '{{ route('login') }}'; }"
+                                    class="px-8 py-2.5 text-xs sm:text-sm font-bold text-white uppercase tracking-wider rounded-xl shadow-xs hover:shadow transition-all border-0 cursor-pointer bg-emerald-700 hover:bg-emerald-800">
+                                    {{ __('LOGIN') }}
+                                </button>
                             @endif
 
-                            <div class="small pt-3 text-slate-500">{{ __('Aceda a página') }}
+                            <div class="text-xs sm:text-sm pt-4 text-slate-500 leading-relaxed">{{ __('Aceda a página') }}
                                 <a href="{{ route('about.index') }}" class="font-semibold text-emerald-800 hover:underline"> {{ __('Sobre Nós') }}
                                 </a> {{ __('para obter mais informações') }}
                             </div>
 
-                            <hr class="my-3 border-slate-100">
-
                         </div>
                     </div>
 
-                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
-                        <div class="card-body p-4">
-                            <p class="mb-3 font-semibold text-sm" style="color:#2A6B20">{{ __('Eventos') }}</p>
-                            <div class="list-group list-group-flush space-y-1">
+                    <div class="card mb-4 sm:mb-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-body p-6 sm:p-7">
+                            <h3 class="mb-4 text-base sm:text-lg text-emerald-800 flex items-center gap-2">
+                                <i class="fas fa-calendar-days text-emerald-600"></i>
+                                <span>{{ __('Eventos') }}</span>
+                            </h3>
+                            <div class="list-group list-group-flush space-y-1.5">
 
                                 @if(!empty($eventsFinal) && count($eventsFinal))
                                     @foreach ($eventsFinal as $event)
@@ -63,21 +63,22 @@
                                         @endphp
 
                                         <a href="{{ $link }}"
-                                        class="list-group-item list-group-item-action border-0 py-1 text-truncate block text-xs text-slate-700 hover:text-emerald-800"
+                                        class="list-group-item list-group-item-action border-0 py-2 px-2 rounded-lg text-truncate flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50/50 transition-colors"
                                         rel="noopener noreferrer" target="_blank">
-                                            <i class="fas fa-calendar pe-2 text-slate-400"></i>{{ $title }}
+                                            <i class="fas fa-calendar text-slate-400 shrink-0 text-sm"></i>
+                                            <span class="truncate">{{ $title }}</span>
                                         </a>
                                     @endforeach
                                 @else
-                                    <div class="list-group-item border-0 py-1 text-slate-400 text-xs">{{ __('Sem eventos recentes') }}</div>
+                                    <div class="list-group-item border-0 py-2 text-slate-400 text-xs sm:text-sm">{{ __('Sem eventos recentes') }}</div>
                                 @endif
 
                             </div>
-                            <hr class="my-3 border-slate-100">
+                            <hr class="my-4 border-slate-100">
                             <a href="https://investigacao.islagaia.pt/events/" target="_blank" rel="noopener noreferrer"
-                               class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors">
-                                {{ __('Mostrar todos os Eventos') }}
-                                <i class="fas fa-arrow-right ps-2 text-[10px]"></i>
+                               class="inline-flex items-center text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors gap-2 pt-1">
+                                <span>{{ __('Mostrar todos os Eventos') }}</span>
+                                <i class="fas fa-arrow-right text-xs"></i>
                             </a>
                         </div>
                     </div>
@@ -85,39 +86,61 @@
 
                 {{-- Coluna 2: Banner Central e Lista de Últimos Artigos --}}
                 <div class="col-xl-5">
-                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
-                        <div class="card-body p-3">
-                            <div class="overflow-hidden rounded-xl">
-                                <img src="{{ asset('logo/bg-portal.avif') }}" alt="Portal Científico" class="img-fluid rounded-xl w-full h-auto block"
-                                    loading="eager">
+                    <div class="card mb-4 sm:mb-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-body p-2.5 sm:p-3">
+                            <div class="relative overflow-hidden rounded-xl bg-[#e3e5e4] flex items-stretch min-h-[175px] sm:min-h-[210px] lg:min-h-[225px]">
+                                {{-- Left: Books Capsule Graphic --}}
+                                <div class="w-5/12 sm:w-1/2 -ml-2 sm:-ml-3 shrink-0 flex items-center justify-center">
+                                    <picture>
+                                        <source srcset="{{ asset('logo/image-portal.avif') }}" type="image/avif">
+                                        <source srcset="{{ asset('logo/image-portal.webp') }}" type="image/webp">
+                                        <img src="{{ asset('logo/image-portal.png') }}"
+                                             alt="{{ __('Portal Científico') }}"
+                                             class="w-full h-auto max-h-[190px] sm:max-h-[220px] object-contain block drop-shadow-xs"
+                                             loading="eager">
+                                    </picture>
+                                </div>
+
+                                {{-- Right: Fully Translatable Text (PT / EN) --}}
+                                <div class="w-[56%] flex flex-col justify-center py-4 pr-4 sm:py-6 sm:pr-8 pl-1 sm:pl-3 text-left">
+                                    <h2 class="text-xl sm:text-2xl lg:text-[28px] font-bold text-[#286e36] tracking-tight leading-tight m-0 mb-2 sm:mb-3">
+                                        {{ __('Portal Científico') }}
+                                    </h2>
+                                    <p class="text-xs sm:text-[13.5px] lg:text-[15px] font-normal text-black leading-relaxed sm:leading-relaxed m-0">
+                                        {{ __('Um repositório centralizado que disponibiliza o património científico da Instituição aos seus utilizadores.') }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
-                        <div class="card-body p-5">
-                            <p class="mb-4 font-semibold text-sm" style="color:#2A6B20">{{ __('Últimos artigos') }}</p>
+                    <div class="card mb-4 sm:mb-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-body p-6 sm:p-8">
+                            <h3 class="mb-5 text-base sm:text-lg text-emerald-800 flex items-center gap-2">
+                                <i class="fas fa-book-open text-emerald-600"></i>
+                                <span>{{ __('Últimos artigos') }}</span>
+                            </h3>
 
                             @if(!empty($lastOutputs) && count($lastOutputs))
                                 @foreach ($lastOutputs as $publication)
-                                    <div class="py-1">
+                                    <div class="py-1.5">
                                         <x-publication-title :publication=$publication displayType="0"
                                             displayAccessPubButton="1" />
                                     </div>
                                     @if (!$loop->last)
-                                        <hr class="my-3 border-slate-100">
+                                        <hr class="my-4 border-slate-100">
                                     @endif
                                 @endforeach
                             @else
-                                <p class="text-xs text-slate-400">{{ __('Sem publicações recentes') }}</p>
+                                <p class="text-sm text-slate-400 py-3">{{ __('Sem publicações recentes') }}</p>
                             @endif
 
                             @if (Auth::check())
-                                <div class="mt-4 pt-2">
+                                <div class="mt-5 pt-2">
                                     <a href="{{ route('outputs.index') }}"
-                                       class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors">
-                                        {{ __('Mostrar todas as Publicações') }}
-                                        <i class="fas fa-arrow-right ps-2 text-[10px]"></i>
+                                       class="inline-flex items-center text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors gap-2">
+                                        <span>{{ __('Mostrar todas as Publicações') }}</span>
+                                        <i class="fas fa-arrow-right text-xs"></i>
                                     </a>
                                 </div>
                             @endif
@@ -128,19 +151,18 @@
                 {{-- Coluna 3: Estatísticas e Links Úteis --}}
                 <div class="col-xl-4">
                     {{-- Estatística Autores --}}
-                    <div class="card mb-3 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
-                        <div class="p-4">
+                    <div class="card mb-3 rounded-xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="p-3.5 sm:p-4">
                             <div class="flex items-center">
                                 <div class="shrink-0">
-                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg shadow-sm"
-                                        style="background-color:#2A6B20">
+                                    <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-white text-base sm:text-lg shadow-xs bg-emerald-700">
                                         <i class="fas fa-user"></i>
                                     </div>
                                 </div>
-                                <div class="grow ms-4">
-                                    <p class="text-xs text-slate-500 mb-0 font-medium">{{ __('Autores') }}</p>
+                                <div class="grow ms-3 sm:ms-3.5">
+                                    <p class="text-[11px] sm:text-xs text-slate-500 mb-0.5 font-semibold uppercase tracking-wider">{{ __('Autores') }}</p>
                                     <div>
-                                        <h2 class="mb-0 text-2xl font-bold text-slate-800 counter" id="number-of-authors"
+                                        <h2 class="mb-0 text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight counter" id="number-of-authors"
                                             data-count="{{ $numberOfAuthors }}">
                                             {{ $numberOfAuthors }}
                                         </h2>
@@ -151,19 +173,18 @@
                     </div>
 
                     {{-- Estatística Artigos --}}
-                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
-                        <div class="p-4">
+                    <div class="card mb-3 sm:mb-4 rounded-xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="p-3.5 sm:p-4">
                             <div class="flex items-center">
                                 <div class="shrink-0">
-                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg shadow-sm"
-                                        style="background-color:#2A6B20">
+                                    <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-white text-base sm:text-lg shadow-xs bg-emerald-700">
                                         <i class="fas fa-newspaper"></i>
                                     </div>
                                 </div>
-                                <div class="grow ms-4">
-                                    <p class="text-xs text-slate-500 mb-0 font-medium">{{ __('Artigos') }}</p>
+                                <div class="grow ms-3 sm:ms-3.5">
+                                    <p class="text-[11px] sm:text-xs text-slate-500 mb-0.5 font-semibold uppercase tracking-wider">{{ __('Artigos') }}</p>
                                     <div title="{{ __('Artigos') }}">
-                                        <h2 class="mb-0 text-2xl font-bold text-slate-800 counter" id="number-of-outputs"
+                                        <h2 class="mb-0 text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight counter" id="number-of-outputs"
                                             data-count="{{ $numberOfOutputs }}">
                                             {{ $numberOfOutputs }}
                                         </h2>
@@ -174,9 +195,12 @@
                     </div>
 
                     {{-- Links Úteis --}}
-                    <div class="card mb-4 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
-                        <div class="card-body p-4">
-                            <p class="mb-3 font-semibold text-sm" style="color:#2A6B20">{{ __('Links Úteis') }}</p>
+                    <div class="card mb-4 sm:mb-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                        <div class="card-body p-6 sm:p-7">
+                            <h3 class="mb-4 text-base sm:text-lg text-emerald-800 flex items-center gap-2">
+                                <i class="fas fa-link text-emerald-600"></i>
+                                <span>{{ __('Links Úteis') }}</span>
+                            </h3>
                             <div class="space-y-1">
                                 @if(!empty($coursesFinal) && count($coursesFinal))
                                     @foreach ($coursesFinal as $course)
@@ -187,30 +211,30 @@
                                         @endphp
 
                                         <a href="{{ $permalink }}"
-                                            class="flex items-center py-1.5 text-xs text-slate-700 hover:text-emerald-800 truncate transition-colors"
+                                            class="flex items-center py-2 px-2 rounded-lg text-xs sm:text-sm font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50/50 truncate transition-colors gap-2"
                                             target="_blank" rel="noopener noreferrer">
-                                            <i class="fa-solid fa-chalkboard-user pe-2 text-slate-400 shrink-0"></i>
+                                            <i class="fa-solid fa-chalkboard-user text-slate-400 shrink-0 text-sm"></i>
                                             <span class="truncate">{{ $name }}</span>
                                         </a>
                                     @endforeach
                                 @else
-                                    <div class="py-1 text-slate-400 text-xs">{{ __('Sem cursos recentes') }}</div>
+                                    <div class="py-2 text-slate-400 text-xs sm:text-sm">{{ __('Sem cursos recentes') }}</div>
                                 @endif
 
                                 <a href="https://www.webofscience.com/wos/woscc/basic-search"
-                                    class="flex items-center py-1.5 text-xs text-slate-700 hover:text-emerald-800 truncate transition-colors"
+                                    class="flex items-center py-2 px-2 rounded-lg text-xs sm:text-sm font-medium text-slate-700 hover:text-emerald-800 hover:bg-emerald-50/50 truncate transition-colors gap-2"
                                     target="_blank" rel="noopener noreferrer">
-                                    <i class="fa-solid fa-chalkboard-user pe-2 text-slate-400 shrink-0"></i>
+                                    <i class="fa-solid fa-chalkboard-user text-slate-400 shrink-0 text-sm"></i>
                                     <span class="truncate">Web of Science</span>
                                 </a>
                             </div>
 
-                            <hr class="my-3 border-slate-100">
+                            <hr class="my-4 border-slate-100">
 
                             <a href="https://ci-islagaia.pt/formacao-online/" target="_blank" rel="noopener noreferrer"
-                               class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors">
-                                {{ __('Mostrar todos os links úteis') }}
-                                <i class="fas fa-arrow-right ps-2 text-[10px]"></i>
+                               class="inline-flex items-center text-xs sm:text-sm font-semibold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors gap-2 pt-1">
+                                <span>{{ __('Mostrar todos os links úteis') }}</span>
+                                <i class="fas fa-arrow-right text-xs"></i>
                             </a>
                         </div>
                     </div>

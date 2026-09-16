@@ -31,6 +31,7 @@
 
     @stack('header-scripts')
 
+    @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -49,56 +50,47 @@
 
     <x-layouts.footer />
 
+    @guest
+        <x-auth-modal />
+    @endguest
+
     <!-- MDB -->
     @stack('scripts')
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Get elements
-            var reportLinks = document.querySelectorAll(".report-link");
-            var reportModal = document.getElementById("reportModal");
-            var closeModalBtns = document.querySelectorAll("#closeModalBtn");
-            var reportTitle = document.getElementById("reportModalTitle");
-            var reportForm = document.getElementById("reportForm");
-            var reportEntity = document.getElementById("reportEntity");
+    @livewireScripts
 
-            if (reportLinks.length && reportModal) {
-                reportLinks.forEach(function(link) {
-                    link.addEventListener("click", function(event) {
-                        event.preventDefault();
-                        var entity = link.getAttribute("data-entity") || "";
-                        var action = link.getAttribute("data-report-action") || reportForm?.action;
+    <script data-navigate-once>
+        document.addEventListener("click", function(event) {
+            // Report modal trigger
+            var link = event.target.closest(".report-link");
+            if (link) {
+                event.preventDefault();
+                var reportModal = document.getElementById("reportModal");
+                var reportTitle = document.getElementById("reportModalTitle");
+                var reportForm = document.getElementById("reportForm");
+                var reportEntity = document.getElementById("reportEntity");
+                var entity = link.getAttribute("data-entity") || "";
+                var action = link.getAttribute("data-report-action") || (reportForm ? reportForm.action : "");
 
-                        if (reportTitle) {
-                            reportTitle.textContent = entity ? `Gerar relatorio de ${entity}` : 'Gerar relatorio';
-                        }
-
-                        if (reportForm && action) {
-                            reportForm.action = action;
-                        }
-
-                        if (reportEntity) {
-                            reportEntity.value = entity;
-                        }
-
-                        reportModal.style.display = "flex";
-                    });
-                });
+                if (reportTitle) reportTitle.innerText = "Exportar Relatório - " + entity;
+                if (reportForm && action) reportForm.action = action;
+                if (reportEntity) reportEntity.value = entity;
+                if (reportModal) reportModal.style.display = "flex";
+                return;
             }
 
-            // Close the modal when the close button is clicked
-            closeModalBtns.forEach(function(btn) {
-                btn.addEventListener("click", function() {
-                    reportModal.style.display = "none"; // Hide the modal
-                });
-            });
+            // Close modal buttons
+            if (event.target.closest("#closeModalBtn") || event.target.closest("#cancelBtn")) {
+                var modal = document.getElementById("reportModal");
+                if (modal) modal.style.display = "none";
+                return;
+            }
 
-            // Close the modal when clicking outside the modal content
-            reportModal.addEventListener("click", function(event) {
-                if (event.target === reportModal) {
-                    reportModal.style.display = "none"; // Hide the modal
-                }
-            });
+            // Backdrop click
+            var modalBackdrop = document.getElementById("reportModal");
+            if (modalBackdrop && event.target === modalBackdrop) {
+                modalBackdrop.style.display = "none";
+            }
         });
     </script>
 </body>

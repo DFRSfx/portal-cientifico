@@ -48,57 +48,30 @@
     const apiResultsToShow = document.getElementById("search-results");
     const repositoriesCard = document.getElementById("repositoriesCard");
 
-    window.addEventListener("load", (event) => {
-        const apiResultsCardAnimation = new mdb.Animate(apiResultsToShow, {
-            animation: "slide-in-up",
-            animationStart: "manually",
-            animationDelay: "0",
-            animationDuration: "500",
-            onEnd: () => {
-                apiResultsCardAnimation.stopAnimation();
-            },
-            onStart: () => {
-                if (apiResultsToShow.style.display != "block") apiResultsToShow.style.display = "block";
-            }
-        });
-
-        const repositoriesCardAnimation = new mdb.Animate(repositoriesCard, {
-            animation: "slide-in-left",
-            animationStart: "manually",
-            animationDelay: "0",
-            animationDuration: "1000",
-            onEnd: () => {
-                repositoriesCardAnimation.stopAnimation();
-            },
-            onStart: () => {
-                if (repositoriesCard.style.display != "block") repositoriesCard.style.display = "block";
-            }
-        });
-
-        repositoriesCardAnimation.init();
-        apiResultsCardAnimation.init();
-    });
-
     $("#form").submit(function(event) {
         event.preventDefault();
 
-        const repositoriesCardAnimation = mdb.Animate.getInstance(repositoriesCard);
-        repositoriesCardAnimation.startAnimation();
+        if (repositoriesCard) repositoriesCard.style.display = "block";
+        const spinner = document.getElementById("scopus-spinner");
+        const checkIcon = document.getElementById("scopus-check-icon");
+        if (spinner) spinner.style.display = "inline-block";
+        if (checkIcon) checkIcon.style.display = "none";
 
-        window.setTimeout(() => {
-            const apiResultsCardAnimation = mdb.Animate.getInstance(apiResultsToShow);
+        const textVal = document.getElementById("text-to-search").value;
+        if (!textVal) return;
 
-            $.ajax({
-                type: 'GET',
-                data:{
-                    doi: document.getElementById("text-to-search").value
-                },
-                url: 'https://portalcientifico.islagaia.pt/test-search',
-                success: function(data, status) {
-                    document.getElementById("scopus-spinner").style.display = "none";
-                    document.getElementById("scopus-check-icon").style.display = "block";
+        $.ajax({
+            type: 'GET',
+            data: {
+                doi: textVal
+            },
+            url: '/test-search',
+            success: function(data, status) {
+                if (spinner) spinner.style.display = "none";
+                if (checkIcon) checkIcon.style.display = "block";
+                if (apiResultsToShow) apiResultsToShow.style.display = "block";
 
-                    const item = (data && data["data"] && data["data"][0]) ? data["data"][0] : null;
+                const item = (data && data["data"] && data["data"][0]) ? data["data"][0] : null;
                     const cardContent = document.getElementById("element1");
 
                     if (!item) {

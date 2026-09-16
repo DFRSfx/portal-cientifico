@@ -27,7 +27,7 @@ class UserCreationRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             "ciencia_vitae" => ["exclude_if:type,administrative", "required", "regex:/^([A-Z0-9]{4}-){2}[A-Z0-9]{4}$/i", 'unique:' . User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            "type" => ["string", Rule::in(["student", "teacher", "administrative"])],
+            "type" => ["string", Rule::in(["student", "teacher", "researcher", "administrative"])],
             "is_isla" => ['required','boolean']
         ];
     }

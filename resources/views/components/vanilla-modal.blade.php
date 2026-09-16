@@ -1,86 +1,102 @@
-<div id="reportModal" class="vc-modal" aria-hidden="true" role="dialog" aria-labelledby="reportModalTitle" style="display:none;">
-    <div class="vc-modal-backdrop"></div>
-    <div class="vc-modal-dialog" role="document">
-        <div class="vc-modal-card">
-            <button type="button" class="vc-close" id="closeModalBtn" aria-label="{{ __('Close') }}">&times;</button>
-
-            <header class="vc-modal-header">
-                <div class="vc-header-left">
-                    <!-- icon -->
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <rect width="24" height="24" rx="6" fill="#2f6b2f"/>
-                        <path d="M7 12h10M7 8h10M7 16h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+<div id="reportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 overflow-y-auto" aria-hidden="true" role="dialog" aria-labelledby="reportModalTitle" style="display:none;">
+    <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200/80 my-8 transition-all" role="document">
+        
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-emerald-800 to-emerald-700 px-6 py-5 flex items-start justify-between gap-4 text-white">
+            <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center text-white shrink-0 shadow-inner">
+                    <i class="fas fa-file-excel text-xl"></i>
                 </div>
-                <div class="vc-header-body">
-                    <h5 id="reportModalTitle">{{ __('Gerar relatório') }}</h5>
-                    <p class="vc-subtitle">{{ __('Selecione o ano para gerar um relatório protegido em Excel.') }}</p>
+                <div class="min-w-0">
+                    <h3 id="reportModalTitle" class="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                        {{ __('Gerar relatório') }}
+                    </h3>
+                    <p class="text-xs text-emerald-100/90 mt-0.5 font-normal leading-relaxed">
+                        {{ __('Selecione o ano para exportar o relatório detalhado em Excel.') }}
+                    </p>
                 </div>
-            </header>
+            </div>
+            <button type="button" class="text-white/70 hover:text-white hover:bg-white/15 rounded-lg p-1.5 transition-colors focus:outline-none cursor-pointer shrink-0" id="closeModalBtn" aria-label="{{ __('Close') }}">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </header>
 
-            <div class="vc-modal-body">
-                <form id="reportForm" action="{{ route('ceos-excel') }}" method="GET" class="vc-form" aria-describedby="reportHelp">
-                    @method('GET')
-                    <input type="hidden" id="reportEntity" name="entity" value="">
-                    <p id="reportHelp" class="vc-help small">{{ __('Escolha um dos anos rápidos ou digite manualmente. O relatório é gerado em Excel protegido.') }}</p>
+        <!-- Body -->
+        <div class="p-6">
+            <form id="reportForm" action="{{ route('ceos-excel') }}" method="GET" aria-describedby="reportHelp">
+                @method('GET')
+                <input type="hidden" id="reportEntity" name="entity" value="">
 
-                    <div class="vc-quickyears" role="list">
+                <!-- Quick Years Selection -->
+                <div class="mb-5">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                        {{ __('Seleção rápida de ano') }}
+                    </label>
+                    <div class="flex items-center gap-2 flex-wrap" role="list">
                         @php
                             $current = (int) now()->format('Y');
                         @endphp
                         @for($i = 0; $i < 5; $i++)
-                            <button type="button" class="vc-year-btn" data-year="{{ $current - $i }}" aria-pressed="false">{{ $current - $i }}</button>
+                            @php $y = $current - $i; @endphp
+                            <button type="button" 
+                                    class="vc-year-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border-slate-200/90 hover:border-emerald-200" 
+                                    data-year="{{ $y }}" 
+                                    aria-pressed="false">
+                                {{ $y }}
+                            </button>
                         @endfor
                     </div>
+                </div>
 
-                    <div class="vc-input-row">
-                        <label for="yearPicker" class="form-label"> {{ __('Ano') }} </label>
-                        <input type="number" class="form-control" id="yearPicker" name="year" placeholder="2025" min="1900" max="2099" required>
+                <!-- Manual Year Input -->
+                <div class="mb-5">
+                    <label for="yearPicker" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        {{ __('Ano pretendido') }} <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fas fa-calendar-alt text-sm"></i>
+                        </div>
+                        <input type="number" 
+                               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all shadow-2xs" 
+                               id="yearPicker" 
+                               name="year" 
+                               placeholder="{{ $current }}" 
+                               min="1900" 
+                               max="2099" 
+                               required>
                     </div>
+                </div>
 
-                    <div class="vc-footer">
-                        <button type="submit" id="generateBtn" class="vc-cta">
-                            <span id="ctaText">{{ __('Gerar Reporte') }}</span>
-                            <span id="ctaSpinner" class="vc-spinner" aria-hidden="true" style="display:none;"></span>
-                        </button>
-                        <button type="button" class="vc-secondary" id="cancelBtn">{{ __('Cancelar') }}</button>
-                    </div>
-                </form>
-            </div>
+                <!-- Info Box -->
+                <div class="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600 leading-relaxed mb-6">
+                    <i class="fas fa-shield-halved text-emerald-700 text-sm mt-0.5 shrink-0"></i>
+                    <span>{{ __('O relatório é gerado em formato Excel protegido (.xlsx) com a informação científica consolidada da entidade selecionada.') }}</span>
+                </div>
+
+                <!-- Footer -->
+                <div class="border-t border-slate-100 pt-4 -mx-6 px-6 bg-slate-50/50 flex items-center justify-end gap-2.5">
+                    <button type="button" 
+                            class="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-200/60 rounded-xl transition-colors cursor-pointer border-0 bg-transparent" 
+                            id="cancelBtn">
+                        {{ __('Cancelar') }}
+                    </button>
+                    <button type="submit" 
+                            id="generateBtn" 
+                            class="px-5 py-2 text-xs sm:text-sm font-semibold text-white bg-emerald-700 hover:bg-emerald-800 active:scale-[0.98] rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer border-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span id="ctaSpinner" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" style="display:none;" aria-hidden="true"></span>
+                        <i class="fas fa-download text-xs" id="ctaIcon"></i>
+                        <span id="ctaText">{{ __('Gerar Relatório') }}</span>
+                    </button>
+                </div>
+            </form>
         </div>
+
     </div>
 
-    <style>
-        /* Minimal styles scoped to the component */
-        .vc-modal { position: fixed; inset: 0; z-index: 1050; display:flex; align-items:center; justify-content:center; }
-        .vc-modal-backdrop { position:absolute; inset:0; background:rgba(0,0,0,0.45); backdrop-filter: blur(2px); }
-        .vc-modal-dialog { position:relative; z-index:2; width:100%; max-width:640px; padding:1rem; }
-        .vc-modal-card { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.15); transform:translateY(10px); animation:vc-enter .18s ease-out both; }
-        @keyframes vc-enter { from { opacity:0; transform:translateY(18px) scale(.99) } to { opacity:1; transform:translateY(0) scale(1) } }
-
-        .vc-modal-header { display:flex; gap:1rem; align-items:center; padding:1.25rem; background:linear-gradient(90deg,#2f6b2f,#245022); color:#fff; }
-        .vc-header-left svg { border-radius:8px; }
-        .vc-header-body h5 { margin:0; font-size:1.125rem; font-weight:600; }
-        .vc-subtitle { margin:0; opacity:.9; font-size:.875rem; color:rgba(255,255,255,.95) }
-
-        .vc-close { position:absolute; right:.75rem; top:.5rem; background:transparent; border:0; color:#fff; font-size:1.5rem; line-height:1; cursor:pointer; }
-
-        .vc-modal-body { padding:1.25rem; }
-        .vc-help { margin-bottom:.5rem; color:#666; }
-
-        .vc-quickyears { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
-        .vc-year-btn { background:#f1f6f1; border:1px solid #e6efe6; padding:.45rem .6rem; border-radius:8px; cursor:pointer; font-weight:600; color:#234a23; }
-        .vc-year-btn[aria-pressed="true"] { background:#245022; color:#fff; box-shadow:0 6px 12px rgba(36,80,34,.18); transform:translateY(-1px); }
-
-        .vc-input-row { margin-bottom:1rem; }
-        .vc-cta { background:#2f6b2f; color:#fff; border:0; padding:.75rem 1rem; border-radius:8px; font-weight:700; display:inline-flex; gap:.5rem; align-items:center; }
-        .vc-secondary { background:transparent; border:0; color:#666; padding:.5rem 1rem; cursor:pointer; }
-
-        .vc-spinner { width:18px; height:18px; border:3px solid rgba(255,255,255,0.25); border-left-color:#fff; border-radius:50%; animation:spin .85s linear infinite; display:inline-block; }
-        @keyframes spin { to { transform:rotate(360deg); } }
-    </style>
-
-    <script>
+    <script data-navigate-once>
         (function () {
             const modal = document.getElementById('reportModal');
             const closeBtn = document.getElementById('closeModalBtn');
@@ -90,43 +106,64 @@
             const form = document.getElementById('reportForm');
             const generateBtn = document.getElementById('generateBtn');
             const ctaSpinner = document.getElementById('ctaSpinner');
+            const ctaIcon = document.getElementById('ctaIcon');
             const ctaText = document.getElementById('ctaText');
+
+            function syncYearBtnState(selectedYear) {
+                quickBtns.forEach(b => {
+                    const isMatch = b.getAttribute('data-year') === String(selectedYear);
+                    b.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+                    if (isMatch) {
+                        b.classList.add('bg-emerald-700', 'text-white', 'border-emerald-700', 'shadow-xs');
+                        b.classList.remove('bg-slate-50', 'text-slate-700', 'border-slate-200/90');
+                    } else {
+                        b.classList.remove('bg-emerald-700', 'text-white', 'border-emerald-700', 'shadow-xs');
+                        b.classList.add('bg-slate-50', 'text-slate-700', 'border-slate-200/90');
+                    }
+                });
+            }
 
             function openModal() {
                 modal.style.display = 'flex';
                 modal.setAttribute('aria-hidden', 'false');
-                // focus on year input
-                setTimeout(()=> yearInput.focus(), 160);
+                setTimeout(() => yearInput?.focus(), 120);
             }
+
             function closeModal() {
                 modal.style.display = 'none';
                 modal.setAttribute('aria-hidden', 'true');
             }
 
-            // attach handlers
             closeBtn?.addEventListener('click', closeModal);
             cancelBtn?.addEventListener('click', closeModal);
-            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
+                    closeModal();
+                }
+            });
 
             quickBtns.forEach(b => {
                 b.addEventListener('click', function () {
-                    // toggle pressed state
-                    quickBtns.forEach(x => x.setAttribute('aria-pressed', 'false'));
-                    this.setAttribute('aria-pressed', 'true');
                     const y = this.getAttribute('data-year');
-                    yearInput.value = y;
+                    if (yearInput) {
+                        yearInput.value = y;
+                    }
+                    syncYearBtnState(y);
                 });
+            });
+
+            yearInput?.addEventListener('input', function () {
+                syncYearBtnState(this.value);
             });
 
             form?.addEventListener('submit', async function (e) {
                 e.preventDefault();
 
-                // show spinner and disable submit to avoid double post
                 generateBtn.disabled = true;
-                ctaSpinner.style.display = 'inline-block';
-                ctaText.textContent = '{{ __("Generating...") }}';
+                if (ctaSpinner) ctaSpinner.style.display = 'inline-block';
+                if (ctaIcon) ctaIcon.style.display = 'none';
+                if (ctaText) ctaText.textContent = '{{ __("A gerar...") }}';
 
-                // build URL with query params (GET)
                 const url = new URL(form.action, window.location.origin);
                 const formData = new FormData(form);
                 for (const [k, v] of formData.entries()) {
@@ -145,13 +182,11 @@
                     if (!resp.ok) throw new Error('Network response not ok');
 
                     const blob = await resp.blob();
-                    // tenta obter filename do header Content-Disposition
                     const cd = resp.headers.get('Content-Disposition') || '';
-                    let filename = 'report.xlsx';
+                    let filename = 'relatorio.xlsx';
                     const m = cd.match(/filename\*?=(?:UTF-8'')?["']?([^;"']+)/i);
                     if (m && m[1]) filename = decodeURIComponent(m[1]);
 
-                    // cria link de download e dispara
                     const blobUrl = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = blobUrl;
@@ -161,20 +196,18 @@
                     a.remove();
                     window.URL.revokeObjectURL(blobUrl);
 
-                    // opcional: fecha modal
-                    // closeModal();
+                    closeModal();
                 } catch (err) {
                     console.error(err);
-                    alert('{{ __("Erro ao gerar o relatório. Tenta novamente.") }}');
+                    alert('{{ __("Erro ao gerar o relatório. Tente novamente.") }}');
                 } finally {
-                    // sempre reativa o botão e esconde o spinner
                     generateBtn.disabled = false;
-                    ctaSpinner.style.display = 'none';
-                    ctaText.textContent = '{{ __("Gerar Reporte") }}';
+                    if (ctaSpinner) ctaSpinner.style.display = 'none';
+                    if (ctaIcon) ctaIcon.style.display = 'inline-block';
+                    if (ctaText) ctaText.textContent = '{{ __("Gerar Relatório") }}';
                 }
             });
 
-            // expose openModal to global so you can call openReportModal() from other places
             window.openReportModal = openModal;
             window.closeReportModal = closeModal;
         })();

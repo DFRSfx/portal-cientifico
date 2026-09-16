@@ -2,51 +2,6 @@
 {{-- os que não tiverem título, copiar a descrição em trim() --}}
 {{-- se for of uma conference scientifc comittee --}}
 @section('author-information')
-    <style>
-        .btn-jstabales {
-            background-color: transparent;
-            color: black;
-        }
-
-        .activities-body {
-            padding-left: 12px;
-            padding-right: 12px;
-        }
-
-        @media (min-width: 1200px) {
-            .activities-body {
-                padding-left: 6px;
-                padding-right: 6px;
-            }
-        }
-
-            .activities-table {
-                border-collapse: separate;
-                border-spacing: 0;
-            }
-
-            .activities-table thead th {
-                background: #e6f1ea;
-                color: #1f4d2f;
-                font-weight: 700;
-                border-bottom: 1px solid #cfe2d6;
-                padding: 12px 14px;
-            }
-
-            .activities-table tbody td {
-                padding: 12px 14px;
-                border-bottom: 1px solid #dfeae3;
-                vertical-align: middle;
-            }
-
-            .activities-table tbody tr:nth-child(even) {
-                background: #f2f8f4;
-            }
-
-            .activities-table tbody tr:hover {
-                background: #e3f2e8;
-            }
-    </style>
     <div class="accordion-item">
         <div class="accordion-header" id="headingEight">
             <h5 class="mb-0">

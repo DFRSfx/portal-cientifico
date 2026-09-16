@@ -31,4 +31,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'ciencia_vitae' => [
+        'client_id' => env('CIENCIA_VITAE_CLIENT_ID', env('PASSPORT_CLIENT_ID')),
+        'client_secret' => env('CIENCIA_VITAE_CLIENT_SECRET', env('PASSPORT_CLIENT_SECRET')),
+        'redirect' => env('CIENCIA_VITAE_REDIRECT_URI', env('APP_URL') . '/auth/ciencia-vitae/callback'),
+        'oauth_url' => env('CIENCIA_VITAE_OAUTH_URL', 'https://autenticacao.cienciavitae.pt/oauth'),
+        'api_url' => env('CIENCIA_VITAE_API_URL', 'https://api.cienciavitae.pt/v1.1'),
+        'dev_mode' => env('CIENCIA_VITAE_DEV_MODE', true),
+    ],
+
 ];

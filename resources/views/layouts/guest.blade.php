@@ -23,6 +23,7 @@
 
     @stack('header-scripts')
 
+    @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -38,6 +39,7 @@
     
     <x-layouts.footer />
 
+    @livewireScripts
 </body>
 
 </html>
